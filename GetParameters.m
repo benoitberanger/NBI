@@ -27,12 +27,17 @@ Parameters.Video.FixationCrossColor = [255 255 255]; % [R B G] color ( from 0 to
 %%%%%%%%%%%%%%
 %   Screen   %
 %%%%%%%%%%%%%%
-Parameters.Video.ScreenWide = 1024;                         % Number of horizontal pixel in MRI video system @ CENIR
-Parameters.Video.ScreenHeight = 768;                        % Number of vertical pixel in MRI video system @ CENIR
-Parameters.Video.ScreenFrequency = 60;                      % Refresh rate (in Hertz)
+Parameters.Video.ScreenWidthPx   = 1024;  % Number of horizontal pixel in MRI video system @ CENIR
+Parameters.Video.ScreenHeightPx  = 768;   % Number of vertical pixel in MRI video system @ CENIR
+Parameters.Video.ScreenFrequency = 60;    % Refresh rate (in Hertz)
+Parameters.Video.SubjectDistance = 0.120; % m
+Parameters.Video.ScreenWidthM    = 0.040; % m
+Parameters.Video.ScreenHeightM   = 0.030; % m
 
-Parameters.Video.ScreenBackgroundColor = [0 0 0]; % [R G B] ( from 0 to 255 )
+Parameters.Video.ScreenBackgroundColor = [255 255 255]/2; % [R G B] ( from 0 to 255 )
+
 Parameters.Toolbox = 'PsychToolbox';
+
 
 %%%%%%%%%%%%%%
 %  Keybinds  %

@@ -8,7 +8,7 @@ try
         
         case 'Task1'
             names = {
-                'Cross'    ;
+                'Fixation'    ;
                 'InOut'      ;
                 'Rotation'      ;
                 'Response'
@@ -36,7 +36,7 @@ try
         
         switch EventData{event,1}
             
-            case 'Point'
+            case 'Fixation'
                 onsets{1} = [onsets{1} ; EventData{event,2}];
             case 'InOut'
                 onsets{2} = [onsets{2} ; EventData{event,2}];
@@ -55,7 +55,7 @@ try
         
         switch EventData{event,1}
             
-            case 'Point'
+            case 'Fixation'
                 durations{1} = [ durations{1} ; EventData{event+1,2}-EventData{event,2}] ;
             case 'InOut'
                 durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;

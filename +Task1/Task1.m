@@ -4,36 +4,48 @@ try
     %% Preparation of movies
     
     % Load location
-    TaskData.moviefile1 = [pwd filesep 'videos' filesep 'pathS_InOut.mov'];
-    TaskData.moviefile2 = [pwd filesep 'videos' filesep 'pathS_Rot.mov'];
+    movie(1).file = [ pwd filesep 'videos' filesep 'pathS_InOut.mov' ];
+    movie(2).file = [ pwd filesep 'videos' filesep 'pathS_Rot.mov' ];
     
     % [ moviePtr [duration] [fps] [width] [height] [count] [aspectRatio]]=Screen('OpenMovie', windowPtr, moviefile [, async=0] [, preloadSecs=1] [, specialFlags1=0][, pixelFormat=4][, maxNumberThreads=-1][, movieOptions]);
-    [ moviePtr1 duration1 fps1 width1 height1 count1 aspectRatio1]=Screen('OpenMovie', DataStruct.PTB.Window, TaskData.moviefile1)
-    [ moviePtr2 duration2 fps2 width2 height2 count2 aspectRatio2]=Screen('OpenMovie', DataStruct.PTB.Window, TaskData.moviefile2)
+    [ movie(1).Ptr movie(1).duration movie(1).fps movie(1).width movie(1).height movie(1).count movie(1).aspectRatio] = Screen( 'OpenMovie' , DataStruct.PTB.Window , movie(1).file );
+    [ movie(2).Ptr movie(2).duration movie(2).fps movie(2).width movie(2).height movie(2).count movie(2).aspectRatio] = Screen( 'OpenMovie' , DataStruct.PTB.Window , movie(2).file );
+    
+    disp(movie(1))
+    disp(' ')
+    disp(movie(2))
     
     speed = 1;
+    
+    TaskData.movie = movie;
     
     %% Tunning of the task
     
     % Create the planning object
-    header = { 'event_name' , 'onset(s)'         , 'duration(s)' , 'movie_Prt' , 'movie_file'};
+    header = {       'event_name' , 'onset(s)'         ,  'duration(s)' ,    'movie_Prt' , 'movie_file'};
     EP     = EventPlanning(header);
     
     % Define a planing
-    EP.AddPlanning({
-        'StartTime'           0                    0               []            []
-        'InOut'               0                    duration1       moviePtr1     TaskData.moviefile1
-        'Rotation'            duration1            duration2       moviePtr2     TaskData.moviefile2
-        'StopTime'            duration1+duration2  0               []            []
-        });
+    
+    EP.AddPlanning({ 'StartTime'    0                     0                  []            []            });
+    EP.AddPlanning({ 'InOut'        OnsetCalculator(EP)   movie(1).duration  movie(1).Ptr  movie(1).file });
+    EP.AddPlanning({ 'Fixation'     OnsetCalculator(EP)   5                  []            []            });
+    EP.AddPlanning({ 'Rotation'     OnsetCalculator(EP)   movie(2).duration  movie(2).Ptr  movie(2).file });
+    EP.AddPlanning({ 'Fixation'     OnsetCalculator(EP)   5                  []            []            });
+    EP.AddPlanning({ 'StopTime'     OnsetCalculator(EP)   0                  []            []            });
     
     EP.BuildGraph;
     TaskData.EP = EP;
     
     % Prepare event record
-    ER = EventRecorder(header(1:2),10);
-    ER.AddStartTime('StartTime',0);
+    ER = EventRecorder( header(1:2) , size(EP.Data,1) );
+    ER.AddStartTime( 'StartTime' , 0 );
     
+    %% Prepare fixation dot
+    
+    PixelPerDegree = va2pix( 1 , DataStruct.Parameters.Video.SubjectDistance , DataStruct.Parameters.Video.ScreenWidthM , DataStruct.Parameters.Video.ScreenWidthPx );
+    DotVisualAngle = 0.1; 
+
     
     %% Generate MRI triggers
     
@@ -43,7 +55,7 @@ try
     
     KL = KbLogger(KbName(keys) , keys);
     
-    KL.GenerateMRITrigger(0.950, ceil( EP.Data{end,2} ) );
+    KL.GenerateMRITrigger( 0.950 , ceil( EP.Data{end,2} ) );
     
     KL.ScaleTime;
     KL.ComputeDurations;
@@ -55,17 +67,41 @@ try
     
     StartTime = GetSecs;
     
-    ER_movie1 = PlayMovieTrial( moviePtr1 , speed , DataStruct , count1 );
-
-    ER_movie1.ClearEmptyEvents;
-    ER.AddEvent({ 'InOut' ER_movie1.Data{1,2}-StartTime })
-    %     ER.AddEvent({'movie1_end' ER_movie1.Data{end,2}});
+    for evt = 1 : size( EP.Data , 1 )
+        
+        switch EP.Data{evt,1}
+            
+            case 'Fixation'
+                
+                DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
+                fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack );
+                
+                ER.AddEvent({ 'Fixation' fixation_onset-StartTime })
+                
+                if evt < size( EP.Data , 1 )
+                    WaitSecs('UntilTime', fixation_onset + EP.Data{evt,3} - DataStruct.PTB.slack );
+                end
+                
+            case 'InOut'
+                
+                WaitSecs('UntilTime', StartTime + EP.Data{evt,2} - DataStruct.PTB.slack );
+                
+                ER_movie1 = PlayMovieTrial( movie(1).Ptr , speed , DataStruct , movie(1).count );
+                ER_movie1.ClearEmptyEvents;
+                ER.AddEvent({ 'InOut' ER_movie1.Data{1,2}-StartTime })
     
-    ER_movie2 = PlayMovieTrial( moviePtr2 , speed , DataStruct , count2 );
-    
-    ER_movie2.ClearEmptyEvents;
-    ER.AddEvent({ 'Rotation' ER_movie2.Data{1,2}-StartTime })
-    %     ER.AddEvent({'movie2_end' ER_movie2.Data{end,2}});
+            case 'Rotation'
+            
+                WaitSecs('UntilTime', StartTime + EP.Data{evt,2} - DataStruct.PTB.slack );
+                
+                ER_movie2 = PlayMovieTrial( movie(2).Ptr , speed , DataStruct , movie(2).count );
+                
+                ER_movie2.ClearEmptyEvents;
+                ER.AddEvent({ 'Rotation' ER_movie2.Data{1,2}-StartTime })
+                
+        end
+            
+    end
 
 
     %% End
@@ -76,7 +112,10 @@ try
     ER.BuildGraph;
     TaskData.ER = ER;
     
+    TaskData.KL = KL;
+    
     plotStim(EP,ER,KL)
+    
     
     %% Send infos to base workspace
     
@@ -89,6 +128,7 @@ try
     
     assignin('base','TaskData',TaskData)
     
+    
 catch err
     
     sca
@@ -99,6 +139,22 @@ end
 end
 
 %% Local functions
+
+%--------------------------------------------------------------------------
+%                                 va2pix
+%--------------------------------------------------------------------------
+function PixelPerDegree = va2pix( VisualAngle , SubjectDistance , ScreenWidthM , ScreenWidthPx )
+PixelPerDegree = SubjectDistance * tan(VisualAngle*pi/180) / (ScreenWidthM/ScreenWidthPx);
+end
+
+%--------------------------------------------------------------------------
+%                              DrawFixation
+%--------------------------------------------------------------------------
+function DrawFixation( winPtr , Color , PositionH , PositionV , VisualAngle , PixelPerDegree )
+pu = round( PixelPerDegree * VisualAngle );
+rect = [ 0 0 pu pu ];
+Screen( winPtr , 'FillOval' , Color , CenterRectOnPoint(rect,PositionH,PositionV) );
+end
 
 %--------------------------------------------------------------------------
 %                             PlayMovieTrial
@@ -141,4 +197,11 @@ Screen('PlayMovie', moviePtr, 0);
 % Close movie:
 Screen('CloseMovie', moviePtr);
 
+end
+
+%--------------------------------------------------------------------------
+%                            OnsetCalculator
+%--------------------------------------------------------------------------
+function Onset = OnsetCalculator(EP)
+Onset = EP.Data{end,2} + EP.Data{end,3};
 end

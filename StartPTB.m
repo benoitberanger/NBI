@@ -26,6 +26,13 @@ PTB.slack = Screen('GetFlipInterval', PTB.Window)/2;
 Screen('TextSize', PTB.Window, Video.TextSize);
 Screen('TextFont', PTB.Window, Video.TextFont);
 
+% Center
+[ PTB.CenterH , PTB.CenterV ] = RectCenter(PTB.WindowRect);
+
+% B&W colors
+PTB.Black = BlackIndex(PTB.Window);
+PTB.White = WhiteIndex(PTB.Window);
+
 
 %% Echo in command window
 

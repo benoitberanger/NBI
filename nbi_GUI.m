@@ -313,6 +313,7 @@ DataStruct.PTB = StartPTB( DataStruct );
 handles.DataStruct = DataStruct;
 guidata(hObject, handles);
 
+
 %% Task run
 
 switch Task
@@ -334,6 +335,7 @@ switch Task
 end
 
 DataStruct.TaskData = TaskData;
+
 
 %% Update handles (and DataStruct) structure
 
