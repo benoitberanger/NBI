@@ -24,30 +24,26 @@ try
     durations = cell(size(names));
     
     % Shortcut
-    try
-        Display_cell = DataStruct.TaskData.Display_cell.Data;
-    catch
-        Display_cell = DataStruct.TaskData.Display_cell;
-    end
+    EventData = DataStruct.TaskData.ER.Data;
     
     % Display 'durations' inside Display_cell for diagnostic
-    for k = 2:size(Display_cell)
-        Display_cell{k-1,3} = Display_cell{k,2} - sum(cell2mat(Display_cell(k-1,2)));
+    for k = 2:size(EventData)
+        EventData{k-1,3} = EventData{k,2} - sum(cell2mat(EventData(k-1,2)));
     end
     
     % Onsets building
-    for event = 1:size(Display_cell,1)
+    for event = 1:size(EventData,1)
         
-        switch Display_cell{event,1}
+        switch EventData{event,1}
             
-            case 'Cross'
-                onsets{1} = [onsets{1} ; Display_cell{event,2}];
+            case 'Point'
+                onsets{1} = [onsets{1} ; EventData{event,2}];
             case 'InOut'
-                onsets{1} = [onsets{1} ; Display_cell{event,2}];
+                onsets{2} = [onsets{2} ; EventData{event,2}];
             case 'Rotation'
-                onsets{1} = [onsets{1} ; Display_cell{event,2}];
+                onsets{3} = [onsets{3} ; EventData{event,2}];
             case 'Response'
-                onsets{1} = [onsets{1} ; Display_cell{event,2}];
+                onsets{4} = [onsets{4} ; EventData{event,2}];
                 
         end
         
@@ -55,18 +51,18 @@ try
     
     
     % Duratins building
-    for event = 1:size(Display_cell,1)
+    for event = 1:size(EventData,1)
         
-        switch Display_cell{event,1}
+        switch EventData{event,1}
             
-            case 'Cross'
-                durations{1} = [ durations{1} ; Display_cell{event+1,2}-Display_cell{event,2}] ;
+            case 'Point'
+                durations{1} = [ durations{1} ; EventData{event+1,2}-EventData{event,2}] ;
             case 'InOut'
-                durations{1} = [ durations{1} ; Display_cell{event+1,2}-Display_cell{event,2}] ;
+                durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
             case 'Rotation'
-                durations{1} = [ durations{1} ; Display_cell{event+1,2}-Display_cell{event,2}] ;
+                durations{3} = [ durations{3} ; EventData{event+1,2}-EventData{event,2}] ;
             case 'Response'
-                durations{1} = [ durations{1} ; Display_cell{event+1,2}-Display_cell{event,2}] ;
+                durations{4} = [ durations{4} ; EventData{event+1,2}-EventData{event,2}] ;
 
                 
         end
