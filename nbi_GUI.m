@@ -82,12 +82,18 @@ set(handles.edit_RunNumber,'String','1')
 set(handles.edit_SubjectID,'String','xxxx')
 set(handles.uipanel_EyelinkMode,'SelectedObject',handles.radiobutton_EyelinkOn)
 
+set(handles.pushbutton_Task2,'Visible','off')
+set(handles.pushbutton_Task3,'Visible','off')
 
 %% Try to pick a random seed for the RNG
+
+% Try one time
 try
     rng('shuffle')
 catch err
 end
+
+% Try a second time
 try
     rng('default')
     rng('shuffle')
@@ -184,10 +190,10 @@ DataStruct.SaveMode = SaveMode;
 switch get(get(handles.uipanel_OperationMode,'SelectedObject'),'Tag')
     case 'radiobutton_Acquisition'
         OperationMode = 'Acquisition';
-    case 'radiobutton_DebugMode_1'
-        OperationMode = 'DebugMode_1';
-    case 'radiobutton_DebugMode_2'
-        OperationMode = 'DebugMode_2';
+    case 'radiobutton_FastDebug'
+        OperationMode = 'FastDebug';
+    case 'radiobutton_RealisticDebug'
+        OperationMode = 'RealisticDebug';
     otherwise
         warning('NBI:ModeSelection','Error in Mode selection')
 end
@@ -232,7 +238,7 @@ switch get(hObject,'Tag')
         Task = 'Task3';
         
     otherwise
-        warning('NBI:TaskSelection','Error in Task selection')
+        error('NBI:TaskSelection','Error in Task selection')
 end
 
 handles.Task    = Task;
@@ -260,7 +266,7 @@ switch get(get(handles.uipanel_EyelinkMode,'SelectedObject'),'Tag')
         
         % Save mode ?
         if strcmp(DataStruct.SaveMode,'NoSave')
-            error('NBI:EyelinkMode','\n ---> Save mode should be turned when using Eyelink <---')
+            error('NBI:EyelinkMode','\n ---> Save mode should be turned on when using Eyelink <---')
         end
         
         handles.EyelinkToolboxAvailable = EyelinkToolboxAvailable;
@@ -280,7 +286,7 @@ DataStruct.EyelinkMode = EyelinkMode;
 
 if strcmp(SaveMode,'SaveData') && strcmp(OperationMode,'Acquisition')
     
-    DataPath = [fileparts(pwd) filesep 'data' filesep sprintf('%s', SubjectID) filesep];
+    DataPath = [fileparts(pwd) filesep 'data' filesep SubjectID filesep];
     DataFile = sprintf('%s%s_%s_%s_%s', DataPath, SubjectID, Task, Environement, RunNumber);
     
     if exist([DataFile '.mat'], 'file')
@@ -308,10 +314,10 @@ DataStruct.Parameters.Video.ScreenMode = str2double( AvalableDisplays(SelectedDi
 DataStruct.PTB = StartPTB( DataStruct );
 
 
-%% Update handles (and DataStruct) structure
-
-handles.DataStruct = DataStruct;
-guidata(hObject, handles);
+% %% Update handles (and DataStruct) structure
+% 
+% handles.DataStruct = DataStruct;
+% guidata(hObject, handles);
 
 
 %% Task run
@@ -337,10 +343,10 @@ end
 DataStruct.TaskData = TaskData;
 
 
-%% Update handles (and DataStruct) structure
-
-handles.DataStruct = DataStruct;
-guidata(hObject, handles);
+% %% Update handles (and DataStruct) structure
+% 
+% handles.DataStruct = DataStruct;
+% guidata(hObject, handles);
 
 
 %% Save files
@@ -357,7 +363,6 @@ end
 try
     Screen('CloseAll'); % Close PTB window
 catch err
-    rethrow(err)
 end
 
 

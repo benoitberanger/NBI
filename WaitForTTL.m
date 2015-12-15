@@ -1,8 +1,8 @@
-function [ T_start ] = WaitForTTL( DataStruct )
+function [ TriggerTime ] = WaitForTTL( DataStruct )
 
 if strcmp(DataStruct.OperationMode,'Acquisition')
     
-    if ~isfield(DataStruct,'T_start') % It means wait for 1st TTL @ Begining of stimulation
+    if ~isfield(DataStruct,'StartTime') % It means wait for 1st TTL @ Begining of stimulation
         
         % Fixation cross
         Screen(DataStruct.PTB.Window, 'FillRect', DataStruct.Parameters.ScreenBackgroundColor);
@@ -36,12 +36,11 @@ if strcmp(DataStruct.OperationMode,'Acquisition')
         , DataStruct.Parameters.Keybinds.Right_Green_3_ASCII...
         ]);
     
-%     FlushEvents();
     
     % Waitong for TTL signal
     while 1
         
-        [ ~ , T_start, keyCode ] = KbCheck;
+        [ ~ , TriggerTime, keyCode ] = KbCheck;
         
         if strcmp(DataStruct.Environement,'MRI')
             
@@ -95,7 +94,7 @@ if strcmp(DataStruct.OperationMode,'Acquisition')
                 
                 sca
                 stack = dbstack;
-                error('WitingForTTL:Abort','\n ESCAPE key : %s aborted \n',stack.file)
+                error('WaitingForTTL:Abort','\n ESCAPE key : %s aborted \n',stack.file)
                 
             end
             
@@ -121,7 +120,7 @@ if strcmp(DataStruct.OperationMode,'Acquisition')
     
 else % in DebugMod
     
-    if isfield(DataStruct,'T_start') % It means wait for 1st TTL @ Begining of stimulation
+    if ~isfield(DataStruct,'StartTime') % It means wait for 1st TTL @ Begining of stimulation
         
         disp('Waiting for 1st TTL : DebugMode')
         
@@ -131,7 +130,7 @@ else % in DebugMod
         
     end
     
-    T_start = GetSecs;
+    TriggerTime = GetSecs;
     
 end
 
