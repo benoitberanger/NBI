@@ -1,19 +1,83 @@
-function ER_movie = PlayMovieTrial( moviePtr , Speed , DataStruct , count )
+% function ER_movie = PlayMovieTrial( movie , current_ER , DataStruct  , DeadLine )
+%
+% % Pointer
+% ER_movie = current_ER;
+%
+% % Start playback engine:
+% Screen('PlayMovie', movie.Ptr , 1 );
+%
+% % Initilization
+% timeindex = 0;
+%
+% % Playback loop: Runs until end of movie or keypress:
+% while ~KbCheck && timeindex < DeadLine
+%
+%     % Wait for next movie frame, retrieve texture handle to it
+%     [ texturePtr timeindex ] = Screen('GetMovieImage', DataStruct.PTB.Window, movie.Ptr);
+%
+%     % Valid texture returned? A negative value means end of movie reached:
+%     if texturePtr<=0
+%         % We're done, break out of loop:
+%         break;
+%     end
+%
+%     % Draw the new texture immediately to screen:
+%     Screen('DrawTexture', DataStruct.PTB.Window, texturePtr);
+%
+%     % Update display
+%     frame_onset = Screen('Flip', DataStruct.PTB.Window);
+%
+%     ER_movie.AddEvent( { 'Flip' frame_onset } );
+%
+%     % Release texture
+%     Screen('Close', texturePtr);
+%
+% end
+%
+% % Stop playback:
+% Screen('PlayMovie', movie.Ptr, 0);
+%
+% % Rewind movie
+% Screen( 'SetMovieTimeIndex' , movie.Ptr, 0 );
+%
+% ER_movie.ClearEmptyEvents;
+%
+% end
 
-ER_movie = EventRecorder( { 'event_name' , 'onset(s)'} , count );
-
-frame_counter = 0;
+function [ First_frame , Last_frame ] = PlayMovieTrial( movie , DataStruct  , DeadLine )
 
 % Start playback engine:
-Screen('PlayMovie', moviePtr , 1 );
+Screen('PlayMovie', movie.Ptr , 1 );
+
+
+%% Do ...
+
+% Wait for next movie frame, retrieve texture handle to it
+[ texturePtr timeindex ] = Screen('GetMovieImage', DataStruct.PTB.Window, movie.Ptr);
+
+% Valid texture returned? A negative value means end of movie reached:
+if texturePtr<=0
+    % We're done, break out of loop:
+    error('texturePtr<=0')
+end
+
+% Draw the new texture immediately to screen:
+Screen('DrawTexture', DataStruct.PTB.Window, texturePtr);
+
+% Update display
+First_frame = Screen('Flip', DataStruct.PTB.Window);
+
+% Release texture
+Screen('Close', texturePtr);
+
+
+%% ... While
 
 % Playback loop: Runs until end of movie or keypress:
-while ~KbCheck
-    
-    frame_counter = frame_counter + 1;
+while ~KbCheck && timeindex < DeadLine
     
     % Wait for next movie frame, retrieve texture handle to it
-    [ texturePtr timeindex ] = Screen('GetMovieImage', DataStruct.PTB.Window, moviePtr);
+    [ texturePtr timeindex ] = Screen('GetMovieImage', DataStruct.PTB.Window, movie.Ptr);
     
     % Valid texture returned? A negative value means end of movie reached:
     if texturePtr<=0
@@ -24,26 +88,21 @@ while ~KbCheck
     % Draw the new texture immediately to screen:
     Screen('DrawTexture', DataStruct.PTB.Window, texturePtr);
     
-    if mod(frame_counter,Speed) == 0
-    
-        % Update display
-        frame_onset = Screen('Flip', DataStruct.PTB.Window);
-        
-        ER_movie.AddEvent( { 'frame' frame_onset } );
-        
-    end
-    
+    % Update display
+    Last_frame = Screen('Flip', DataStruct.PTB.Window);
+
     % Release texture
     Screen('Close', texturePtr);
     
 end
 
-% Stop playback:
-Screen('PlayMovie', moviePtr, 0);
 
-% Close movie:
-Screen('CloseMovie', moviePtr);
+%% Rewind
 
-ER_movie.ClearEmptyEvents;
+% Stop playback
+Screen('PlayMovie', movie.Ptr, 0);
+
+% Rewind movie
+Screen( 'SetMovieTimeIndex' , movie.Ptr, 0 );
 
 end

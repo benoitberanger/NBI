@@ -3,18 +3,23 @@ function [ TaskData ] = Task1( DataStruct )
 try
     %% Preparation of movies
     
+    % Preallocation ?
+    movie = struct;
+    
     % Load location
     movie(1).file = [ pwd filesep 'videos' filesep 'pathS_InOut.mov' ];
     movie(2).file = [ pwd filesep 'videos' filesep 'pathS_Rot.mov' ];
     
-    % [ moviePtr [duration] [fps] [width] [height] [count] [aspectRatio]]=Screen('OpenMovie', windowPtr, moviefile [, async=0] [, preloadSecs=1] [, specialFlags1=0][, pixelFormat=4][, maxNumberThreads=-1][, movieOptions]);
-    [ movie(1).Ptr movie(1).duration movie(1).fps movie(1).width movie(1).height movie(1).count movie(1).aspectRatio] = Screen( 'OpenMovie' , DataStruct.PTB.Window , movie(1).file );
-    [ movie(2).Ptr movie(2).duration movie(2).fps movie(2).width movie(2).height movie(2).count movie(2).aspectRatio] = Screen( 'OpenMovie' , DataStruct.PTB.Window , movie(2).file );
+    for m = 1 : length(movie)
+        
+        % [ moviePtr [duration] [fps] [width] [height] [count] [aspectRatio]]=Screen('OpenMovie', windowPtr, moviefile [, async=0] [, preloadSecs=1] [, specialFlags1=0][, pixelFormat=4][, maxNumberThreads=-1][, movieOptions]);
+        [ movie(m).Ptr movie(m).duration movie(m).fps movie(m).width movie(m).height movie(m).count movie(m).aspectRatio ] = Screen( 'OpenMovie' , DataStruct.PTB.Window , movie(m).file );
+        
+        disp( movie(m) )
+        disp(' ')
+        
+    end
     
-    disp(movie(1))
-    disp(' ')
-    disp(movie(2))
-
     TaskData.movie = movie;
     
     %% Tunning of the task
@@ -34,6 +39,19 @@ try
     EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
     EP.AddPlanning({ 'Rotation'     NextOnset(EP)   movie(2).duration  movie(2).Ptr  movie(2).file });
     EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
+    EP.AddPlanning({ 'InOut'        NextOnset(EP)   movie(1).duration  movie(1).Ptr  movie(1).file });
+    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
+    EP.AddPlanning({ 'Rotation'     NextOnset(EP)   movie(2).duration  movie(2).Ptr  movie(2).file });
+    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
+    
+    EP.AddPlanning({ 'InOut'        NextOnset(EP)   movie(1).duration  movie(1).Ptr  movie(1).file });
+    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
+    EP.AddPlanning({ 'Rotation'     NextOnset(EP)   movie(2).duration  movie(2).Ptr  movie(2).file });
+    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
+    EP.AddPlanning({ 'InOut'        NextOnset(EP)   movie(1).duration  movie(1).Ptr  movie(1).file });
+    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
+    EP.AddPlanning({ 'Rotation'     NextOnset(EP)   movie(2).duration  movie(2).Ptr  movie(2).file });
+    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
     
     EP.AddPlanning({ 'StopTime'     NextOnset(EP)   0                  []            []            });
     
@@ -44,12 +62,12 @@ try
             
         case 'FastDebug'
             
-            Speed = 5;
+            Speed = 10;
             
-            new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) , 'UniformOutput' , true );
+            new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) );
             EP.Data(:,2) = new_onsets;
             
-            new_durations = cellfun( @(x) {x/Speed} , EP.Data(:,3) , 'UniformOutput' , true );
+            new_durations = cellfun( @(x) {x/Speed} , EP.Data(:,3) );
             EP.Data(:,3) = new_durations;
             
         case 'RealisticDebug'
@@ -110,16 +128,32 @@ try
             
     end
     
+    %% Prepare a structure to handle each movie event recorder
     
+    % Preallocation of each ER is necessary to avoid pointers to refer on
+    % a single object.
+    
+%     ER_movieStruct = struct;
+%     
+%     for ev = 1 : size( EP.Data , 1 )
+%         
+%         ER_movieStruct(ev).ER = EventRecorder( header(1:2) , max([movie.count]) );
+%         
+%     end
+    
+            
     %% Synchronization
     
     StartTime = WaitForTTL( DataStruct );
     
     
     %% Go
-    
+
+    delay = nan( 1 , size( EP.Data , 1 ) );
     
     for evt = 1 : size( EP.Data , 1 )
+        
+        delay(evt) = (GetSecs - EP.Data{evt,2} - StartTime) * 1000
         
         switch EP.Data{evt,1}
             
@@ -132,35 +166,49 @@ try
                 ER.AddEvent({ 'Fixation' fixation_onset-StartTime })
                 
                 if evt < size( EP.Data , 1 )
-                    WaitSecs('UntilTime', fixation_onset + EP.Data{evt,3} - DataStruct.PTB.slack );
+                    WaitSecs('UntilTime', StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack*2 );
+                else
+                    WaitSecs('UntilTime', fixation_onset + EP.Data{evt,3} );
                 end
                 
             case 'InOut'
                 
-                %                 WaitSecs('UntilTime', StartTime + EP.Data{evt,2} - DataStruct.PTB.slack );
+                if Speed ~= 1
+                    DeadLine = EP.Data{evt,3};
+                else
+                    DeadLine = Inf;
+                end
                 
-                ER_movie1 = Task1.PlayMovieTrial( movie(1).Ptr , Speed , DataStruct , movie(1).count );
+%                 ER_movieStruct(evt).EP_header = EP.Header;
+%                 ER_movieStruct(evt).EP_line   = EP.Data(evt,:);
                 
-                ER.AddEvent({ 'InOut' ER_movie1.Data{1,2}-StartTime })
+%                 ER_movieStruct(evt).ER        = Task1.PlayMovieTrial( movie(1) , ER_movieStruct(evt).ER , DataStruct , DeadLine );
+                [ First_frame , ~ ]        = Task1.PlayMovieTrial( movie(1) , DataStruct , DeadLine );
                 
-                ER_movie1.ScaleTime;
+                ER.AddEvent({ 'InOut' First_frame-StartTime })
                 
-                ER_movie1.Data
+%                 ER_movieStruct(evt).ER.ScaleTime;
+                
 
                 
             case 'Rotation'
-                
-                %                 WaitSecs('UntilTime', StartTime + EP.Data{evt,2} - DataStruct.PTB.slack );
-                
-                ER_movie2 = Task1.PlayMovieTrial( movie(2).Ptr , Speed , DataStruct , movie(2).count );
-                
-                ER.AddEvent({ 'Rotation' ER_movie2.Data{1,2}-StartTime })
-                
-                ER_movie1.ScaleTime;
-                
-                ER_movie1.Data
 
+                if Speed ~= 1
+                    DeadLine = EP.Data{evt,3};
+                else
+                    DeadLine = Inf;
+                end
                 
+%                 ER_movieStruct(evt).EP_header = EP.Header;
+%                 ER_movieStruct(evt).EP_line   = EP.Data(evt,:);
+                
+%                 ER_movieStruct(evt).ER        = Task1.PlayMovieTrial( movie(2) , ER_movieStruct(evt).ER , DataStruct , DeadLine );
+                [ First_frame , ~ ]        = Task1.PlayMovieTrial( movie(2) , DataStruct , DeadLine );
+                
+                ER.AddEvent({ 'Rotation' First_frame-StartTime })
+                
+%                 ER_movieStruct(evt).ER.ScaleTime;
+
         end
         
     end
@@ -171,6 +219,11 @@ try
     % Record StopTime
     ER.AddStopTime( 'StopTime' , StopTime - StartTime );
     
+    
+    [ ER.Data(:,1) cellfun( @(b,a) { (b-a)*1000 } , ER.Data(:,2) , EP.Data(:,2) ) ]
+    
+    figure
+    plot( cellfun( @(b,a) (b-a)*1000 , ER.Data(:,2) , EP.Data(:,2) ) )
     
     %% End of stimulation
     
@@ -213,8 +266,16 @@ try
     assignin('base','ER',ER)
     assignin('base','KL',KL)
     
+%     assignin('base','ER_movieStruct',ER_movieStruct)
+    
     assignin('base','TaskData',TaskData)
     
+    
+    %% Close all movies
+    
+    for m = 1 : length(movie)
+        Screen('CloseMovie', movie(m).Ptr );
+    end
     
 catch err
     
