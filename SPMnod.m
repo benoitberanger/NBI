@@ -8,10 +8,12 @@ try
         
         case 'Task1'
             names = {
-                'Fixation'    ;
-                'InOut'      ;
-                'Rotation'      ;
-                'Response'
+                'Fixation'             ;
+                'pathS_InOut'          ;
+                'pathS_Rot'            ;
+                'control2_pathS_InOut' ;
+                'control2_pathS_Rot'   ;
+                'Response'             ;
                 };
 
         case 'EyelinkCalibrationNPI'
@@ -38,12 +40,16 @@ try
             
             case 'Fixation'
                 onsets{1} = [onsets{1} ; EventData{event,2}];
-            case 'InOut'
+            case 'pathS_InOut'
                 onsets{2} = [onsets{2} ; EventData{event,2}];
-            case 'Rotation'
+            case 'pathS_Rot'
                 onsets{3} = [onsets{3} ; EventData{event,2}];
-            case 'Response'
+            case 'control2_pathS_InOut'
                 onsets{4} = [onsets{4} ; EventData{event,2}];
+            case 'control2_pathS_Rot'
+                onsets{5} = [onsets{5} ; EventData{event,2}];
+            case 'Response'
+                onsets{6} = [onsets{6} ; EventData{event,2}];
                 
         end
         
@@ -57,12 +63,16 @@ try
             
             case 'Fixation'
                 durations{1} = [ durations{1} ; EventData{event+1,2}-EventData{event,2}] ;
-            case 'InOut'
+            case 'pathS_InOut'
                 durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
-            case 'Rotation'
+            case 'pathS_Rot'
                 durations{3} = [ durations{3} ; EventData{event+1,2}-EventData{event,2}] ;
-            case 'Response'
+            case 'control2_pathS_InOut'
                 durations{4} = [ durations{4} ; EventData{event+1,2}-EventData{event,2}] ;
+            case 'control2_pathS_Rot'
+                durations{5} = [ durations{5} ; EventData{event+1,2}-EventData{event,2}] ;
+            case 'Response'
+                durations{6} = [ durations{6} ; EventData{event+1,2}-EventData{event,2}] ;
 
                 
         end

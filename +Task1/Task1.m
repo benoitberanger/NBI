@@ -9,6 +9,8 @@ try
     % Load location
     movie(1).file = [ pwd filesep 'videos' filesep 'pathS_InOut.mov' ];
     movie(2).file = [ pwd filesep 'videos' filesep 'pathS_Rot.mov' ];
+    movie(3).file = [ pwd filesep 'videos' filesep 'control2_pathS_InOut.mov' ];
+    movie(4).file = [ pwd filesep 'videos' filesep 'control2_pathS_Rot.mov' ];
     
     for m = 1 : length(movie)
         
@@ -22,38 +24,42 @@ try
     
     TaskData.movie = movie;
     
+    
     %% Tunning of the task
     
     % Create and prepare
-    header = {       'event_name' , 'onset(s)'    , 'duration(s)' ,    'movie_Prt' , 'movie_file'};
+    header = {          'event_name' ,          'onset(s)' ,   'duration(s)' ,    'movie_Prt' , 'movie_file'};
     EP     = EventPlanning(header);
     
     NextOnset = @(EP) EP.Data{end,2} + EP.Data{end,3};
     
     % Define a planning <--- paradigme
     
-    EP.AddPlanning({ 'StartTime'    0               0                  []            []            });
+    EP.AddPlanning({ 'StartTime'             0              0                  []            []            });
     
-    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
-    EP.AddPlanning({ 'InOut'        NextOnset(EP)   movie(1).duration  movie(1).Ptr  movie(1).file });
-    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
-    EP.AddPlanning({ 'Rotation'     NextOnset(EP)   movie(2).duration  movie(2).Ptr  movie(2).file });
-    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
-    EP.AddPlanning({ 'InOut'        NextOnset(EP)   movie(1).duration  movie(1).Ptr  movie(1).file });
-    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
-    EP.AddPlanning({ 'Rotation'     NextOnset(EP)   movie(2).duration  movie(2).Ptr  movie(2).file });
-    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []            });
     
-    EP.AddPlanning({ 'InOut'        NextOnset(EP)   movie(1).duration  movie(1).Ptr  movie(1).file });
-    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
-    EP.AddPlanning({ 'Rotation'     NextOnset(EP)   movie(2).duration  movie(2).Ptr  movie(2).file });
-    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
-    EP.AddPlanning({ 'InOut'        NextOnset(EP)   movie(1).duration  movie(1).Ptr  movie(1).file });
-    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
-    EP.AddPlanning({ 'Rotation'     NextOnset(EP)   movie(2).duration  movie(2).Ptr  movie(2).file });
-    EP.AddPlanning({ 'Fixation'     NextOnset(EP)   5                  []            []            });
+    % --- Bloc ------------------------------------------------------------
     
-    EP.AddPlanning({ 'StopTime'     NextOnset(EP)   0                  []            []            });
+    % Condition 1 + Fixation
+    EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration  movie(1).Ptr  movie(1).file });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []            });
+    
+    % Condition 2 + Fixation
+    EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration  movie(2).Ptr  movie(2).file });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []            });
+    
+    % Condition 3 + Fixation
+    EP.AddPlanning({ 'control2_pathS_InOut'  NextOnset(EP)  movie(3).duration  movie(3).Ptr  movie(3).file });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []            });
+    
+    % Condition 4 + Fixation
+    EP.AddPlanning({ 'control2_pathS_Rot'    NextOnset(EP)  movie(4).duration  movie(4).Ptr  movie(4).file });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []            });
+    
+    % ---------------------------------------------------------------------
+    
+    EP.AddPlanning({ 'StopTime'              NextOnset(EP)  0                  []            []            });
     
     switch DataStruct.OperationMode
         case 'Acquisition'
@@ -124,54 +130,70 @@ try
             nbVolumes = ceil( EP.Data{end,2} / TR ) + 2 ; % nb of volumes for the estimated time of stimulation + 2 to be safe
             KL.GenerateMRITrigger( TR , nbVolumes );
             
-        otherwise
-            
     end
-    
-    %% Prepare a structure to handle each movie event recorder
-    
-    % Preallocation of each ER is necessary to avoid pointers to refer on
-    % a single object.
-    
-%     ER_movieStruct = struct;
-%     
-%     for ev = 1 : size( EP.Data , 1 )
-%         
-%         ER_movieStruct(ev).ER = EventRecorder( header(1:2) , max([movie.count]) );
-%         
-%     end
-    
-            
-    %% Synchronization
-    
-    StartTime = WaitForTTL( DataStruct );
     
     
     %% Go
-
-    delay = nan( 1 , size( EP.Data , 1 ) );
     
+    % Loop over the EventPlanning
     for evt = 1 : size( EP.Data , 1 )
-        
-        delay(evt) = (GetSecs - EP.Data{evt,2} - StartTime) * 1000
         
         switch EP.Data{evt,1}
             
+            case 'StartTime'
+                
+                % Draw fixation point
+                Task1.DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
+                
+                % Flip video
+                Screen( 'Flip' , DataStruct.PTB.Window );
+                
+                % Synchronization
+                StartTime = WaitForTTL( DataStruct );
+                
+                
             case 'Fixation'
                 
+                % Draw fixation point
                 Task1.DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
-
+                
+                % Flip video
                 fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack );
                 
+                % Save onset
                 ER.AddEvent({ 'Fixation' fixation_onset-StartTime })
                 
-                if evt < size( EP.Data , 1 )
-                    WaitSecs('UntilTime', StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack*2 );
-                else
-                    WaitSecs('UntilTime', fixation_onset + EP.Data{evt,3} );
-                end
+                % Fixation duration handeling
+                WaitSecs('UntilTime', StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack*0 );
                 
-            case 'InOut'
+                
+            case 'StopTime'
+                
+                % Stop time
+                StopTime = GetSecs;
+                
+                % Record StopTime
+                ER.AddStopTime( 'StopTime' , StopTime - StartTime );
+                
+                
+            otherwise % == movie
+                
+                % Which condition ?
+                switch EP.Data{evt,1}
+                    
+                    case 'pathS_InOut'
+                        movie_ref = 1;
+                        
+                    case 'pathS_Rot'
+                        movie_ref = 2;
+                        
+                    case 'control2_pathS_InOut'
+                        movie_ref = 3;
+                        
+                    case 'control2_pathS_Rot'
+                        movie_ref = 4;
+                        
+                end
                 
                 if Speed ~= 1
                     DeadLine = EP.Data{evt,3};
@@ -179,51 +201,28 @@ try
                     DeadLine = Inf;
                 end
                 
-%                 ER_movieStruct(evt).EP_header = EP.Header;
-%                 ER_movieStruct(evt).EP_line   = EP.Data(evt,:);
+                % Play movie
+                [ First_frame , ~ , Exit_flag ] = Task1.PlayMovieTrial( movie(movie_ref) , DataStruct , DeadLine );
                 
-%                 ER_movieStruct(evt).ER        = Task1.PlayMovieTrial( movie(1) , ER_movieStruct(evt).ER , DataStruct , DeadLine );
-                [ First_frame , ~ ]        = Task1.PlayMovieTrial( movie(1) , DataStruct , DeadLine );
+                % Save onset
+                ER.AddEvent({ EP.Data{evt,1} First_frame-StartTime })
                 
-                ER.AddEvent({ 'InOut' First_frame-StartTime })
-                
-%                 ER_movieStruct(evt).ER.ScaleTime;
-                
-
-                
-            case 'Rotation'
-
-                if Speed ~= 1
-                    DeadLine = EP.Data{evt,3};
-                else
-                    DeadLine = Inf;
+                if Exit_flag
+                    
+                    % Stop time
+                    StopTime = GetSecs;
+                    
+                    % Record StopTime
+                    ER.AddStopTime( 'StopTime' , StopTime - StartTime );
+                    
+                    break
                 end
                 
-%                 ER_movieStruct(evt).EP_header = EP.Header;
-%                 ER_movieStruct(evt).EP_line   = EP.Data(evt,:);
-                
-%                 ER_movieStruct(evt).ER        = Task1.PlayMovieTrial( movie(2) , ER_movieStruct(evt).ER , DataStruct , DeadLine );
-                [ First_frame , ~ ]        = Task1.PlayMovieTrial( movie(2) , DataStruct , DeadLine );
-                
-                ER.AddEvent({ 'Rotation' First_frame-StartTime })
-                
-%                 ER_movieStruct(evt).ER.ScaleTime;
-
         end
+        
         
     end
     
-    % Stop time
-    StopTime = GetSecs;
-    
-    % Record StopTime
-    ER.AddStopTime( 'StopTime' , StopTime - StartTime );
-    
-    
-    [ ER.Data(:,1) cellfun( @(b,a) { (b-a)*1000 } , ER.Data(:,2) , EP.Data(:,2) ) ]
-    
-    figure
-    plot( cellfun( @(b,a) (b-a)*1000 , ER.Data(:,2) , EP.Data(:,2) ) )
     
     %% End of stimulation
     
@@ -258,15 +257,13 @@ try
     TaskData.DotVisualAngle = DotVisualAngle;
     TaskData.StartTime      = StartTime;
     TaskData.StopTime       = StopTime;
-    
+        
     
     %% Send infos to base workspace
     
     assignin('base','EP',EP)
     assignin('base','ER',ER)
     assignin('base','KL',KL)
-    
-%     assignin('base','ER_movieStruct',ER_movieStruct)
     
     assignin('base','TaskData',TaskData)
     
@@ -276,6 +273,7 @@ try
     for m = 1 : length(movie)
         Screen('CloseMovie', movie(m).Ptr );
     end
+    
     
 catch err
     
