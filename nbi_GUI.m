@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 03-Dec-2015 17:14:58
+% Last Modified by GUIDE v2.5 21-Dec-2015 11:35:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -82,8 +82,6 @@ set(handles.edit_RunNumber,'String','1')
 set(handles.edit_SubjectID,'String','xxxx')
 set(handles.uipanel_EyelinkMode,'SelectedObject',handles.radiobutton_EyelinkOn)
 
-set(handles.pushbutton_Task2,'Visible','off')
-set(handles.pushbutton_Task3,'Visible','off')
 
 %% Try to pick a random seed for the RNG
 
@@ -158,8 +156,6 @@ DataStruct.RunNumber    = RunNumber;
 switch get(get(handles.uipanel_Environement,'SelectedObject'),'Tag')
     case 'radiobutton_MRI'
         Environement = 'MRI';
-    case 'radiobutton_MRI_training'
-        Environement = 'MRItraining';
     case 'radiobutton_Training'
         Environement = 'Training';
     otherwise
@@ -228,14 +224,8 @@ switch get(hObject,'Tag')
     case 'pushbutton_EyelinkCalibration'
         Task = 'EyelinkCalibration';
         
-    case 'pushbutton_Task1'
-        Task = 'Task1';
-        
-    case 'pushbutton_Task2'
-        Task = 'Task2';
-        
-    case 'pushbutton_Task3'
-        Task = 'Task3';
+    case 'pushbutton_NBI'
+        Task = 'NBI';
         
     otherwise
         error('NBI:TaskSelection','Error in Task selection')
@@ -266,7 +256,7 @@ switch get(get(handles.uipanel_EyelinkMode,'SelectedObject'),'Tag')
         
         % Save mode ?
         if strcmp(DataStruct.SaveMode,'NoSave')
-            error('NBI:EyelinkMode','\n ---> Save mode should be turned on when using Eyelink <---')
+            error('NBI:EyelinkMode',' \n ---> Save mode should be turned on when using Eyelink <--- \n ')
         end
         
         handles.EyelinkToolboxAvailable = EyelinkToolboxAvailable;
@@ -315,7 +305,7 @@ DataStruct.PTB = StartPTB( DataStruct );
 
 
 % %% Update handles (and DataStruct) structure
-% 
+%
 % handles.DataStruct = DataStruct;
 % guidata(hObject, handles);
 
@@ -324,14 +314,8 @@ DataStruct.PTB = StartPTB( DataStruct );
 
 switch Task
     
-    case 'Task1'
-        TaskData = Task1.Task1( DataStruct );
-        
-    case 'Task2'
-        TaskData = Task2.Task2( DataStruct );
-        
-    case 'Task3'
-        TaskData = Task3.Task3( DataStruct );
+    case 'NBI'
+        TaskData = NBI.NBI( DataStruct );
         
     case 'EyelinkCalibration'
         TaskData = Eyelink.Calibration( DataStruct );
@@ -344,7 +328,7 @@ DataStruct.TaskData = TaskData;
 
 
 % %% Update handles (and DataStruct) structure
-% 
+%
 % handles.DataStruct = DataStruct;
 % guidata(hObject, handles);
 
@@ -406,17 +390,9 @@ function pushbutton_EyelinkCalibration_Callback(hObject, eventdata, handles) %#o
 NBI_main_routine(hObject, eventdata, handles)
 
 
-% --- Executes on button press in pushbutton_Task1.
-function pushbutton_Task1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_Task1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-NBI_main_routine(hObject, eventdata, handles)
-
-
-% --- Executes on button press in pushbutton_Task2.
-function pushbutton_Task2_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_Task2 (see GCBO)
+% --- Executes on button press in pushbutton_NBI.
+function pushbutton_NBI_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_NBI (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 NBI_main_routine(hObject, eventdata, handles)
@@ -433,14 +409,6 @@ NBI_main_routine(hObject, eventdata, handles)
 % --- Executes on button press in pushbutton_Morphology_words.
 function pushbutton_Morphology_words_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_Morphology_words (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-NBI_main_routine(hObject, eventdata, handles)
-
-
-% --- Executes on button press in pushbutton_Task3.
-function pushbutton_Task3_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_Task3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 NBI_main_routine(hObject, eventdata, handles)
@@ -579,3 +547,62 @@ function text_ScreenMode_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 set(hObject,'TooltipString',sprintf('Output of Screen(''Screens'') \n Use ''Screen Screens?'' in Command window for help'))
+
+
+% --- Executes on button press in pushbutton_RunNumber_p1.
+function pushbutton_RunNumber_p1_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_RunNumber_p1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+CurrentRunNumber_str = get(handles.edit_RunNumber,'String');
+CurrentRunNumber = str2double(CurrentRunNumber_str) + 1;
+
+set(handles.edit_RunNumber,'String', num2str( CurrentRunNumber ) )
+
+
+% --- Executes on button press in pushbutton_RunNumber_m1.
+function pushbutton_RunNumber_m1_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_RunNumber_m1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+CurrentRunNumber_str = get(handles.edit_RunNumber,'String');
+CurrentRunNumber = str2double(CurrentRunNumber_str) - 1;
+
+set(handles.edit_RunNumber,'String', num2str( CurrentRunNumber ) )
+
+
+% --- Executes on button press in pushbutton_Check_SubjectID_data.
+function pushbutton_Check_SubjectID_data_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_Check_SubjectID_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% ../
+upperDir = fullfile( fileparts( pwd ) );
+
+% ../data/
+dataDir = fullfile( upperDir , 'data' );
+
+% ../data/ exists ?
+if ~isdir( dataDir )
+    error( ' \n ---> data directory not found in the upper dir : %s <--- \n ' , upperDir )
+end
+
+SubjectID = get(handles.edit_SubjectID,'String');
+
+% ../data/(SubjectID)
+SubjectIDDir = fullfile( dataDir , SubjectID );
+
+% ../data/(SubjectID) exists ?
+if ~isdir( SubjectIDDir )
+    error( ' \n ---> SubjectID directory not found in the : %s <--- \n ' , dataDir )
+end
+
+% Display dir
+disp(SubjectIDDir)
+
+% Display content
+dir(SubjectIDDir)
+

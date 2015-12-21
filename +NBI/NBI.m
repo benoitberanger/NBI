@@ -1,4 +1,4 @@
-function [ TaskData ] = Task1( DataStruct )
+function [ TaskData ] = NBI( DataStruct )
 
 try
     %% Preparation of movies
@@ -100,7 +100,7 @@ try
     
     %% Prepare fixation dot
     
-    PixelPerDegree = Task1.va2pix( 1 , DataStruct.Parameters.Video.SubjectDistance , DataStruct.Parameters.Video.ScreenWidthM , DataStruct.Parameters.Video.ScreenWidthPx );
+    PixelPerDegree = NBI.va2pix( 1 , DataStruct.Parameters.Video.SubjectDistance , DataStruct.Parameters.Video.ScreenWidthM , DataStruct.Parameters.Video.ScreenWidthPx );
     
     DotVisualAngle = 0.1;
     
@@ -143,7 +143,7 @@ try
             case 'StartTime'
                 
                 % Draw fixation point
-                Task1.DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
+                NBI.DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
                 
                 % Flip video
                 Screen( 'Flip' , DataStruct.PTB.Window );
@@ -155,7 +155,7 @@ try
             case 'Fixation'
                 
                 % Draw fixation point
-                Task1.DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
+                NBI.DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
                 
                 % Flip video
                 fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack );
@@ -202,7 +202,7 @@ try
                 end
                 
                 % Play movie
-                [ First_frame , ~ , Exit_flag ] = Task1.PlayMovieTrial( movie(movie_ref) , DataStruct , DeadLine );
+                [ First_frame , ~ , Exit_flag ] = NBI.PlayMovieTrial( movie(movie_ref) , DataStruct , DeadLine );
                 
                 % Save onset
                 ER.AddEvent({ EP.Data{evt,1} First_frame-StartTime })
@@ -257,7 +257,7 @@ try
     TaskData.DotVisualAngle = DotVisualAngle;
     TaskData.StartTime      = StartTime;
     TaskData.StopTime       = StopTime;
-        
+    
     
     %% Send infos to base workspace
     

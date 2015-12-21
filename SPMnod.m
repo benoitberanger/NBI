@@ -6,7 +6,7 @@ try
     % 'names' for SPM
     switch DataStruct.Task
         
-        case 'Task1'
+        case 'NBI'
             names = {
                 'Fixation'             ;
                 'pathS_InOut'          ;
