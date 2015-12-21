@@ -33,6 +33,10 @@ if strcmp(DataStruct.EyelinkMode,'On')
                     error('ReceiveFile error, status : %d ',status);
                 end
                 
+                % Rename Eyelink file
+                movefile([DataPath filesep DataStruct.TaskData.EyelinkFile '.edf'], [DataStruct.DataFile '.edf'])
+                
+                
             elseif err == -1 % -1 means not recording
                 
                 disp('Eyelink not recording')

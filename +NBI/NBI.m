@@ -28,9 +28,10 @@ try
     %% Tunning of the task
     
     % Create and prepare
-    header = {          'event_name' ,          'onset(s)' ,   'duration(s)' ,    'movie_Prt' , 'movie_file'};
+    header = {       'event_name' ,          'onset(s)' ,   'duration(s)' ,    'movie_Prt' , 'movie_file'};
     EP     = EventPlanning(header);
     
+    % NextOnset = PreviousOnset + PreviousDuration
     NextOnset = @(EP) EP.Data{end,2} + EP.Data{end,3};
     
     % Define a planning <--- paradigme
@@ -108,7 +109,7 @@ try
     %% Prepare the logger of MRI triggers
     
     KbName('UnifyKeyNames');
-    keys = {'5%'};
+    keys = {'5%'}; % fORP in USB : MRI trigger are converted into keyboard input
     KL = KbLogger(KbName(keys) , keys);
     
     switch DataStruct.OperationMode
@@ -131,6 +132,10 @@ try
             KL.GenerateMRITrigger( TR , nbVolumes );
             
     end
+    
+    %% Start recording eye motions
+    
+    TaskData.EyelinkFile = Eyelink.StartRecording( DataStruct );
     
     
     %% Go
@@ -216,6 +221,7 @@ try
                     ER.AddStopTime( 'StopTime' , StopTime - StartTime );
                     
                     break
+                    
                 end
                 
         end

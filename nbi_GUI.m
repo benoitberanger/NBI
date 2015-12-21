@@ -280,7 +280,7 @@ if strcmp(SaveMode,'SaveData') && strcmp(OperationMode,'Acquisition')
     DataFile = sprintf('%s%s_%s_%s_%s', DataPath, SubjectID, Task, Environement, RunNumber);
     
     if exist([DataFile '.mat'], 'file')
-        error('MATLAB:FileAlreadyExists','\n The file %s.mat already exists : the program stops. \n',DataFile);
+        error('MATLAB:FileAlreadyExists',' \n ---> \n The file %s.mat already exists .  <--- \n \n',DataFile);
     end
     
     DataStruct.DataPath = DataPath;
@@ -375,6 +375,11 @@ assignin('base', 'DataStruct', DataStruct);
 assignin('base', 'names', names);
 assignin('base', 'onsets', onsets);
 assignin('base', 'durations', durations);
+
+
+%% End recording of Eyelink
+
+Eyelink.StopRecording( DataStruct )
 
 
 % -------------------------------------------------------------------------
