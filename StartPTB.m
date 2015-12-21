@@ -3,6 +3,9 @@ function [ PTB ] = StartPTB( DataStruct )
 % Shortcut
 Video = DataStruct.Parameters.Video;
 
+% Use GStreamer
+Screen('Preference', 'OverrideMultimediaEngine', 1);
+
 % PTB opening screen will be empty = black screen
 Screen('Preference', 'VisualDebugLevel', 1);
 

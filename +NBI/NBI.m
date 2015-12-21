@@ -1,6 +1,31 @@
 function [ TaskData ] = NBI( DataStruct )
 
 try
+    %% Open parallel port
+    
+    % Open parallel port
+    config_io;
+    
+    % Adresse
+    adr = hex2dec('378');
+    msg.adresse = adr;
+    
+    % Set pp to 0
+    outp(adr,0)
+    
+    % Prepare messages
+    msg.pathS_InOut          = bin2dec('0 0 0 0 0 0 0 1');
+    msg.pathS_Rot            = bin2dec('0 0 0 0 0 0 1 0');
+    msg.control2_pathS_InOut = bin2dec('0 0 0 0 0 1 0 0');
+    msg.control2_pathS_Rot   = bin2dec('0 0 0 0 1 0 0 0');
+    
+    msg.fixation             = bin2dec('1 0 0 0 0 0 0 0');
+    
+    msg.duration             = 0.005; % seconds
+    
+    TaskData.ParPortMessages = msg;
+    
+    
     %% Preparation of movies
     
     % Preallocation ?
@@ -28,7 +53,7 @@ try
     %% Tunning of the task
     
     % Create and prepare
-    header = {       'event_name' ,          'onset(s)' ,   'duration(s)' ,    'movie_Prt' , 'movie_file'};
+    header = {       'event_name' ,          'onset(s)' ,   'duration(s)' ,    'movie_Prt' , 'movie_file' , 'ParPort_message'};
     EP     = EventPlanning(header);
     
     % NextOnset = PreviousOnset + PreviousDuration
@@ -36,31 +61,31 @@ try
     
     % Define a planning <--- paradigme
     
-    EP.AddPlanning({ 'StartTime'             0              0                  []            []            });
+    EP.AddPlanning({ 'StartTime'             0              0                  []            []             []                       });
     
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []            });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []             msg.fixation             });
     
     % --- Bloc ------------------------------------------------------------
     
     % Condition 1 + Fixation
-    EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration  movie(1).Ptr  movie(1).file });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []            });
+    EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration  movie(1).Ptr  movie(1).file  msg.pathS_InOut          });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []             msg.fixation             });
     
     % Condition 2 + Fixation
-    EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration  movie(2).Ptr  movie(2).file });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []            });
+    EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration  movie(2).Ptr  movie(2).file  msg.pathS_Rot            });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []             msg.fixation             });
     
     % Condition 3 + Fixation
-    EP.AddPlanning({ 'control2_pathS_InOut'  NextOnset(EP)  movie(3).duration  movie(3).Ptr  movie(3).file });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []            });
+    EP.AddPlanning({ 'control2_pathS_InOut'  NextOnset(EP)  movie(3).duration  movie(3).Ptr  movie(3).file  msg.control2_pathS_InOut });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []             msg.fixation             });
     
     % Condition 4 + Fixation
-    EP.AddPlanning({ 'control2_pathS_Rot'    NextOnset(EP)  movie(4).duration  movie(4).Ptr  movie(4).file });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []            });
+    EP.AddPlanning({ 'control2_pathS_Rot'    NextOnset(EP)  movie(4).duration  movie(4).Ptr  movie(4).file  msg.control2_pathS_Rot   });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []             msg.fixation             });
     
     % ---------------------------------------------------------------------
     
-    EP.AddPlanning({ 'StopTime'              NextOnset(EP)  0                  []            []            });
+    EP.AddPlanning({ 'StopTime'              NextOnset(EP)  0                  []            []             []                       });
     
     switch DataStruct.OperationMode
         case 'Acquisition'
@@ -163,19 +188,24 @@ try
                 NBI.DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
                 
                 % Flip video
-                fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack );
+                fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 );
+                
+                % Parallel port message
+                outp( adr , EP.Data{evt,6} );
+                WaitSecs( msg.duration );
+                outp( adr , 0 );
                 
                 % Save onset
                 ER.AddEvent({ 'Fixation' fixation_onset-StartTime })
                 
                 % Fixation duration handeling
-                WaitSecs('UntilTime', StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack*0 );
+%                 WaitSecs('UntilTime', StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 0 );
                 
                 
             case 'StopTime'
                 
-                % Stop time
-                StopTime = GetSecs;
+                % Fixation duration handeling
+                StopTime = WaitSecs('UntilTime', StartTime + EP.Data{evt,2} );
                 
                 % Record StopTime
                 ER.AddStopTime( 'StopTime' , StopTime - StartTime );
@@ -207,7 +237,8 @@ try
                 end
                 
                 % Play movie
-                [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = NBI.PlayMovieTrial( movie(movie_ref) , DataStruct , DeadLine ); %#ok<ASGLU>
+                [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = NBI.PlayMovieTrial( StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 ,...
+                    movie(movie_ref) , DataStruct , DeadLine , adr , EP.Data{evt,6} , msg.duration  ); %#ok<ASGLU>
                 
                 % Save onset
                 ER.AddEvent({ EP.Data{evt,1} First_frame-StartTime })
@@ -278,6 +309,25 @@ try
     
     for m = 1 : length(movie)
         Screen('CloseMovie', movie(m).Ptr );
+    end
+    
+    
+    %% Diagnotic
+    
+    switch DataStruct.OperationMode
+        case 'Acquisition'
+            
+            
+        case 'FastDebug'
+            
+            plotDelay
+            
+        case 'RealisticDebug'
+            
+            plotDelay
+            
+        otherwise
+            error( 'DataStruct.OperationMode = %s' , DataStruct.OperationMode )
     end
     
     

@@ -99,7 +99,17 @@ catch err
 end
 
 
-% Update handles structure
+%% Add parallel port functions to the path
+
+p = regexp( path , ';', 'split');
+p_idx =  regexp( p , 'MATLAB_functions_benoit');
+
+ParPort_path = [ p{ ~cellfun( @isempty , p_idx ) } filesep 'ParPort_XP_32bit' ];
+
+addpath(ParPort_path)
+
+
+%% Update handles structure
 guidata(hObject, handles);
 
 % UIWAIT makes nbi_GUI wait for user response (see UIRESUME)
@@ -233,6 +243,7 @@ end
 
 handles.Task    = Task;
 DataStruct.Task = Task;
+
 
 %% Check if Eyelink toolbox is available
 

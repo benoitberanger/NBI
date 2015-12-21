@@ -1,4 +1,4 @@
-function [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = PlayMovieTrial( movie , DataStruct  , DeadLine )
+function [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = PlayMovieTrial( when , movie , DataStruct , DeadLine , adr , msg , dur )
 
 Last_frame = NaN; % Just to avoid some bugs
 
@@ -13,6 +13,7 @@ Screen('PlayMovie', movie.Ptr , 1 );
 % Frame counter
 frame = 0;
 
+
 %% Do ...
 
 frame = frame + 1;
@@ -21,16 +22,25 @@ frame = frame + 1;
 [ texturePtr timeindex ] = Screen('GetMovieImage', DataStruct.PTB.Window, movie.Ptr);
 
 % Valid texture returned? A negative value means end of movie reached:
-if texturePtr<=0
+if texturePtr <= 0
     % We're done, break out of loop
-    error('texturePtr<=0')
+    error('texturePtr <= 0')
 end
 
+Screen( 'FillRect' , DataStruct.PTB.Window , [0 0 0] );
+
 % Draw the new texture immediately to screen
-Screen('DrawTexture', DataStruct.PTB.Window, texturePtr);
+Screen('DrawTexture', DataStruct.PTB.Window, texturePtr , [] , CenterRectOnPoint(ScaleRect([0 0 1039 1039],0.5,0.5),DataStruct.PTB.CenterH,DataStruct.PTB.CenterV) );
+    
+% Sync with movie is special
+WaitSecs('UntilTime', when );
 
 % Update display
-First_frame = Screen('Flip', DataStruct.PTB.Window);
+First_frame = Screen('Flip', DataStruct.PTB.Window );
+
+outp( adr , msg );
+WaitSecs( dur );
+outp( adr , 0 );
 
 % Release texture
 Screen('Close', texturePtr);
@@ -40,7 +50,7 @@ Screen('Close', texturePtr);
 
 % Playback loop
 while timeindex < DeadLine
-    
+
     frame = frame + 1;
     
     % Escape ?
@@ -62,15 +72,15 @@ while timeindex < DeadLine
     
     % Valid texture returned? A negative value means end of movie reached
     if texturePtr<=0
-        % We're done, break out of loop
+        % We're done, break out of loop)
         break
     end
     
     % Draw the new texture immediately to screen
-    Screen('DrawTexture', DataStruct.PTB.Window, texturePtr);
+    Screen('DrawTexture', DataStruct.PTB.Window, texturePtr , [] , CenterRectOnPoint(ScaleRect([0 0 1039 1039],0.5,0.5),DataStruct.PTB.CenterH,DataStruct.PTB.CenterV) );
     
     % Update display
-    Last_frame = Screen('Flip', DataStruct.PTB.Window);
+    Last_frame = Screen('Flip', DataStruct.PTB.Window );
     
     % Release texture
     Screen('Close', texturePtr);
