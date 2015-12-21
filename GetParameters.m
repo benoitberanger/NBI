@@ -46,21 +46,23 @@ Parameters.Toolbox = 'PsychToolbox';
 KbName('UnifyKeyNames');
 
 Parameters.Keybinds.Right_Blue_1_ASCII   = KbName('1!');
-Parameters.Keybinds.Right_Yellow_2_ASCII = KbName('2@');
-Parameters.Keybinds.Right_Green_3_ASCII  = KbName('3#');
-Parameters.Keybinds.Right_Red_4_ASCII    = KbName('4$');
+% Parameters.Keybinds.Right_Yellow_2_ASCII = KbName('2@');
+% Parameters.Keybinds.Right_Green_3_ASCII  = KbName('3#');
+% Parameters.Keybinds.Right_Red_4_ASCII    = KbName('4$');
 
 Parameters.Keybinds.TTL_5_ASCII = KbName('5%');
 
-Parameters.Keybinds.Left_Blue_1_ASCII   = KbName('6^');
-Parameters.Keybinds.Left_Yellow_2_ASCII = KbName('7&');
-Parameters.Keybinds.Left_Green_3_ASCII  = KbName('8*');
-Parameters.Keybinds.Left_Red_4_ASCII    = KbName('9(');
+% Parameters.Keybinds.Left_Blue_1_ASCII   = KbName('6^');
+% Parameters.Keybinds.Left_Yellow_2_ASCII = KbName('7&');
+% Parameters.Keybinds.Left_Green_3_ASCII  = KbName('8*');
+% Parameters.Keybinds.Left_Red_4_ASCII    = KbName('9(');
 
 Parameters.Keybinds.emulTTL_SpaceBar_ASCII = KbName('space');
 
 Parameters.Keybinds.Stop_Escape_ASCII = KbName('ESCAPE');
 
+% To save time, we restrict keys for all future KbCheck
+RestrictKeysForKbCheck( struct2array(Parameters.Keybinds) );
 
 %%%%%%%%%%%
 %  Audio  %

@@ -1,6 +1,8 @@
-function [ First_frame , Last_frame , Exit_flag ] = PlayMovieTrial( movie , DataStruct  , DeadLine )
+function [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = PlayMovieTrial( movie , DataStruct  , DeadLine )
 
 Last_frame = NaN; % Just to avoid some bugs
+
+Subject_inputtime = zeros( movie.count , 1 );
 
 % Flag
 Exit_flag = 0;
@@ -8,8 +10,12 @@ Exit_flag = 0;
 % Start playback engine
 Screen('PlayMovie', movie.Ptr , 1 );
 
+% Frame counter
+frame = 0;
 
 %% Do ...
+
+frame = frame + 1;
 
 % Wait for next movie frame, retrieve texture handle to it
 [ texturePtr timeindex ] = Screen('GetMovieImage', DataStruct.PTB.Window, movie.Ptr);
@@ -35,9 +41,16 @@ Screen('Close', texturePtr);
 % Playback loop
 while timeindex < DeadLine
     
+    frame = frame + 1;
+    
     % Escape ?
-    [ keyIsDown, ~ , keyCode ] = KbCheck;
+    [ keyIsDown, secs , keyCode ] = KbCheck;
     if keyIsDown
+        
+        if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
+            Subject_inputtime(frame) = secs;
+        end
+        
         if keyCode(DataStruct.Parameters.Keybinds.Stop_Escape_ASCII)
             Exit_flag = 1;
             break
@@ -58,7 +71,7 @@ while timeindex < DeadLine
     
     % Update display
     Last_frame = Screen('Flip', DataStruct.PTB.Window);
-
+    
     % Release texture
     Screen('Close', texturePtr);
     

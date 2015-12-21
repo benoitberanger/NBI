@@ -35,7 +35,7 @@ try
                         
                         % Code for Task
                         switch DataStruct.Task
-                            case 'Task1'
+                            case 'NBI'
                                 aliasTask = 'A';
                         end
                         
@@ -43,10 +43,8 @@ try
                         switch DataStruct.Environement
                             case 'MRI'
                                 aliasEnvironement = 'X';
-                            case 'MRItraining'
-                                aliasEnvironement = 'Y';
                             case 'Training'
-                                aliasEnvironement = 'Z';
+                                aliasEnvironement = 'Y';
                         end
                         
                         % Name of Eyelinik file

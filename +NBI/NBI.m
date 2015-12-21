@@ -7,10 +7,10 @@ try
     movie = struct;
     
     % Load location
-    movie(1).file = [ pwd filesep 'videos' filesep 'pathS_InOut.mov' ];
-    movie(2).file = [ pwd filesep 'videos' filesep 'pathS_Rot.mov' ];
+    movie(1).file = [ pwd filesep 'videos' filesep 'pathS_InOut.mov'          ];
+    movie(2).file = [ pwd filesep 'videos' filesep 'pathS_Rot.mov'            ];
     movie(3).file = [ pwd filesep 'videos' filesep 'control2_pathS_InOut.mov' ];
-    movie(4).file = [ pwd filesep 'videos' filesep 'control2_pathS_Rot.mov' ];
+    movie(4).file = [ pwd filesep 'videos' filesep 'control2_pathS_Rot.mov'   ];
     
     for m = 1 : length(movie)
         
@@ -202,7 +202,7 @@ try
                 end
                 
                 % Play movie
-                [ First_frame , ~ , Exit_flag ] = NBI.PlayMovieTrial( movie(movie_ref) , DataStruct , DeadLine );
+                [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = NBI.PlayMovieTrial( movie(movie_ref) , DataStruct , DeadLine ); %#ok<ASGLU>
                 
                 % Save onset
                 ER.AddEvent({ EP.Data{evt,1} First_frame-StartTime })

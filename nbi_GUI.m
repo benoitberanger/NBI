@@ -321,7 +321,7 @@ switch Task
         TaskData = Eyelink.Calibration( DataStruct );
         
     otherwise
-        error('Task ?')
+        error('NBI:Task','Task ?')
 end
 
 DataStruct.TaskData = TaskData;
@@ -587,7 +587,7 @@ dataDir = fullfile( upperDir , 'data' );
 
 % ../data/ exists ?
 if ~isdir( dataDir )
-    error( ' \n ---> data directory not found in the upper dir : %s <--- \n ' , upperDir )
+    error( 'MATLAB:DataDirExists' , ' \n ---> data directory not found in the upper dir : %s <--- \n ' , upperDir )
 end
 
 SubjectID = get(handles.edit_SubjectID,'String');
@@ -597,7 +597,7 @@ SubjectIDDir = fullfile( dataDir , SubjectID );
 
 % ../data/(SubjectID) exists ?
 if ~isdir( SubjectIDDir )
-    error( ' \n ---> SubjectID directory not found in the : %s <--- \n ' , dataDir )
+    error( 'MATLAB:SubjectIDDirExists' ,  ' \n ---> SubjectID directory not found in the : %s <--- \n ' , dataDir )
 end
 
 % Display dir
