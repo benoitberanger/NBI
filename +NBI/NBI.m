@@ -52,6 +52,8 @@ try
     
     %% Tunning of the task
     
+    FixationDuration = 10; % secondes
+    
     % Create and prepare
     header = {       'event_name' ,          'onset(s)' ,   'duration(s)' ,    'movie_Prt' , 'movie_file' , 'ParPort_message'};
     EP     = EventPlanning(header);
@@ -63,25 +65,25 @@ try
     
     EP.AddPlanning({ 'StartTime'             0              0                  []            []             []                       });
     
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []             msg.fixation             });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                  []            []             msg.fixation             });
     
     % --- Bloc ------------------------------------------------------------
     
     % Condition 1 + Fixation
     EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration  movie(1).Ptr  movie(1).file  msg.pathS_InOut          });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []             msg.fixation             });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
     
     % Condition 2 + Fixation
     EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration  movie(2).Ptr  movie(2).file  msg.pathS_Rot            });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []             msg.fixation             });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
     
     % Condition 3 + Fixation
     EP.AddPlanning({ 'control2_pathS_InOut'  NextOnset(EP)  movie(3).duration  movie(3).Ptr  movie(3).file  msg.control2_pathS_InOut });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []             msg.fixation             });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
     
     % Condition 4 + Fixation
     EP.AddPlanning({ 'control2_pathS_Rot'    NextOnset(EP)  movie(4).duration  movie(4).Ptr  movie(4).file  msg.control2_pathS_Rot   });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  5                  []            []             msg.fixation             });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
     
     % ---------------------------------------------------------------------
     
@@ -128,7 +130,7 @@ try
     
     PixelPerDegree = NBI.va2pix( 1 , DataStruct.Parameters.Video.SubjectDistance , DataStruct.Parameters.Video.ScreenWidthM , DataStruct.Parameters.Video.ScreenWidthPx );
     
-    DotVisualAngle = 0.1;
+    DotVisualAngle = 10;
     
     
     %% Prepare the logger of MRI triggers
@@ -199,7 +201,7 @@ try
                 ER.AddEvent({ 'Fixation' fixation_onset-StartTime })
                 
                 % Fixation duration handeling
-%                 WaitSecs('UntilTime', StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 0 );
+%                 WaitSecs('UntilTime', StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 1 );
                 
                 
             case 'StopTime'
@@ -240,6 +242,8 @@ try
                 [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = NBI.PlayMovieTrial( StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 ,...
                     movie(movie_ref) , DataStruct , DeadLine , adr , EP.Data{evt,6} , msg.duration  ); %#ok<ASGLU>
                 
+                Last_frame - First_frame
+                
                 % Save onset
                 ER.AddEvent({ EP.Data{evt,1} First_frame-StartTime })
                 
@@ -265,6 +269,7 @@ try
     
     % EventRecorder
     ER.ClearEmptyEvents;
+    ER.ComputeDurations;
     ER.BuildGraph;
     TaskData.ER = ER;
     
@@ -289,11 +294,12 @@ try
     TaskData.KL = KL;
     
     % Save some values
-    TaskData.Speed          = Speed;
-    TaskData.PixelPerDegree = PixelPerDegree;
-    TaskData.DotVisualAngle = DotVisualAngle;
-    TaskData.StartTime      = StartTime;
-    TaskData.StopTime       = StopTime;
+    TaskData.FixationDuration = FixationDuration;
+    TaskData.Speed            = Speed;
+    TaskData.PixelPerDegree   = PixelPerDegree;
+    TaskData.DotVisualAngle   = DotVisualAngle;
+    TaskData.StartTime        = StartTime;
+    TaskData.StopTime         = StopTime;
     
     
     %% Send infos to base workspace
