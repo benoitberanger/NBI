@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 21-Dec-2015 11:35:59
+% Last Modified by GUIDE v2.5 23-Dec-2015 11:33:42
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -82,6 +82,9 @@ set(handles.edit_RunNumber,'String','1')
 set(handles.edit_SubjectID,'String','xxxx')
 set(handles.uipanel_EyelinkMode,'SelectedObject',handles.radiobutton_EyelinkOn)
 
+% ParPort
+set( handles.checkbox_ParPort , 'Value' , 1 )
+handles = checkbox_ParPort_Callback( handles.checkbox_ParPort , eventdata , handles );
 
 %% Try to pick a random seed for the RNG
 
@@ -97,16 +100,6 @@ try
     rng('shuffle')
 catch err
 end
-
-
-%% Add parallel port functions to the path
-
-p = regexp( path , ';', 'split');
-p_idx =  regexp( p , 'MATLAB_functions_benoit');
-
-ParPort_path = [ p{ ~cellfun( @isempty , p_idx ) } filesep 'ParPort_XP_32bit' ];
-
-addpath(ParPort_path)
 
 
 %% Update handles structure
@@ -225,6 +218,20 @@ switch OperationMode
         end
         
 end
+
+
+%% Parallel port ?
+
+switch get( handles.checkbox_ParPort , 'Value' )
+    case 1
+        ParPort = 'On';
+        
+    case 0
+        ParPort = 'Off';
+end
+
+handles.ParPort    = ParPort;
+DataStruct.ParPort = ParPort;
 
 
 %% Task selection
@@ -622,3 +629,78 @@ disp(SubjectIDDir)
 % Display content
 dir(SubjectIDDir)
 
+
+
+% --- Executes on button press in checkbox_ParPort.
+function handles = checkbox_ParPort_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox_ParPort (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox_ParPort
+
+switch get(hObject,'Value')
+    
+    case 1 % Add parallel port functions to the path
+        
+        try
+            
+            p = regexp( path , ';', 'split');
+            p_idx =  regexp( p , 'MATLAB_functions_benoit');
+            
+            ParPort_path = [ p{ ~cellfun( @isempty , p_idx ) } filesep 'ParPort_XP_32bit' ];
+            
+            addpath(ParPort_path)
+            
+            handles.ParPort_path = ParPort_path;
+            
+            disp('Parallel port path added successfully')
+            
+        catch err
+            
+            set(hObject,'Value',0)
+            
+            disp('Parallel port path NOT added successfully')
+            
+        end
+        
+    case 0 % Remove parallel port functions from the path
+        
+        try
+            
+            rmpath(handles.ParPort_path)
+            
+            handles = rmfield( handles , 'ParPort_path' );
+            
+            disp('Parallel port path removed successfully')
+            
+        catch err
+            
+            set(hObject,'Value',1)
+            
+            disp('Parallel port path NOT removed successfully')
+            
+        end
+        
+end
+
+
+guidata(hObject, handles);
+
+
+
+% --- Executes when user attempts to close figure1.
+function figure1_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: delete(hObject) closes the figure
+
+% ParPort
+if isfield( handles , 'ParPort_path' )
+    set( handles.checkbox_ParPort , 'Value' , 0 )
+    handles = checkbox_ParPort_Callback( handles.checkbox_ParPort , eventdata , handles );
+end
+
+delete(hObject);

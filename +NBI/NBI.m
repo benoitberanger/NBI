@@ -3,15 +3,9 @@ function [ TaskData ] = NBI( DataStruct )
 try
     %% Open parallel port
     
-    % Open parallel port
-    config_io;
-    
     % Adresse
     adr = hex2dec('378');
     msg.adresse = adr;
-    
-    % Set pp to 0
-    outp(adr,0)
     
     % Prepare messages
     msg.pathS_InOut          = bin2dec('0 0 0 0 0 0 0 1');
@@ -22,6 +16,20 @@ try
     msg.fixation             = bin2dec('1 0 0 0 0 0 0 0');
     
     msg.duration             = 0.005; % seconds
+   
+    switch DataStruct.ParPort
+        
+        case 'On'
+            
+            % Open parallel port
+            config_io;
+
+            % Set pp to 0
+            outp(adr,0)
+            
+        case 'Off'
+            
+    end
     
     TaskData.ParPortMessages = msg;
     
@@ -52,7 +60,9 @@ try
     
     %% Tunning of the task
     
-    FixationDuration = 10; % secondes
+    FixationDuration = 5; % secondes
+    
+    movieDurationOffcet = 0.1; % secondes
     
     % Create and prepare
     header = {       'event_name' ,          'onset(s)' ,   'duration(s)' ,    'movie_Prt' , 'movie_file' , 'ParPort_message'};
@@ -70,19 +80,19 @@ try
     % --- Bloc ------------------------------------------------------------
     
     % Condition 1 + Fixation
-    EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration  movie(1).Ptr  movie(1).file  msg.pathS_InOut          });
+    EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration+movieDurationOffcet  movie(1).Ptr  movie(1).file  msg.pathS_InOut          });
     EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
     
     % Condition 2 + Fixation
-    EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration  movie(2).Ptr  movie(2).file  msg.pathS_Rot            });
+    EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration+movieDurationOffcet  movie(2).Ptr  movie(2).file  msg.pathS_Rot            });
     EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
     
     % Condition 3 + Fixation
-    EP.AddPlanning({ 'control2_pathS_InOut'  NextOnset(EP)  movie(3).duration  movie(3).Ptr  movie(3).file  msg.control2_pathS_InOut });
+    EP.AddPlanning({ 'control2_pathS_InOut'  NextOnset(EP)  movie(3).duration+movieDurationOffcet  movie(3).Ptr  movie(3).file  msg.control2_pathS_InOut });
     EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
     
     % Condition 4 + Fixation
-    EP.AddPlanning({ 'control2_pathS_Rot'    NextOnset(EP)  movie(4).duration  movie(4).Ptr  movie(4).file  msg.control2_pathS_Rot   });
+    EP.AddPlanning({ 'control2_pathS_Rot'    NextOnset(EP)  movie(4).duration+movieDurationOffcet  movie(4).Ptr  movie(4).file  msg.control2_pathS_Rot   });
     EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
     
     % ---------------------------------------------------------------------
@@ -167,6 +177,9 @@ try
     
     %% Go
     
+%     figure
+%     subplot_count = 0;
+
     % Loop over the EventPlanning
     for evt = 1 : size( EP.Data , 1 )
         
@@ -191,11 +204,14 @@ try
                 
                 % Flip video
                 fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 );
+%                 fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window );
                 
-                % Parallel port message
-                outp( adr , EP.Data{evt,6} );
-                WaitSecs( msg.duration );
-                outp( adr , 0 );
+                if strcmp( DataStruct.ParPort , 'On' )
+                    % Parallel port message
+                    outp( adr , EP.Data{evt,6} );
+                    WaitSecs( msg.duration );
+                    outp( adr , 0 );
+                end
                 
                 % Save onset
                 ER.AddEvent({ 'Fixation' fixation_onset-StartTime })
@@ -239,10 +255,15 @@ try
                 end
                 
                 % Play movie
-                [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = NBI.PlayMovieTrial( StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 ,...
-                    movie(movie_ref) , DataStruct , DeadLine , adr , EP.Data{evt,6} , msg.duration  ); %#ok<ASGLU>
+                [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = NBI.PlayMovieTrial( StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 2 ,...
+                    movie(movie_ref) , DataStruct , DeadLine , adr , EP.Data{evt,6} , msg.duration  ); %#ok<*ASGLU>
                 
-                Last_frame - First_frame
+%                 subplot_count = subplot_count + 1;
+%                 
+%                 subplot(4,1,subplot_count)
+%                 plot( Subject_inputtime(:,1) , Subject_inputtime(:,2) )
+                
+                fprintf(' \n Real movie duration = %.3f s \n ' , Last_frame - First_frame )
                 
                 % Save onset
                 ER.AddEvent({ EP.Data{evt,1} First_frame-StartTime })

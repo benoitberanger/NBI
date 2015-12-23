@@ -1,15 +1,13 @@
 function [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = PlayMovieTrial( when , movie , DataStruct , DeadLine , adr , msg , dur )
 
-First_frame = NaN; % Just to avoid some bugs
-Last_frame = NaN; % Just to avoid some bugs
+% Just to avoid some bugs
+First_frame = NaN; 
+Last_frame  = NaN;
 
-Subject_inputtime = zeros( movie.count , 1 );
+Subject_inputtime = zeros( movie.count , 2 );
 
 % Flag
 Exit_flag = 0;
-
-% Start playback engine
-Screen('PlayMovie', movie.Ptr , 1 );
 
 % Frame counter
 frame = 0;
@@ -18,6 +16,9 @@ timeindex = 0;
 
 % Sync with movie is special
 WaitSecs('UntilTime', when );
+
+% Start playback engine
+Screen('PlayMovie', movie.Ptr , 1 );
 
 
 %% Playback
@@ -28,18 +29,15 @@ while timeindex < DeadLine
     frame = frame + 1;
     
     % Escape ?
-    [ keyIsDown, secs , keyCode ] = KbCheck;
-    if keyIsDown
-        
-        if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
-            Subject_inputtime(frame) = secs;
-        end
-        
-        if keyCode(DataStruct.Parameters.Keybinds.Stop_Escape_ASCII)
-            Exit_flag = 1;
-            break
-        end
+    [ ~ , secs , keyCode ] = KbCheck;
+    
+    Subject_inputtime(frame,:) = [ secs keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII) ];
+    
+    if keyCode(DataStruct.Parameters.Keybinds.Stop_Escape_ASCII)
+        Exit_flag = 1;
+        break
     end
+    
     
     % Wait for next movie frame, retrieve texture handle to it
     [ texturePtr timeindex ] = Screen('GetMovieImage', DataStruct.PTB.Window, movie.Ptr);
@@ -61,10 +59,14 @@ while timeindex < DeadLine
         First_frame = Last_frame;
     end
     
-    % Send Trigger
-    outp( adr , msg );
-    WaitSecs( dur );
-    outp( adr , 0 );
+    if strcmp( DataStruct.ParPort , 'On' )
+    
+        % Send Trigger
+        outp( adr , msg );
+        WaitSecs( dur );
+        outp( adr , 0 );
+        
+    end
     
     % Release texture
     Screen('Close', texturePtr);
