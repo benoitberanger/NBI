@@ -654,13 +654,22 @@ switch get(hObject,'Value')
             p = regexp( path , ';', 'split');
             p_idx =  regexp( p , 'MATLAB_functions_benoit');
             
-            ParPort_path = [ p{ ~cellfun( @isempty , p_idx ) } filesep 'ParPort_XP_32bit' ];
-            
-            addpath(ParPort_path)
-            
-            handles.ParPort_path = ParPort_path;
-            
-            disp('Parallel port path added successfully')
+            if any(cellfun(@isempty,p_idx))
+                
+                set( handles.checkbox_ParPort , 'Value' , 0 )
+                handles = checkbox_ParPort_Callback( handles.checkbox_ParPort , eventdata , handles );
+                
+            else
+                
+                ParPort_path = [ p{ ~cellfun( @isempty , p_idx ) } filesep 'ParPort_XP_32bit' ];
+                
+                addpath(ParPort_path)
+                
+                handles.ParPort_path = ParPort_path;
+                
+                disp('Parallel port path added successfully')
+                
+            end
             
         catch err
             
@@ -682,9 +691,19 @@ switch get(hObject,'Value')
             
         catch err
             
-            set(hObject,'Value',1)
+            if strcmp( err.identifier , 'MATLAB:nonExistentField' )
+                
+                set(hObject,'Value',0)
             
-            disp('Parallel port path NOT removed successfully')
+                disp('Parallel port path NOT added successfully')
+                
+            else
+                
+                set(hObject,'Value',1)
+                
+                disp('Parallel port path NOT removed successfully')
+                
+            end
             
         end
         

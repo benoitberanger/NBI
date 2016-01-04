@@ -62,7 +62,7 @@ Parameters.Keybinds.emulTTL_SpaceBar_ASCII = KbName('space');
 Parameters.Keybinds.Stop_Escape_ASCII = KbName('ESCAPE');
 
 % To save time, we restrict keys for all future KbCheck
-RestrictKeysForKbCheck( struct2array(Parameters.Keybinds) );
+RestrictKeysForKbCheck( cell2mat(struct2cell(Parameters.Keybinds)) );
 
 %%%%%%%%%%%
 %  Audio  %
