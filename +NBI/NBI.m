@@ -16,14 +16,14 @@ try
     msg.fixation             = bin2dec('1 0 0 0 0 0 0 0');
     
     msg.duration             = 0.005; % seconds
-   
+    
     switch DataStruct.ParPort
         
         case 'On'
             
             % Open parallel port
             config_io;
-
+            
             % Set pp to 0
             outp(adr,0)
             
@@ -65,7 +65,7 @@ try
     movieDurationOffcet = 0.1; % secondes
     
     % Create and prepare
-    header = {       'event_name' ,          'onset(s)' ,   'duration(s)' ,    'movie_Prt' , 'movie_file' , 'ParPort_message'};
+    header = {       'event_name' ,          'onset(s)' ,   'duration(s)' ,                       'movie_Prt' , 'movie_file' , 'ParPort_message'};
     EP     = EventPlanning(header);
     
     % NextOnset = PreviousOnset + PreviousDuration
@@ -73,31 +73,31 @@ try
     
     % Define a planning <--- paradigme
     
-    EP.AddPlanning({ 'StartTime'             0              0                  []            []             []                       });
+    EP.AddPlanning({ 'StartTime'             0              0                                      []            []             []                       });
     
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                  []            []             msg.fixation             });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
     
     % --- Bloc ------------------------------------------------------------
     
     % Condition 1 + Fixation
     EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration+movieDurationOffcet  movie(1).Ptr  movie(1).file  msg.pathS_InOut          });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
     
     % Condition 2 + Fixation
     EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration+movieDurationOffcet  movie(2).Ptr  movie(2).file  msg.pathS_Rot            });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
     
     % Condition 3 + Fixation
     EP.AddPlanning({ 'control2_pathS_InOut'  NextOnset(EP)  movie(3).duration+movieDurationOffcet  movie(3).Ptr  movie(3).file  msg.control2_pathS_InOut });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
     
     % Condition 4 + Fixation
     EP.AddPlanning({ 'control2_pathS_Rot'    NextOnset(EP)  movie(4).duration+movieDurationOffcet  movie(4).Ptr  movie(4).file  msg.control2_pathS_Rot   });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration   []            []             msg.fixation             });
+    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
     
     % ---------------------------------------------------------------------
     
-    EP.AddPlanning({ 'StopTime'              NextOnset(EP)  0                  []            []             []                       });
+    EP.AddPlanning({ 'StopTime'              NextOnset(EP)  0                                      []            []             []                       });
     
     switch DataStruct.OperationMode
         case 'Acquisition'
@@ -177,15 +177,14 @@ try
     
     %% Go
     
-%     figure
-%     subplot_count = 0;
-
     % Loop over the EventPlanning
     for evt = 1 : size( EP.Data , 1 )
         
         switch EP.Data{evt,1}
             
             case 'StartTime'
+                
+                HideCursor;
                 
                 % Draw fixation point
                 NBI.DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
@@ -203,8 +202,8 @@ try
                 NBI.DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
                 
                 % Flip video
-                fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 );
-%                 fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window );
+                % fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 );
+                fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window );
                 
                 if strcmp( DataStruct.ParPort , 'On' )
                     % Parallel port message
@@ -217,7 +216,7 @@ try
                 ER.AddEvent({ 'Fixation' fixation_onset-StartTime })
                 
                 % Fixation duration handeling
-%                 WaitSecs('UntilTime', StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 1 );
+                % WaitSecs('UntilTime', StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 1 );
                 
                 
             case 'StopTime'
@@ -228,6 +227,8 @@ try
                 % Record StopTime
                 ER.AddStopTime( 'StopTime' , StopTime - StartTime );
                 
+                ShowCursor;
+                Priority( DataStruct.PTB.oldLevel );
                 
             otherwise % == movie
                 
@@ -257,11 +258,6 @@ try
                 % Play movie
                 [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = NBI.PlayMovieTrial( StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 2 ,...
                     movie(movie_ref) , DataStruct , DeadLine , adr , EP.Data{evt,6} , msg.duration  ); %#ok<*ASGLU>
-                
-%                 subplot_count = subplot_count + 1;
-%                 
-%                 subplot(4,1,subplot_count)
-%                 plot( Subject_inputtime(:,1) , Subject_inputtime(:,2) )
                 
                 fprintf(' \n Real movie duration = %.3f s \n ' , Last_frame - First_frame )
                 
@@ -353,14 +349,14 @@ try
             
             plotDelay
             
-        otherwise
-            error( 'DataStruct.OperationMode = %s' , DataStruct.OperationMode )
     end
     
     
 catch err
     
     sca
+    Priority( DataStruct.PTB.oldLevel );
+    ShowCursor;
     rethrow(err)
     
 end

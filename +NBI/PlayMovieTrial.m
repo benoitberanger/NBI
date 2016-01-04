@@ -1,7 +1,7 @@
 function [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = PlayMovieTrial( when , movie , DataStruct , DeadLine , adr , msg , dur )
 
 % Just to avoid some bugs
-First_frame = NaN; 
+First_frame = NaN;
 Last_frame  = NaN;
 
 Subject_inputtime = zeros( movie.count , 2 );
@@ -51,7 +51,8 @@ while timeindex < DeadLine
     Screen( 'FillRect' , DataStruct.PTB.Window , [0 0 0] );
     
     % Draw the new texture immediately to screen
-    Screen('DrawTexture', DataStruct.PTB.Window, texturePtr , [] , CenterRectOnPoint(ScaleRect([0 0 1039 1039],0.5,0.5),DataStruct.PTB.CenterH,DataStruct.PTB.CenterV) );
+    % Screen('DrawTexture', DataStruct.PTB.Window, texturePtr , [] , CenterRectOnPoint(ScaleRect([0 0 1039 1039],0.5,0.5),DataStruct.PTB.CenterH,DataStruct.PTB.CenterV) );
+    Screen('DrawTexture', DataStruct.PTB.Window, texturePtr );
     
     Last_frame = Screen('Flip', DataStruct.PTB.Window );
     
@@ -60,7 +61,7 @@ while timeindex < DeadLine
     end
     
     if strcmp( DataStruct.ParPort , 'On' )
-    
+        
         % Send Trigger
         outp( adr , msg );
         WaitSecs( dur );

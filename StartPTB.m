@@ -19,8 +19,9 @@ catch err
 end
 
 % Set max priority
-PTB.priorityLevel = MaxPriority(PTB.Window);
-PTB.newLevel      = Priority(PTB.priorityLevel);
+PTB.oldLevel         = Priority();
+PTB.maxPriorityLevel = MaxPriority( PTB.Window );
+PTB.newLevel         = Priority( PTB.maxPriorityLevel );
 
 % Refresh time of the monitor
 PTB.slack = Screen('GetFlipInterval', PTB.Window)/2;
@@ -30,11 +31,11 @@ Screen('TextSize', PTB.Window, Video.TextSize);
 Screen('TextFont', PTB.Window, Video.TextFont);
 
 % Center
-[ PTB.CenterH , PTB.CenterV ] = RectCenter(PTB.WindowRect);
+[ PTB.CenterH , PTB.CenterV ] = RectCenter( PTB.WindowRect );
 
 % B&W colors
-PTB.Black = BlackIndex(PTB.Window);
-PTB.White = WhiteIndex(PTB.Window);
+PTB.Black = BlackIndex( PTB.Window );
+PTB.White = WhiteIndex( PTB.Window );
 
 
 %% Echo in command window

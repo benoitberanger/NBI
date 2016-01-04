@@ -363,8 +363,13 @@ end
 % Just to be sure that if there is a problem with PTB, we do not loose all
 % the data drue to a crash.
 try
+    
     Screen('CloseAll'); % Close PTB window
+    
+    Priority( DataStruct.PTB.oldLevel );
+    
 catch err
+    
 end
 
 
@@ -398,6 +403,7 @@ assignin('base', 'durations', durations);
 %% End recording of Eyelink
 
 Eyelink.StopRecording( DataStruct )
+
 
 
 % -------------------------------------------------------------------------
@@ -552,7 +558,7 @@ set(hObject,'TooltipString',sprintf('Select the display mode \n PTB : 0 for exte
 
 AvailableDisplays = Screen('Screens');
 
-% Put screen 1 on the top : CENIR configuration
+% Put screen 1 on the top : CENIR human MRI configuration
 if length(AvailableDisplays) > 1
     AvailableDisplays = circshift(AvailableDisplays',length(AvailableDisplays)-1);
     ListOfScreens = num2str(AvailableDisplays);
