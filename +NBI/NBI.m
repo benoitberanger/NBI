@@ -62,7 +62,7 @@ try
     
     FixationDuration = 5; % secondes
     
-    movieDurationOffcet = 0.1; % secondes
+    movieDurationOffcet = 0.050; % secondes
     
     % Create and prepare
     header = {       'event_name' ,          'onset(s)' ,   'duration(s)' ,                       'movie_Prt' , 'movie_file' , 'ParPort_message'};
@@ -146,8 +146,14 @@ try
     %% Prepare the logger of MRI triggers
     
     KbName('UnifyKeyNames');
-    keys = {'5%'}; % fORP in USB : MRI trigger are converted into keyboard input
-    KL = KbLogger(KbName(keys) , keys);
+    
+    % fORP in USB : MRI trigger are converted into keyboard input
+    if ~IsLinux
+        keys = {'5%'};
+    else
+        keys = {'parenleft'};
+    end
+    KL = KbLogger(min(KbName(keys)) , keys);
     
     switch DataStruct.OperationMode
         
@@ -202,8 +208,8 @@ try
                 NBI.DrawFixation( DataStruct.PTB.Window , DataStruct.PTB.Black , DataStruct.PTB.CenterH , DataStruct.PTB.CenterV , DotVisualAngle , PixelPerDegree )
                 
                 % Flip video
-                % fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 );
-                fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window );
+                fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 );
+%                 fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window );
                 
                 if strcmp( DataStruct.ParPort , 'On' )
                     % Parallel port message
