@@ -542,6 +542,7 @@ function listbox_Screens_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from listbox_Screens
 
 
+
 % --- Executes during object creation, after setting all properties.
 function listbox_Screens_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to listbox_Screens (see GCBO)
@@ -569,6 +570,7 @@ end
 set(hObject,'String',ListOfScreens)
 
 
+
 % --- Executes during object creation, after setting all properties.
 function text_ScreenMode_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to text_ScreenMode (see GCBO)
@@ -576,6 +578,7 @@ function text_ScreenMode_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 set(hObject,'TooltipString',sprintf('Output of Screen(''Screens'') \n Use ''Screen Screens?'' in Command window for help'))
+
 
 
 % --- Executes on button press in pushbutton_RunNumber_p1.
@@ -590,6 +593,7 @@ CurrentRunNumber = str2double(CurrentRunNumber_str) + 1;
 set(handles.edit_RunNumber,'String', num2str( CurrentRunNumber ) )
 
 
+
 % --- Executes on button press in pushbutton_RunNumber_m1.
 function pushbutton_RunNumber_m1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_RunNumber_m1 (see GCBO)
@@ -600,6 +604,7 @@ CurrentRunNumber_str = get(handles.edit_RunNumber,'String');
 CurrentRunNumber = str2double(CurrentRunNumber_str) - 1;
 
 set(handles.edit_RunNumber,'String', num2str( CurrentRunNumber ) )
+
 
 
 % --- Executes on button press in pushbutton_Check_SubjectID_data.
@@ -645,43 +650,34 @@ function handles = checkbox_ParPort_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox_ParPort
 
-switch get(hObject,'Value')
+PTB_path = PsychtoolboxRoot;
+
+% Remove \ or / at the end if exists
+if strcmp( PTB_path(end) , filesep )
     
-    case 1 % Add parallel port functions to the path
+    PTB_path = PTB_path(1:end-1);
+    
+end
+
+Toolbox_path = fileparts( PTB_path );
+
+ParPort_path = [ Toolbox_path filesep 'MATLAB_functions_benoit' filesep 'ParPort_XP_32bit' ];
+
+
+% ParPort dir exists ?
+if isdir( ParPort_path ) % YES
+    
+    switch get(hObject,'Value')
         
-        try
+        case 1 % Add parallel port functions to the path
             
-            p = regexp( path , ';', 'split');
-            p_idx =  regexp( p , 'MATLAB_functions_benoit');
+            addpath(ParPort_path)
             
-            if any(cellfun(@isempty,p_idx))
-                
-                set( handles.checkbox_ParPort , 'Value' , 0 )
-                handles = checkbox_ParPort_Callback( handles.checkbox_ParPort , eventdata , handles );
-                
-            else
-                
-                ParPort_path = [ p{ ~cellfun( @isempty , p_idx ) } filesep 'ParPort_XP_32bit' ];
-                
-                addpath(ParPort_path)
-                
-                handles.ParPort_path = ParPort_path;
-                
-                disp('Parallel port path added successfully')
-                
-            end
+            handles.ParPort_path = ParPort_path;
             
-        catch err
+            disp('Parallel port path added successfully')
             
-            set(hObject,'Value',0)
-            
-            disp('Parallel port path NOT added successfully')
-            
-        end
-        
-    case 0 % Remove parallel port functions from the path
-        
-        try
+        case 0 % Remove parallel port functions from the path
             
             rmpath(handles.ParPort_path)
             
@@ -689,26 +685,15 @@ switch get(hObject,'Value')
             
             disp('Parallel port path removed successfully')
             
-        catch err
-            
-            if strcmp( err.identifier , 'MATLAB:nonExistentField' )
-                
-                set(hObject,'Value',0)
-            
-                disp('Parallel port path NOT added successfully')
-                
-            else
-                
-                set(hObject,'Value',1)
-                
-                disp('Parallel port path NOT removed successfully')
-                
-            end
-            
-        end
-        
+    end
+    
+else % NO
+    
+    disp('Parallel port path NOT DETECTED');
+    
+    set(hObject,'Value',0);
+    
 end
-
 
 guidata(hObject, handles);
 
