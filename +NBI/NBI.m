@@ -39,11 +39,16 @@ try
     % Preallocation ?
     movie = struct;
     
-    % Load location
-    movie(1).file = [ pwd filesep 'videos' filesep 'pathS_InOut.mov'          ];
-    movie(2).file = [ pwd filesep 'videos' filesep 'pathS_Rot.mov'            ];
-    movie(3).file = [ pwd filesep 'videos' filesep 'control2_pathS_InOut.mov' ];
-    movie(4).file = [ pwd filesep 'videos' filesep 'control2_pathS_Rot.mov'   ];
+%     % Load location
+%     movie(1).file = [ pwd filesep 'videos' filesep 'pathS_InOut.mov'          ];
+%     movie(2).file = [ pwd filesep 'videos' filesep 'pathS_Rot.mov'            ];
+%     movie(3).file = [ pwd filesep 'videos' filesep 'control2_pathS_InOut.mov' ];
+%     movie(4).file = [ pwd filesep 'videos' filesep 'control2_pathS_Rot.mov'   ];
+    
+    movie(1).file = [ pwd filesep 'videos' filesep 'test_InOut.mov'          ];
+    movie(2).file = [ pwd filesep 'videos' filesep 'test_Rot.mov'            ];
+%     movie(3).file = [ pwd filesep 'videos' filesep 'control2_pathS_InOut.mov' ];
+%     movie(4).file = [ pwd filesep 'videos' filesep 'control2_pathS_Rot.mov'   ];
     
     for m = 1 : length(movie)
         
@@ -81,19 +86,23 @@ try
     
     % Condition 1 + Fixation
     EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration+movieDurationOffcet  movie(1).Ptr  movie(1).file  msg.pathS_InOut          });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
+    EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration+movieDurationOffcet  movie(1).Ptr  movie(1).file  msg.pathS_InOut          });
+    EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration+movieDurationOffcet  movie(1).Ptr  movie(1).file  msg.pathS_InOut          });
+%     EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
     
     % Condition 2 + Fixation
     EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration+movieDurationOffcet  movie(2).Ptr  movie(2).file  msg.pathS_Rot            });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
+    EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration+movieDurationOffcet  movie(2).Ptr  movie(2).file  msg.pathS_Rot            });
+    EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration+movieDurationOffcet  movie(2).Ptr  movie(2).file  msg.pathS_Rot            });
+%     EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
     
     % Condition 3 + Fixation
-    EP.AddPlanning({ 'control2_pathS_InOut'  NextOnset(EP)  movie(3).duration+movieDurationOffcet  movie(3).Ptr  movie(3).file  msg.control2_pathS_InOut });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
-    
-    % Condition 4 + Fixation
-    EP.AddPlanning({ 'control2_pathS_Rot'    NextOnset(EP)  movie(4).duration+movieDurationOffcet  movie(4).Ptr  movie(4).file  msg.control2_pathS_Rot   });
-    EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
+%     EP.AddPlanning({ 'control2_pathS_InOut'  NextOnset(EP)  movie(3).duration+movieDurationOffcet  movie(3).Ptr  movie(3).file  msg.control2_pathS_InOut });
+%     EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
+%     
+%     % Condition 4 + Fixation
+%     EP.AddPlanning({ 'control2_pathS_Rot'    NextOnset(EP)  movie(4).duration+movieDurationOffcet  movie(4).Ptr  movie(4).file  msg.control2_pathS_Rot   });
+%     EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.fixation             });
     
     % ---------------------------------------------------------------------
     
@@ -140,7 +149,7 @@ try
     
     PixelPerDegree = NBI.va2pix( 1 , DataStruct.Parameters.Video.SubjectDistance , DataStruct.Parameters.Video.ScreenWidthM , DataStruct.Parameters.Video.ScreenWidthPx );
     
-    DotVisualAngle = 10;
+    DotVisualAngle = 0.1;
     
     
     %% Prepare the logger of MRI triggers

@@ -4,7 +4,7 @@ function [] = makeVideo_doubleDrift_pathS(filename, angles_expanding, angles_rot
 %
 
 %% various
-saveMovie = 0;    % logical (set to 1 if you want to save a movie)
+saveMovie = 1;    % logical (set to 1 if you want to save a movie)
 squaredMovie = 0; % if movie is required this will make it in a "squared frame" (looks nicer for demo and presentations)
 
 %% stimulus parameters
@@ -12,22 +12,23 @@ squaredMovie = 0; % if movie is required this will make it in a "squared frame" 
 % all values here are in degree of visual angle, and will be transformed 
 % in pixel based on monitor settings below (display settings)
 
-% noise pattern
-stim.sigma = 0.35;      % sigma of gaussian envelope in dva
+stim.sigma = 0.3;      % sigma of gaussian envelope in dva
 stim.nOctaves = 3;      % number of noisy functions added to make the noise
-stim.gridSize = 0.25;   % this set the spatial frequency of the noise functions with lowest spatial frequency
-stim.textureSize = 1.9; % increase this if the gaussian envelope appear clipped
+stim.gridSize = 0.2;   % this set the spatial frequency of the noise functions with lowest spatial frequency
+stim.textureSize = 1.7; % increase this if the gaussian envelope appear clipped
 
 % spatial & motion parameters
-stim.internalSpeed = 4;   % degree (visual angle)/ sec
-stim.ecc = 6;               % eccentricity of each set of noise patches at the center of its path
-stim.pathLength = 2.5;      % physical length of motion path of each noise patch
-stim.sep = 3.5;             % distance between noise patches
-stim.period = 2.5;          % sec, duration of one motion cycle (determine speed)
+stim.internalSpeed = 4; % degree (visual angle)/ sec
+stim.ecc = 5.5;               % eccentricity of each set of noise patches at the center of its path
+stim.pathLength = 2.4;      % physical length of motion path of each noise patch
+stim.sep = 2.5;             % distance between noise patches
+stim.period = 1.8;          % sec, duration of one motion cycle (determine speed)
 
 stim.externalSpeed = stim.pathLength/stim.period; % external speed (degree/sec) currently set as a function of period
 
 %% display settings
+
+videoCodecSetting = ':CodecType=theoraenc EncodingQuality=1';
 
 % these are used to compute values in degree of visual angle
 % adjust them to match your monitor
@@ -35,7 +36,7 @@ scr.subDist = 80;    % subject distance (cm)
 scr.width   = 435;   % monitor width (mm)
 
 %% other settings
-nCycles = 6; % number of motion cycles for the video
+nCycles = 1; % number of motion cycles for the video
 ScreenRes = [1024, 768];
 
 %% target
@@ -224,9 +225,9 @@ if saveMovie
         imageRect = [0 0 scr.xres scr.yres];
     end
     movieX = imageRect(3)-imageRect(1);     movieY = imageRect(4)-imageRect(2);
-    moviePtr = Screen('CreateMovie', scr.main, movieName, movieX, movieY, 60, 'CodecSettings= Videoquality=1 EncodingQuality=1');
+    % moviePtr = Screen('CreateMovie', scr.main, movieName, movieX, movieY, 60, 'CodecSettings= Videoquality=1 EncodingQuality=1');
     % moviePtr = Screen('CreateMovie', scr.main, movieName, movieX, movieY, 60, 'CodecType=x264enc Videoquality=1 EncodingQuality=1');
-    % moviePtr = Screen('CreateMovie', scr.main, movieName, movieX, movieY, 60);
+    moviePtr = Screen('CreateMovie', scr.main, movieName, movieX, movieY, 60, videoCodecSetting);
 end
 
 % This should be the best blend function for drawing the noise patches
@@ -278,9 +279,9 @@ if saveMovie
         imageRect = [0 0 scr.xres scr.yres];
     end
     movieX = imageRect(3)-imageRect(1);     movieY = imageRect(4)-imageRect(2);
-    moviePtr2 = Screen('CreateMovie', scr.main, movieName, movieX, movieY, 60, 'CodecSettings= Videoquality=1 EncodingQuality=1');
+    moviePtr2 = Screen('CreateMovie', scr.main, movieName, movieX, movieY, 60, videoCodecSetting);
+    %moviePtr2 = Screen('CreateMovie', scr.main, movieName, movieX, movieY, 60, 'CodecSettings= Videoquality=1 EncodingQuality=1');
     %moviePtr2 = Screen('CreateMovie', scr.main, movieName, movieX, movieY, 60);
-    %moviePtr2 = Screen('CreateMovie', scr.main, movieName, movieX, movieY, 60, 'CodecType=x264enc Videoquality=1 EncodingQuality=1');
 end
 
 % This should be the best blend function for drawing the noise patches
