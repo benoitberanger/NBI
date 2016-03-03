@@ -1,10 +1,10 @@
-function [ First_frame , Last_frame , Subject_inputtime , Exit_flag ] = PlayMovieTrial( when , movie , DataStruct , DeadLine , adr , msg , dur )
+%% Prepare movie reading
 
 % Just to avoid some bugs
 First_frame = NaN;
 Last_frame  = NaN;
 
-Subject_inputtime = zeros( movie.count , 2 );
+Subject_inputtime = zeros( movie(movie_ref).count , 2 );
 
 % Flag
 Exit_flag = 0;
@@ -18,7 +18,7 @@ timeindex = 0;
 WaitSecs('UntilTime', when );
 
 % Start playback engine
-Screen('PlayMovie', movie.Ptr , 1 );
+Screen('PlayMovie', movie(movie_ref).Ptr , 1 );
 
 
 %% Playback
@@ -34,13 +34,26 @@ while timeindex < DeadLine
     Subject_inputtime(frame,:) = [ secs keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII) ];
     
     if keyCode(DataStruct.Parameters.Keybinds.Stop_Escape_ASCII)
+        
+        % Flag
         Exit_flag = 1;
+        
+        % Stop time
+        StopTime = GetSecs;
+        
+        % Record StopTime
+        ER.AddStopTime( 'StopTime' , StopTime - StartTime );
+        
+        ShowCursor;
+        Priority( DataStruct.PTB.oldLevel );
+        
         break
+        
     end
     
     
     % Wait for next movie frame, retrieve texture handle to it
-    [ texturePtr timeindex ] = Screen('GetMovieImage', DataStruct.PTB.Window, movie.Ptr);
+    [ texturePtr timeindex ] = Screen('GetMovieImage', DataStruct.PTB.Window, movie(movie_ref).Ptr);
     
     % Valid texture returned? A negative value means end of movie reached
     if texturePtr<=0
@@ -63,9 +76,9 @@ while timeindex < DeadLine
     if strcmp( DataStruct.ParPort , 'On' )
         
         % Send Trigger
-        outp( adr , msg );
-        WaitSecs( dur );
-        outp( adr , 0 );
+        WriteParPort( EP.Data{evt,6} );
+        WaitSecs( msg.duration );
+        WriteParPort( 0 );
         
     end
     
@@ -75,13 +88,10 @@ while timeindex < DeadLine
 end
 
 
-%% Rewind
+%% Stop movie engine and Rewind
 
 % Stop playback
-Screen('PlayMovie', movie.Ptr, 0);
+Screen('PlayMovie', movie(movie_ref).Ptr, 0);
 
 % Rewind movie
-Screen( 'SetMovieTimeIndex' , movie.Ptr, 0 );
-
-
-end
+Screen( 'SetMovieTimeIndex' , movie(movie_ref).Ptr, 0 );

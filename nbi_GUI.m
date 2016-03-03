@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 23-Dec-2015 11:33:42
+% Last Modified by GUIDE v2.5 03-Mar-2016 15:52:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -85,6 +85,8 @@ set(handles.uipanel_EyelinkMode,'SelectedObject',handles.radiobutton_EyelinkOn)
 % ParPort
 set( handles.checkbox_ParPort , 'Value' , 1 )
 handles = checkbox_ParPort_Callback( handles.checkbox_ParPort , eventdata , handles );
+
+set(handles.checkbox_WindowedScreen,'Value',0)
 
 %% Try to pick a random seed for the RNG
 
@@ -317,15 +319,25 @@ SelectedDisplay = get(handles.listbox_Screens,'Value');
 DataStruct.Parameters.Video.ScreenMode = str2double( AvalableDisplays(SelectedDisplay) );
 
 
+%% Windowed screen ?
+
+switch get(handles.checkbox_WindowedScreen,'Value')
+    
+    case 1
+        WindowedMode = 'On';
+    case 0
+        WindowedMode = 'Off';
+    otherwise
+        warning('STIMPNEE:WindowedScreen','Error in WindowedScreen')
+        
+end
+
+DataStruct.WindowedMode = WindowedMode;
+
+
 %% Open PTB window
 
 DataStruct.PTB = StartPTB( DataStruct );
-
-
-% %% Update handles (and DataStruct) structure
-%
-% handles.DataStruct = DataStruct;
-% guidata(hObject, handles);
 
 
 %% Task run
@@ -343,12 +355,6 @@ switch Task
 end
 
 DataStruct.TaskData = TaskData;
-
-
-% %% Update handles (and DataStruct) structure
-%
-% handles.DataStruct = DataStruct;
-% guidata(hObject, handles);
 
 
 %% Save files
@@ -650,48 +656,28 @@ function handles = checkbox_ParPort_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox_ParPort
 
-PTB_path = PsychtoolboxRoot;
+opp_path = which('OpenParPort.m');
 
-% Remove \ or / at the end if exists
-if strcmp( PTB_path(end) , filesep )
+if isempty(opp_path)
     
-    PTB_path = PTB_path(1:end-1);
-    
-end
-
-Toolbox_path = fileparts( PTB_path );
-
-ParPort_path = [ Toolbox_path filesep 'MATLAB_functions_benoit' filesep 'ParPort_XP_32bit' ];
-
-
-% ParPort dir exists ?
-if isdir( ParPort_path ) % YES
-    
-    switch get(hObject,'Value')
-        
-        case 1 % Add parallel port functions to the path
-            
-            addpath(ParPort_path)
-            
-            handles.ParPort_path = ParPort_path;
-            
-            disp('Parallel port path added successfully')
-            
-        case 0 % Remove parallel port functions from the path
-            
-            rmpath(handles.ParPort_path)
-            
-            handles = rmfield( handles , 'ParPort_path' );
-            
-            disp('Parallel port path removed successfully')
-            
-    end
-    
-else % NO
-    
-    disp('Parallel port path NOT DETECTED');
-    
+    disp('Parallel port library NOT DETECTED')
+    handles.ParPort = 'Off';
     set(hObject,'Value',0);
+    
+else
+    
+    switch get(hObject,'Value');
+        
+        case 0
+            disp('Parallel port library OFF')
+            handles.ParPort = 'Off';
+            set(hObject,'Value',0);
+            
+        case 1
+            disp('Parallel port library ON')
+            handles.ParPort = 'On';
+            set(hObject,'Value',1);
+    end
     
 end
 
@@ -699,18 +685,10 @@ guidata(hObject, handles);
 
 
 
-% --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, eventdata, handles)
-% hObject    handle to figure1 (see GCBO)
+% --- Executes on button press in checkbox_WindowedScreen.
+function checkbox_WindowedScreen_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox_WindowedScreen (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: delete(hObject) closes the figure
-
-% ParPort
-if isfield( handles , 'ParPort_path' )
-    set( handles.checkbox_ParPort , 'Value' , 0 )
-    handles = checkbox_ParPort_Callback( handles.checkbox_ParPort , eventdata , handles );
-end
-
-delete(hObject);
+% Hint: get(hObject,'Value') returns toggle state of checkbox_WindowedScreen
