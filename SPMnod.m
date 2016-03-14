@@ -19,6 +19,16 @@ try
         case 'EyelinkCalibrationNPI'
             names = {'EyeLinkCalibration'};
             
+        case 'MTMST'
+            names = {
+                '1' ;
+                '2' ;
+                '3' ;
+                '4' ;
+                '5' ;
+                '6' ;
+                };
+            
     end
     
     % 'onsets' & 'durations' for SPM

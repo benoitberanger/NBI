@@ -24,6 +24,15 @@ switch DataStruct.Task
         
         msg.Fixation             = bin2dec('1 0 0 0 0 0 0 0');
         
+    case 'MTMST'
+        
+        msg.pathS_InOut          = bin2dec('0 0 0 0 0 0 0 1');
+        msg.pathS_Rot            = bin2dec('0 0 0 0 0 0 1 0');
+        msg.control2_pathS_InOut = bin2dec('0 0 0 0 0 1 0 0');
+        msg.control2_pathS_Rot   = bin2dec('0 0 0 0 1 0 0 0');
+        
+        msg.Fixation             = bin2dec('1 0 0 0 0 0 0 0');
+        
     otherwise
         
 end

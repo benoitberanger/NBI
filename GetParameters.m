@@ -77,8 +77,6 @@ else
     
 end
 
-% To save time, we restrict keys for all future KbCheck
-RestrictKeysForKbCheck( cell2mat(struct2cell(Parameters.Keybinds)) );
 
 %%%%%%%%%%%
 %  Audio  %

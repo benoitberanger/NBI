@@ -11,7 +11,8 @@ EP     = EventPlanning(header);
 % NextOnset = PreviousOnset + PreviousDuration
 NextOnset = @(EP) EP.Data{end,2} + EP.Data{end,3};
 
-% Define a planning <--- paradigme
+
+%% Define a planning <--- paradigme
 
 % --- Start ---------------------------------------------------------------
 

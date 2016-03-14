@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 03-Mar-2016 15:52:28
+% Last Modified by GUIDE v2.5 03-Mar-2016 18:02:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -66,7 +66,7 @@ set(handles.figure1,'Color',defaultBackground)
 FWFN = get(0,'FixedWidthFontName');
 ListHandles = fieldnames(handles);
 for h = 1 : length( ListHandles )
-    if ~( strcmp( ListHandles{h} , 'figure1' ) || strcmp( ListHandles{h} , 'output' ) )
+    if ~( strcmp( ListHandles{h} , 'figure1' ) || strcmp( ListHandles{h} , 'output' ) ) && isnumeric(handles.(ListHandles{h})) && ishghandle(handles.(ListHandles{h}))
         % set(handles.(ListHandles{h}),'FontName',FWFN)
         set(handles.(ListHandles{h}),'FontName','default')
     end
@@ -87,6 +87,7 @@ set( handles.checkbox_ParPort , 'Value' , 1 )
 handles = checkbox_ParPort_Callback( handles.checkbox_ParPort , eventdata , handles );
 
 set(handles.checkbox_WindowedScreen,'Value',0)
+
 
 %% Try to pick a random seed for the RNG
 
@@ -225,6 +226,7 @@ end
 %% Parallel port ?
 
 switch get( handles.checkbox_ParPort , 'Value' )
+    
     case 1
         ParPort = 'On';
         
@@ -245,6 +247,9 @@ switch get(hObject,'Tag')
         
     case 'pushbutton_NBI'
         Task = 'NBI';
+        
+    case 'pushbutton_MTMST'
+        Task = 'MTMST';
         
     otherwise
         error('NBI:TaskSelection','Error in Task selection')
@@ -350,6 +355,9 @@ switch Task
     case 'EyelinkCalibration'
         TaskData = Eyelink.Calibration( DataStruct );
         
+    case 'MTMST'
+        TaskData = MTMST.MTMST( DataStruct );
+        
     otherwise
         error('NBI:Task','Task ?')
 end
@@ -433,17 +441,9 @@ function pushbutton_NBI_Callback(hObject, eventdata, handles)
 NBI_main_routine(hObject, eventdata, handles)
 
 
-% --- Executes on button press in pushbutton_Morphology_nonce.
-function pushbutton_Morphology_nonce_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_Morphology_nonce (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-NBI_main_routine(hObject, eventdata, handles)
-
-
-% --- Executes on button press in pushbutton_Morphology_words.
-function pushbutton_Morphology_words_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_Morphology_words (see GCBO)
+% --- Executes on button press in pushbutton_MTMST.
+function pushbutton_MTMST_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_MTMST (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 NBI_main_routine(hObject, eventdata, handles)
@@ -692,3 +692,4 @@ function checkbox_WindowedScreen_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox_WindowedScreen
+

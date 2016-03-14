@@ -9,10 +9,10 @@ try
     %% Preparation of movies
     
     % Load location
-    movie(1).file = [ pwd filesep 'videos' filesep 'pathS_InOut.mov'          ];
-    movie(2).file = [ pwd filesep 'videos' filesep 'pathS_Rot.mov'            ];
-    movie(3).file = [ pwd filesep 'videos' filesep 'control2_pathS_InOut.mov' ];
-    movie(4).file = [ pwd filesep 'videos' filesep 'control2_pathS_Rot.mov'   ];
+    movie(1).file = [ pwd filesep '+NBI' filesep 'videos' filesep 'pathS_InOut.mov'          ];
+    movie(2).file = [ pwd filesep '+NBI' filesep 'videos' filesep 'pathS_Rot.mov'            ];
+    movie(3).file = [ pwd filesep '+NBI' filesep 'videos' filesep 'control2_pathS_InOut.mov' ];
+    movie(4).file = [ pwd filesep '+NBI' filesep 'videos' filesep 'control2_pathS_Rot.mov'   ];
     
     %     movie(1).file = [ pwd filesep 'videos' filesep 'test_InOut.mov'          ];
     %     movie(2).file = [ pwd filesep 'videos' filesep 'test_Rot.mov'            ];
