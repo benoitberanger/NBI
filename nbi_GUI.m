@@ -316,7 +316,7 @@ end
 
 %% Get stimulation parameters
 
-DataStruct.Parameters = GetParameters();
+DataStruct.Parameters = GetParameters( DataStruct );
 
 % Screen mode selection
 AvalableDisplays = get(handles.listbox_Screens,'String');

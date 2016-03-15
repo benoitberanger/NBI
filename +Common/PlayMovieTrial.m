@@ -14,6 +14,9 @@ frame = 0;
 
 timeindex = 0;
 
+% Rewind movie
+Screen( 'SetMovieTimeIndex' , movie(movie_ref).Ptr, 0 );
+
 % Sync with movie is special
 WaitSecs('UntilTime', when );
 
@@ -88,10 +91,8 @@ while timeindex < DeadLine
 end
 
 
-%% Stop movie engine and Rewind
+%% Stop movie engine
 
 % Stop playback
 Screen('PlayMovie', movie(movie_ref).Ptr, 0);
 
-% Rewind movie
-Screen( 'SetMovieTimeIndex' , movie(movie_ref).Ptr, 0 );

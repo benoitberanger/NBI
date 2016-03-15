@@ -1,4 +1,4 @@
-function [ Parameters ] = GetParameters
+function [ Parameters ] = GetParameters( DataStruct )
 % GETPARAMETERS Prepare common parameters
 %
 % CONFIG fORRP 932 : USB
@@ -34,7 +34,17 @@ Parameters.Video.SubjectDistance = 0.120; % m
 Parameters.Video.ScreenWidthM    = 0.040; % m
 Parameters.Video.ScreenHeightM   = 0.030; % m
 
-Parameters.Video.ScreenBackgroundColor = [255 255 255]/2; % [R G B] ( from 0 to 255 )
+switch DataStruct.Task
+    
+    case 'NBI'
+        
+        Parameters.Video.ScreenBackgroundColor = [255 255 255]/2; % [R G B] ( from 0 to 255 )
+        
+    case 'MTMST'
+        
+        Parameters.Video.ScreenBackgroundColor = [0 0 0]; % [R G B] ( from 0 to 255 )
+        
+end
 
 Parameters.Toolbox = 'PsychToolbox';
 

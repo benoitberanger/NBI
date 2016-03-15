@@ -42,10 +42,15 @@ try
     
     DotVisualAngle = 0.1;
     
+    diameter = round( PixelPerDegree * DotVisualAngle );
+    rectOval = [ 0 0 diameter diameter ];
+    
+    DotColor = DataStruct.PTB.Black;
+    
     
     %% Start recording eye motions
     
-    TaskData.EyelinkFile = Eyelink.StartRecording( DataStruct );
+    Eyelink.StartRecording( DataStruct );
     
     
     %% Go
@@ -58,7 +63,7 @@ try
             case 'StartTime'
                 
                 % Draw fixation point
-                NBI.DrawFixation;
+                Common.DrawFixation;
                 
                 Common.StartTimeEvent;
                 
@@ -66,7 +71,7 @@ try
             case 'Fixation'
                 
                 % Draw fixation point
-                NBI.DrawFixation;
+                Common.DrawFixation;
                 
                 % Flip video
                 fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 );

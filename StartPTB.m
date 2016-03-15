@@ -37,6 +37,7 @@ PTB.newLevel         = Priority( PTB.maxPriorityLevel );
 % Refresh time of the monitor
 PTB.slack = Screen('GetFlipInterval', PTB.Window)/2;
 PTB.IFI   = Screen('GetFlipInterval', PTB.Window);
+PTB.FPS   = Screen('FrameRate', PTB.Window);
 
 % Set up alpha-blending for smooth (anti-aliased) lines and alpha-blending
 % (transparent background textures)

@@ -27,7 +27,6 @@ KL.BuildGraph;
 TaskData.KL = KL;
 
 % Save some values
-TaskData.FixationDuration = FixationDuration;
 TaskData.Speed            = Speed;
 TaskData.PixelPerDegree   = PixelPerDegree;
 TaskData.DotVisualAngle   = DotVisualAngle;
@@ -46,8 +45,17 @@ assignin('base','TaskData',TaskData)
 
 %% Close all movies
 
-for m = 1 : length(movie)
-    Screen('CloseMovie', movie(m).Ptr );
+switch DataStruct.Task
+    
+    case 'NBI'
+        
+        for m = 1 : length(movie)
+            Screen('CloseMovie', movie(m).Ptr );
+        end
+        
+    case 'MTMST'
+        
+        
 end
 
 

@@ -1,11 +1,7 @@
 %% Tuning
 
-FixationDuration = 2; % secondes
-
-movieDurationOffcet = 0.050; % secondes
-
 % Create and prepare
-header = {       'event_name' ,          'onset(s)' ,   'duration(s)' ,                       'movie_Prt' , 'movie_file' , 'ParPort_message'};
+header = {       'event_name' , 'onset(s)' , 'duration(s)' , 'left' , 'center' , 'right' ,'ParPort_message'};
 EP     = EventPlanning(header);
 
 % NextOnset = PreviousOnset + PreviousDuration
@@ -16,31 +12,19 @@ NextOnset = @(EP) EP.Data{end,2} + EP.Data{end,3};
 
 % --- Start ---------------------------------------------------------------
 
-EP.AddPlanning({ 'StartTime'             0              0                                      []            []             []                       });
+EP.AddPlanning({ 'StartTime' 0  0 [] [] [] [] });
 
 % --- Stim ----------------------------------------------------------------
 
-EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.Fixation             });
-
-% Condition 1 + Fixation
-EP.AddPlanning({ 'pathS_InOut'           NextOnset(EP)  movie(1).duration+movieDurationOffcet  movie(1).Ptr  movie(1).file  msg.pathS_InOut          });
-EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.Fixation             });
-
-% Condition 2 + Fixation
-EP.AddPlanning({ 'pathS_Rot'             NextOnset(EP)  movie(2).duration+movieDurationOffcet  movie(2).Ptr  movie(2).file  msg.pathS_Rot            });
-EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.Fixation             });
-
-% Condition 3 + Fixation
-EP.AddPlanning({ 'control2_pathS_InOut'  NextOnset(EP)  movie(3).duration+movieDurationOffcet  movie(3).Ptr  movie(3).file  msg.control2_pathS_InOut });
-EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.Fixation             });
-
-% Condition 4 + Fixation
-EP.AddPlanning({ 'control2_pathS_Rot'    NextOnset(EP)  movie(4).duration+movieDurationOffcet  movie(4).Ptr  movie(4).file  msg.control2_pathS_Rot   });
-EP.AddPlanning({ 'Fixation'              NextOnset(EP)  FixationDuration                       []            []             msg.Fixation             });
+EP.AddPlanning({ 'Fixation' NextOnset(EP) 3 0 0 0 2 });
+EP.AddPlanning({ 'Left'     NextOnset(EP) 3 1 0 0 4 });
+EP.AddPlanning({ 'Fixation' NextOnset(EP) 3 0 1 0 2 });
+EP.AddPlanning({ 'Right'    NextOnset(EP) 3 0 0 1 1 });
+EP.AddPlanning({ 'LR'       NextOnset(EP) 3 1 0 1 1 });
 
 % --- Stop ----------------------------------------------------------------
 
-EP.AddPlanning({ 'StopTime'              NextOnset(EP)  0                                      []            []             []                       });
+EP.AddPlanning({ 'StopTime' NextOnset(EP) 0 [] [] [] [] });
 
 
 %% Acceleration
