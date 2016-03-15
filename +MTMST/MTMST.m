@@ -20,60 +20,51 @@ try
     Common.PrepareRecorders;
     
     
-    %% Prepare fixation dot
+    %% Prepare dots
     
     PixelPerDegree = va2pix( 1 , DataStruct.Parameters.Video.SubjectDistance , DataStruct.Parameters.Video.ScreenWidthM , DataStruct.Parameters.Video.ScreenWidthPx );
     
+    % -----------------
+    % Set fixation dot
+    % -----------------
+    
     DotVisualAngle = 0.15;
+    DotColor = DataStruct.PTB.White;
     
     diameter = round( PixelPerDegree * DotVisualAngle );
     rectOval = [ 0 0 diameter diameter ];
     
-    DotColor = DataStruct.PTB.White;
     
-    %%
+    % -------------------------
+    % Set dot field parameters
+    % -------------------------
     
-    % ------------------------
-    % set dot field parameters
-    % ------------------------
+    DotSpeed        = 3;    % dot speed (deg/sec)
+    DotFractionKill = 0.001; % fraction of dots to kill each frame (limited lifetime)
     
-    DotSpeed   = 3;    % dot speed (deg/sec)
-    DotFractionKill      = 0.001; % fraction of dots to kill each frame (limited lifetime)
-    
-    NumberOfDots       = 100; % number of dots
-    MaxiumRadiusDeg       = 4;   % maximum radius of  annulus (degrees)
-    MinimumRadiusDeg       = 0.2;    % minumum
+    NumberOfDots     = 50; % number of dots
+    MaxiumRadiusDeg  = 3;   % maximum radius of  annulus (degrees)
+    MinimumRadiusDeg = 0.2;    % minumum
     DotSizeDeg       = 0.1;  % width of dot (deg)
-    FixationRadius       = 0.15; % radius of fixation point (deg)
     
     LRoffcetDeg = 5;
     
-    % ---------------------------------------
-    % initialize dot positions and velocities
-    % ---------------------------------------
+    % -----------------------------------------
+    % Transform each visual angles into pixels
+    % -----------------------------------------
     
     LRoffcetPx = LRoffcetDeg*PixelPerDegree;
     
     PixelFrameSpeed = DotSpeed * PixelPerDegree / DataStruct.PTB.FPS;                            % dot speed (pixels/frame)
     DotSizePx = DotSizeDeg * PixelPerDegree;                                        % dot size (pixels)
     
-    FixationCoordinates = CenterRectOnPoint(rectOval,DataStruct.PTB.CenterH,DataStruct.PTB.CenterV);
-    
-    MaxiumRadiusPx = MaxiumRadiusDeg * PixelPerDegree;	% maximum radius of annulus (pixels from center)
+    MaxiumRadiusPx  = MaxiumRadiusDeg  * PixelPerDegree; % maximum radius of annulus (pixels from center)
     MinimumRadiusPx = MinimumRadiusDeg * PixelPerDegree; % minimum
-    r = MaxiumRadiusPx * sqrt(rand(NumberOfDots,1));	% r
-    r(r<MinimumRadiusPx) = MinimumRadiusPx;
-    t = 2*pi*rand(NumberOfDots,1);                     % theta polar coordinate
-    cs = [cos(t), sin(t)];
-    xy = [r r] .* cs;   % dot positions in Cartesian coordinates (pixels from center)
-    xymatrix = transpose(xy);
     
-    %     mdir = 2 * floor(rand(NumberOfDots,1)+0.5) - 1;    % motion direction (in or out) for each dot
-    mdir = -ones(NumberOfDots,1);
-    dr = PixelFrameSpeed * mdir;                            % change in radius per frame (pixels)
-    dxdy = [dr dr] .* cs;                       % change in x and y per frame (pixels)
+    % Positive or negative speed ?
+    mdirIN  = -ones(NumberOfDots,1);
+    mdirOUT = -mdirIN;
     
-    %     colvect=white;
     
     %% Start recording eye motions
     
@@ -106,37 +97,36 @@ try
                 
                 frame = 0;
                 
+                % New set of points at each IN/OUT trial
+                r = MaxiumRadiusPx * sqrt(rand(NumberOfDots,1));	% r
+                r(r<MinimumRadiusPx) = MinimumRadiusPx;
+                t = 2*pi*rand(NumberOfDots,1);                     % theta polar coordinate
+                cs = [cos(t), sin(t)];
+                xy = [r r] .* cs;   % dot positions in Cartesian coordinates (pixels from center)
+                xymatrix = transpose(xy);
+
                 
+                switch EP.Data{evt,7}
+                    case 'in'
+                        mdir = mdirIN;
+                    case 'out'
+                        mdir = mdirOUT;
+                    otherwise
+                        mdir = mdirIN; % during Fixation, it will randomize the dot position
+                end
+                
+                dr = PixelFrameSpeed * mdir;                % change in radius per frame (pixels)
+                dxdy = [dr dr] .* cs;                       % change in x and y per frame (pixels)
                 
                 while flip_onset < StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 1
                     
-                    % Escape ?
-                    [ ~ , ~ , keyCode ] = KbCheck;
-                    
-                    if keyCode(DataStruct.Parameters.Keybinds.Stop_Escape_ASCII)
-                        
-                        % Flag
-                        Exit_flag = 1;
-                        
-                        % Stop time
-                        StopTime = GetSecs;
-                        
-                        % Record StopTime
-                        ER.AddStopTime( 'StopTime' , StopTime - StartTime );
-                        
-                        ShowCursor;
-                        Priority( DataStruct.PTB.oldLevel );
-                        
-                        break
-                        
-                    end
+                    % ESCAPE key pressed ?
+                    Common.Interrupt;
                     
                     frame = frame + 1 ;
                     
-                    
-                    
-                    Screen('FillOval', DataStruct.PTB.Window, DotColor, FixationCoordinates);	% draw fixation dot (flip erases it)
-                    
+                    % Fixation dot                    
+                    Common.DrawFixation;
                     
                     % Left ?
                     if EP.Data{evt,4}
@@ -184,14 +174,12 @@ try
                     flip_onset = Screen('Flip', DataStruct.PTB.Window);
                     
                     
-                    
-                    
-                    % Parallel port message
-                    if strcmp( DataStruct.ParPort , 'On' )
-                        WriteParPort( EP.Data{evt,7} );
-                        WaitSecs( msg.duration );
-                        WriteParPort( 0 );
-                    end
+%                     % Parallel port message
+%                     if strcmp( DataStruct.ParPort , 'On' )
+%                         WriteParPort( current_message );
+%                         WaitSecs( msg.duration );
+%                         WriteParPort( 0 );
+%                     end
                     
                     if frame == 1
                         
@@ -207,7 +195,7 @@ try
         end % switch
         
         if Exit_flag
-            break
+            break %#ok<*UNRCH>
         end
         
         

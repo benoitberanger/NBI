@@ -1,7 +1,12 @@
 %% Tuning
 
+FixationDuration = 1; % seconds
+INOUTDuration = 1; % seconds
+
+%% Prepare event
+
 % Create and prepare
-header = {       'event_name' , 'onset(s)' , 'duration(s)' , 'left' , 'center' , 'right' ,'ParPort_message'};
+header = { 'event_name' , 'onset(s)' , 'duration(s)' , 'left' , 'center' , 'right' , 'mouvement_dir'};
 EP     = EventPlanning(header);
 
 % NextOnset = PreviousOnset + PreviousDuration
@@ -16,11 +21,25 @@ EP.AddPlanning({ 'StartTime' 0  0 [] [] [] [] });
 
 % --- Stim ----------------------------------------------------------------
 
-EP.AddPlanning({ 'Fixation' NextOnset(EP) 3 0 0 0 2 });
-EP.AddPlanning({ 'Left'     NextOnset(EP) 3 1 0 0 4 });
-EP.AddPlanning({ 'Fixation' NextOnset(EP) 3 0 1 0 2 });
-EP.AddPlanning({ 'Right'    NextOnset(EP) 3 0 0 1 1 });
-EP.AddPlanning({ 'LR'       NextOnset(EP) 3 1 0 1 1 });
+EP.AddPlanning({ 'Fixation' NextOnset(EP) FixationDuration 0 0 0 '' });
+
+for cycle = 1 : 2
+    
+    EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
+    for rep = 1 : 4
+        EP.AddPlanning({ 'leftOUT'  NextOnset(EP) INOUTDuration 1 0 0 'out' });
+        EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
+    end
+    
+    EP.AddPlanning({ 'rightIN'  NextOnset(EP) INOUTDuration 0 0 1 'in' });
+    for rep = 1 : 4
+        EP.AddPlanning({ 'rightOUT' NextOnset(EP) INOUTDuration 0 0 1 'out' });
+        EP.AddPlanning({ 'rightIN'  NextOnset(EP) INOUTDuration 0 0 1 'in' });
+    end
+    
+    EP.AddPlanning({ 'Fixation' NextOnset(EP) FixationDuration 0 0 0 '' });
+    
+end
 
 % --- Stop ----------------------------------------------------------------
 

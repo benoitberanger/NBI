@@ -31,29 +31,10 @@ while timeindex < DeadLine
     
     frame = frame + 1;
     
-    % Escape ?
-    [ ~ , secs , keyCode ] = KbCheck;
+    % ESCAPE key pressed ?
+    Common.Interrupt;
     
     Subject_inputtime(frame,:) = [ secs keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII) ];
-    
-    if keyCode(DataStruct.Parameters.Keybinds.Stop_Escape_ASCII)
-        
-        % Flag
-        Exit_flag = 1;
-        
-        % Stop time
-        StopTime = GetSecs;
-        
-        % Record StopTime
-        ER.AddStopTime( 'StopTime' , StopTime - StartTime );
-        
-        ShowCursor;
-        Priority( DataStruct.PTB.oldLevel );
-        
-        break
-        
-    end
-    
     
     % Wait for next movie frame, retrieve texture handle to it
     [ texturePtr timeindex ] = Screen('GetMovieImage', DataStruct.PTB.Window, movie(movie_ref).Ptr);
