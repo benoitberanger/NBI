@@ -1,28 +1,13 @@
 function [ Parameters ] = GetParameters( DataStruct )
 % GETPARAMETERS Prepare common parameters
 %
-% CONFIG fORRP 932 : USB
+% CONFIG fORRP 932 :
 %
-%     HHSC - 2x4 - C
-%     HID NAR 12345
 %
-% MR CONFON : Stim volume = +10
+%
 
 
 %% Set parameters
-
-%%%%%%%%%%%
-%  Text   %
-%%%%%%%%%%%
-Parameters.Video.TextSize             = 50;
-Parameters.Video.TextFont             = 'Arial';
-Parameters.Video.TextColor            = [255 255 255] ; % [R B G] color ( from 0 to 255 )
-Parameters.Video.TextSizeInstructions = 18;
-
-%%%%%%%%%%%
-%  Cross  %
-%%%%%%%%%%%
-Parameters.Video.FixationCrossColor = [255 255 255]; % [R B G] color ( from 0 to 255 )
 
 %%%%%%%%%%%%%%
 %   Screen   %
@@ -40,9 +25,17 @@ switch DataStruct.Task
         
         Parameters.Video.ScreenBackgroundColor = [255 255 255]/2; % [R G B] ( from 0 to 255 )
         
-    case 'MTMST'
+    case 'MTMST_Left'
         
         Parameters.Video.ScreenBackgroundColor = [0 0 0]; % [R G B] ( from 0 to 255 )
+        
+    case 'MTMST_Right'
+        
+        Parameters.Video.ScreenBackgroundColor = [0 0 0]; % [R G B] ( from 0 to 255 )
+        
+    case 'Retinotopy'
+        
+        Parameters.Video.ScreenBackgroundColor = [255 255 255]/2; % [R G B] ( from 0 to 255 )
         
 end
 
@@ -79,7 +72,7 @@ else
     
     five = KbName('parenleft');
     Parameters.Keybinds.TTL_5_ASCII = five(1);
-%     Parameters.Keybinds.TTL_5_ASCII = KbName('parenleft');
+    %     Parameters.Keybinds.TTL_5_ASCII = KbName('parenleft');
     
     Parameters.Keybinds.emulTTL_SpaceBar_ASCII = KbName('space');
     
@@ -87,22 +80,6 @@ else
     
 end
 
-
-%%%%%%%%%%%
-%  Audio  %
-%%%%%%%%%%%
-
-Parameters.Audio.SamplingRate            = 44100; % Hz
-
-Parameters.Audio.Playback_Mode           = 1; % 1 = playback, 2 = record
-Parameters.Audio.Playback_LowLatencyMode = 1; % {0,1,2,3,4}
-Parameters.Audio.Playback_freq           = Parameters.Audio.SamplingRate;
-Parameters.Audio.Playback_Channels       = 2; % 1 = mono, 2 = stereo
-
-Parameters.Audio.Record_Mode             = 2; % 1 = playback, 2 = record
-Parameters.Audio.Record_LowLatencyMode   = 1; % {0,1,2,3,4}
-Parameters.Audio.Record_freq             = Parameters.Audio.SamplingRate;
-Parameters.Audio.Record_Channels         = 1; % 1 = mono, 2 = stereo
 
 
 %% Echo in command window

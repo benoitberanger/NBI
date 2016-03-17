@@ -15,11 +15,31 @@ try
                 'control2_pathS_Rot'   ;
                 'Response'             ;
                 };
-
+            
         case 'EyelinkCalibrationNPI'
             names = {'EyeLinkCalibration'};
             
-        case 'MTMST'
+        case 'MTMST_Left'
+            names = {
+                '1' ;
+                '2' ;
+                '3' ;
+                '4' ;
+                '5' ;
+                '6' ;
+                };
+            
+        case 'MTMST_Right'
+            names = {
+                '1' ;
+                '2' ;
+                '3' ;
+                '4' ;
+                '5' ;
+                '6' ;
+                };
+            
+        case 'Retinotopy'
             names = {
                 '1' ;
                 '2' ;
@@ -83,7 +103,7 @@ try
                 durations{5} = [ durations{5} ; EventData{event+1,2}-EventData{event,2}] ;
             case 'Response'
                 durations{6} = [ durations{6} ; EventData{event+1,2}-EventData{event,2}] ;
-
+                
                 
         end
         

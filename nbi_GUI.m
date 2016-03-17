@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 03-Mar-2016 18:02:54
+% Last Modified by GUIDE v2.5 17-Mar-2016 12:00:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -248,8 +248,14 @@ switch get(hObject,'Tag')
     case 'pushbutton_NBI'
         Task = 'NBI';
         
-    case 'pushbutton_MTMST'
-        Task = 'MTMST';
+    case 'pushbutton_MTMST_Left'
+        Task = 'MTMST_Left';
+        
+    case 'pushbutton_MTMST_Right'
+        Task = 'MTMST_Right';
+        
+    case 'pushbutton_Retinotopy'
+        Task = 'MTMST_Retinotopy';
         
     otherwise
         error('NBI:TaskSelection','Error in Task selection')
@@ -355,8 +361,14 @@ switch Task
     case 'EyelinkCalibration'
         TaskData = Eyelink.Calibration( DataStruct );
         
-    case 'MTMST'
+    case 'MTMST_Left'
         TaskData = MTMST.MTMST( DataStruct );
+        
+    case 'MTMST_Right'
+        TaskData = MTMST.MTMST( DataStruct );
+        
+    case 'Retinotopy'
+        TaskData = Retinotopy.Retinotopy( DataStruct );
         
     otherwise
         error('NBI:Task','Task ?')
@@ -441,9 +453,25 @@ function pushbutton_NBI_Callback(hObject, eventdata, handles)
 NBI_main_routine(hObject, eventdata, handles)
 
 
-% --- Executes on button press in pushbutton_MTMST.
-function pushbutton_MTMST_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_MTMST (see GCBO)
+% --- Executes on button press in pushbutton_MTMST_Left.
+function pushbutton_MTMST_Left_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_MTMST_Left (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+NBI_main_routine(hObject, eventdata, handles)
+
+
+% --- Executes on button press in pushbutton_MTMST_Right.
+function pushbutton_MTMST_Right_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_MTMST_Right (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+NBI_main_routine(hObject, eventdata, handles)
+
+
+% --- Executes on button press in pushbutton_Retinotopy.
+function pushbutton_Retinotopy_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_Retinotopy (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 NBI_main_routine(hObject, eventdata, handles)

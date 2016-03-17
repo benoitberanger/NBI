@@ -43,10 +43,6 @@ PTB.FPS   = Screen('FrameRate', PTB.Window);
 % (transparent background textures)
 Screen('BlendFunction', PTB.Window, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
 
-% Set text police
-Screen('TextSize', PTB.Window, Video.TextSize);
-Screen('TextFont', PTB.Window, Video.TextFont);
-
 % Center
 [ PTB.CenterH , PTB.CenterV ] = RectCenter( PTB.WindowRect );
 
