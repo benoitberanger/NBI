@@ -31,10 +31,16 @@ for cycle = 1 : 2
         EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
     end
     
-    EP.AddPlanning({ 'rightIN'  NextOnset(EP) INOUTDuration 0 0 1 'in' });
+%     EP.AddPlanning({ 'centerIN'   NextOnset(EP) INOUTDuration 0 1 0 'in' });
+%     for rep = 1 : 4
+%         EP.AddPlanning({ 'centerOUT'  NextOnset(EP) INOUTDuration 0 1 0 'out' });
+%         EP.AddPlanning({ 'centerIN'   NextOnset(EP) INOUTDuration 0 1 0 'in' });
+%     end
+    
+    EP.AddPlanning({ 'rightIN'   NextOnset(EP) INOUTDuration 0 0 1 'in' });
     for rep = 1 : 4
-        EP.AddPlanning({ 'rightOUT' NextOnset(EP) INOUTDuration 0 0 1 'out' });
-        EP.AddPlanning({ 'rightIN'  NextOnset(EP) INOUTDuration 0 0 1 'in' });
+        EP.AddPlanning({ 'rightOUT'  NextOnset(EP) INOUTDuration 0 0 1 'out' });
+        EP.AddPlanning({ 'rightIN'   NextOnset(EP) INOUTDuration 0 0 1 'in' });
     end
     
     EP.AddPlanning({ 'Fixation' NextOnset(EP) FixationDuration 0 0 0 '' });

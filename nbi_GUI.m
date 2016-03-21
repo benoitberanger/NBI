@@ -589,19 +589,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-set(hObject,'TooltipString',sprintf('Select the display mode \n PTB : 0 for extended display (over all screens) , 1 for screen 1 , 2 for screen 2 , etc.'))
-
-AvailableDisplays = Screen('Screens');
-
-% Put screen 1 on the top : CENIR human MRI configuration
-if length(AvailableDisplays) > 1
-    AvailableDisplays = circshift(AvailableDisplays',length(AvailableDisplays)-1);
-    ListOfScreens = num2str(AvailableDisplays);
-else
-    ListOfScreens = num2str(AvailableDisplays');
-end
-
-set(hObject,'String',ListOfScreens)
+GUI.Listbox_Screens_CreateFcn;
 
 
 
@@ -621,10 +609,7 @@ function pushbutton_RunNumber_p1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-CurrentRunNumber_str = get(handles.edit_RunNumber,'String');
-CurrentRunNumber = str2double(CurrentRunNumber_str) + 1;
-
-set(handles.edit_RunNumber,'String', num2str( CurrentRunNumber ) )
+GUI.Pushbutton_RunNumber_p1_Callback;
 
 
 
@@ -634,11 +619,7 @@ function pushbutton_RunNumber_m1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-CurrentRunNumber_str = get(handles.edit_RunNumber,'String');
-CurrentRunNumber = str2double(CurrentRunNumber_str) - 1;
-
-set(handles.edit_RunNumber,'String', num2str( CurrentRunNumber ) )
-
+GUI.Pushbutton_RunNumber_m1_Callback;
 
 
 % --- Executes on button press in pushbutton_Check_SubjectID_data.
@@ -647,33 +628,7 @@ function pushbutton_Check_SubjectID_data_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% ../
-upperDir = fullfile( fileparts( pwd ) );
-
-% ../data/
-dataDir = fullfile( upperDir , 'data' );
-
-% ../data/ exists ?
-if ~isdir( dataDir )
-    error( 'MATLAB:DataDirExists' , ' \n ---> data directory not found in the upper dir : %s <--- \n ' , upperDir )
-end
-
-SubjectID = get(handles.edit_SubjectID,'String');
-
-% ../data/(SubjectID)
-SubjectIDDir = fullfile( dataDir , SubjectID );
-
-% ../data/(SubjectID) exists ?
-if ~isdir( SubjectIDDir )
-    error( 'MATLAB:SubjectIDDirExists' ,  ' \n ---> SubjectID directory not found in the : %s <--- \n ' , dataDir )
-end
-
-% Display dir
-disp(SubjectIDDir)
-
-% Display content
-dir(SubjectIDDir)
-
+GUI.Pushbutton_Check_SubjectID_data_Callback;
 
 
 % --- Executes on button press in checkbox_ParPort.
@@ -684,32 +639,7 @@ function handles = checkbox_ParPort_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox_ParPort
 
-opp_path = which('OpenParPort.m');
-
-if isempty(opp_path)
-    
-    disp('Parallel port library NOT DETECTED')
-    handles.ParPort = 'Off';
-    set(hObject,'Value',0);
-    
-else
-    
-    switch get(hObject,'Value');
-        
-        case 0
-            disp('Parallel port library OFF')
-            handles.ParPort = 'Off';
-            set(hObject,'Value',0);
-            
-        case 1
-            disp('Parallel port library ON')
-            handles.ParPort = 'On';
-            set(hObject,'Value',1);
-    end
-    
-end
-
-guidata(hObject, handles);
+GUI.Checkbox_ParPort_Callback;
 
 
 

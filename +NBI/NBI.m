@@ -70,8 +70,11 @@ try
                 
             case 'Fixation'
                 
+                % Fill background
+                Screen('FillRect',DataStruct.PTB.Window,(DataStruct.PTB.Black + DataStruct.PTB.White)/2);
+                
                 % Draw fixation point
-                Common.DrawFixation;
+                NBI.DrawFixation;
                 
                 % Flip video
                 fixation_onset = Screen( 'Flip' , DataStruct.PTB.Window , StartTime + EP.Data{evt,2} - DataStruct.PTB.slack * 1 );
