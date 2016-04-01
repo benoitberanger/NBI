@@ -63,7 +63,7 @@ try
             case 'StartTime'
                 
                 % Draw fixation point
-                Common.DrawFixation;
+                NBI.DrawFixation;
                 
                 Common.StartTimeEvent;
                 

@@ -255,7 +255,7 @@ switch get(hObject,'Tag')
         Task = 'MTMST_Right';
         
     case 'pushbutton_Retinotopy'
-        Task = 'MTMST_Retinotopy';
+        Task = 'Retinotopy';
         
     otherwise
         error('NBI:TaskSelection','Error in Task selection')
