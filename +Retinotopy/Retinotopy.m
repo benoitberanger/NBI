@@ -6,9 +6,6 @@ try
     
     clc
     
-%     Screen('FillRect',DataStruct.PTB.Window, DataStruct.Parameters.Video.ScreenBackgroundColor);
-%     vbl = Screen('Flip',DataStruct.PTB.Window);
-    
     if exist('flicTexture','var')
         Screen('Close', flicTexture);
     end
@@ -25,83 +22,97 @@ try
     
     a = linspace(0 , 360*( 1 - (1/segements)) , segements)';
     da = diff(a);
-    %     da = da(1)
     
-    r = linspace(innerLimit , screenYpx , alternance+1)';
-    r(1) = [];
+%     r = linspace(innerLimit , screenYpx , alternance+1)';
+    r = logspace(log10(innerLimit), log10(screenYpx) , alternance+1)';
+    
     dr = diff(r)/2;
-    %     dr = dr(1)
+    r(1) = [];
     
-    %     innerCircle = CenterRectOnPoint([0 0 innerLimit+dr innerLimit+dr],DataStruct.PTB.CenterH,DataStruct.PTB.CenterV);
-    %     for osef = 2:length(r)
-    %         innerCircle = vertcat( innerCircle , InsetRect(innerCircle(end,:),dr,dr) );
-    %     end
-    
+    %%
     innerCircle = NaN(length(r),4);
     for osef = 1:length(r)
         innerCircle(osef,:) = CenterRectOnPoint([0 0 r(osef) r(osef)],DataStruct.PTB.CenterH,DataStruct.PTB.CenterV);
     end
     
-    %     %     positionOfMainCircle = [0 0 100 100];
-    %         positionOfMainCircle = CenterRectOnPoint([0 0 100 100],DataStruct.PTB.CenterH-100,DataStruct.PTB.CenterV-100);
-    %
-    %         Screen('FillRect',DataStruct.PTB.Window, [255 255 0 50],positionOfMainCircle)
-    %
-    %         for angle = 1 : length(r)
-    %         Screen('FrameArc',DataStruct.PTB.Window, 255*rand(1,3),positionOfMainCircle + angle * 50,a(angle),r(angle),10);
-    %         end
-    %         Screen('DrawArc',DataStruct.PTB.Window, [255 0 0],positionOfMainCircle-10,45,-90 );
-    
-%     Screen('FillRect',DataStruct.PTB.Window, 255/2)
     
     bumper = 0;
     for angle = 1 : length(a)
         bumper = bumper + 1;
         for radius = 1 : length(r)
             bumper = bumper + 1;
-            Screen('FrameArc',DataStruct.PTB.Window, 255*mod(bumper,2),innerCircle(radius,:),a(angle),da(1),dr(1));
+            Screen('FrameArc',DataStruct.PTB.Window, 255*mod(bumper,2),innerCircle(radius,:),a(angle),da(1),dr(radius));
         end
     end
     
-%     WaitSecs(0.200);
-    
     Screen('DrawingFinished', DataStruct.PTB.Window);
     
-%     vbl = Screen('Flip',DataStruct.PTB.Window,[],1);
     flicImage=Screen('GetImage', DataStruct.PTB.Window,[],'backBuffer');
-    
-%     WaitSecs(0.200);
-    
-    figure; image(flicImage)
-    
-%     vbl = Screen('Flip',DataStruct.PTB.Window,[],1);
+    %     figure; image(flicImage)
     
     flicTexture=Screen('MakeTexture', DataStruct.PTB.Window, flicImage);
     flacTexture=Screen('MakeTexture', DataStruct.PTB.Window, 255 - flicImage);
     
-%     Screen('FillRect',DataStruct.PTB.Window, [255 255 255 128],CenterRectOnPoint([0 0 innerLimit innerLimit],DataStruct.PTB.CenterH,DataStruct.PTB.CenterV))
+    %     Screen('FillRect',DataStruct.PTB.Window, [255 255 255 128],CenterRectOnPoint([0 0 innerLimit innerLimit],DataStruct.PTB.CenterH,DataStruct.PTB.CenterV))
     
     %%
     
-    flicflac = 0;
+    % Start angle at which we would like our mask to begin (degrees)
+    startAngle = 0;
     
-%     WaitSecs(0.4)
+    % Length of the arc (degrees)
+    arcAngle = 270;
     
-    vbl = Screen('Flip',DataStruct.PTB.Window);
+    
+    % Rate at which our mask will rotate
+    degPerSec = 20;
+    degPerFrame = degPerSec * DataStruct.PTB.IFI;
+    
+    % The rect in which we will define our arc
+    arcRect = CenterRectOnPoint([0 0 screenYpx*1.1 screenYpx*1.1],DataStruct.PTB.CenterH,DataStruct.PTB.CenterV);
+    
+    %% flic flac
+    
+    flicDuration = 1.000;
+    flacDuration = 0.100;
+    ifi = DataStruct.PTB.IFI;
+    
+    flicFrames = round(flicDuration/ifi);
+    flacFrames = round(flacDuration/ifi);
+    
+    
+    %%
+    
+    
+    frame_counter = 0;
+    
+    %     Screen('DrawTexture', DataStruct.PTB.Window,flicTexture)
     
     while ~KbCheck
         
-        flicflac = flicflac + 1;
+        frame_counter = frame_counter  + 1 ;
         
-        switch mod(flicflac,2)
-            case 0
-                Screen('DrawTexture', DataStruct.PTB.Window,flicTexture)
-            case 1
+        
+        if frame_counter > flicFrames
+            
+            if mod(frame_counter,flicFrames + flacFrames) < flacFrames
                 Screen('DrawTexture', DataStruct.PTB.Window,flacTexture)
+            else
+                Screen('DrawTexture', DataStruct.PTB.Window,flicTexture)
+            end
+            
+        else
+            Screen('DrawTexture', DataStruct.PTB.Window,flicTexture)
         end
-
         
-        vbl = Screen('Flip',DataStruct.PTB.Window,vbl + 0.250 - DataStruct.PTB.slack);
+        % Draw our mask
+        Screen('FillArc', DataStruct.PTB.Window, DataStruct.Parameters.Video.ScreenBackgroundColor, arcRect, startAngle, arcAngle)
+        
+        VBL = Screen('Flip',DataStruct.PTB.Window);
+        
+        
+        % Increment the start angle of the mask
+        startAngle = startAngle + degPerFrame;
         
         tic
         
