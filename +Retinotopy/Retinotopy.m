@@ -35,25 +35,41 @@ try
     FixV = DataStruct.PTB.CenterV;
     
     % Checkerboard
-    Checkerboard.segements = 24;
-    Checkerboard.alternance = 8;
-    Checkerboard.innerLimit = 50; % Pixel
+    Checkerboard.segements = 32;
+    Checkerboard.alternance = 16;
+    Checkerboard.innerLimit = PixelPerDegree*DotVisualAngle*3; % Pixel
     
     % Wedge
     Wedge.startAngle = 90; % Start angle at which we would like our mask to begin (degrees)
     Wedge.arcAngle = 270; % Length of the arc (degrees)
-    Wedge.degPerSec = 20; % Rate at which our mask will rotate
     
-    Wedge.degPerFrame = Wedge.degPerSec * DataStruct.PTB.IFI;
+%     % Rate at which our mask will rotate
+%     switch DataStruct.OperationMode
+%         case 'Acquisition'
+%             Wedge.degPerSec = 20;
+%         case 'FastDebug'
+%             Wedge.degPerSec = 20*Speed;
+%         case 'RealisticDebug'
+%             Wedge.degPerSec = 20;
+%     end
+    
+    
+%     Wedge.degPerFrame = Wedge.degPerSec * DataStruct.PTB.IFI;
     Wedge.arcRect = CenterRectOnPoint([0 0 DataStruct.PTB.WindowRect(4)*1.1 DataStruct.PTB.WindowRect(4)*1.1],DataStruct.PTB.CenterH,DataStruct.PTB.CenterV); % The rect in which we will define our arc
     
     
     % flic flac
-    Flic.Duration = 0.750;
-    Flac.Duration = 0.150;
+    Flic.Duration = 0.500;
+    Flac.Duration = 0.100;
     
-    Flic.Frames = round(Flic.Duration/DataStruct.PTB.IFI);
-    Flac.Frames = round(Flac.Duration/DataStruct.PTB.IFI);
+    Flic.flotFrames = Flic.Duration/DataStruct.PTB.IFI;
+    Flac.flotFrames = Flac.Duration/DataStruct.PTB.IFI;
+    Flic.Frames = round(Flic.flotFrames);
+    Flac.Frames = round(Flac.flotFrames);
+    
+    fprintf('\n')
+    fprintf('Flic.flotFrames = %g -> %d \n',Flic.flotFrames,Flic.Frames)
+    fprintf('Flac.flotFrames = %g -> %d \n',Flac.flotFrames,Flac.Frames)
     
     
     %% Prepare coordinates
@@ -112,6 +128,9 @@ try
     
     %% Go
     
+    flip_onset = 0;
+    Exit_flag = 0;
+    
     % Loop over the EventPlanning
     for evt = 1 : size( EP.Data , 1 )
         
@@ -126,8 +145,6 @@ try
                 
                 Common.StartTimeEvent;
                 
-                WaitSecs(0.3);
-                
             case 'StopTime'
                 
                 Common.StopTimeEvent;
@@ -135,17 +152,22 @@ try
                 
             otherwise
                 
-                frame_counter = 0;
+                frame = 0;
                 
-                while ~KbCheck
+                fix_counter = 0;
+                
+                while flip_onset < StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 1
                     
-                    frame_counter = frame_counter  + 1 ;
+                    % ESCAPE key pressed ?
+                    Common.Interrupt;
+                    
+                    frame = frame  + 1 ;
                     
                     Screen('FillRect',DataStruct.PTB.Window)
                     
-                    if frame_counter > Flic.Frames
+                    if frame > Flic.Frames
                         
-                        if mod(frame_counter,Flic.Frames + Flac.Frames) < Flac.Frames
+                        if mod(frame,Flic.Frames + Flac.Frames) < Flac.Frames
                             Screen('DrawTexture', DataStruct.PTB.Window,Flac.Texture)
                         else
                             Screen('DrawTexture', DataStruct.PTB.Window,Flic.Texture)
@@ -159,26 +181,42 @@ try
                     Screen('FillArc', DataStruct.PTB.Window, DataStruct.Parameters.Video.ScreenBackgroundColor, Wedge.arcRect, Wedge.startAngle, Wedge.arcAngle)
                     
                     % Draw fixation point
-                    MTMST.DrawFixation;
+                    if fix_counter == 0
+                        if rand > 0.99
+                            fix_counter = 2;
+                        else
+                            MTMST.DrawFixation;
+                        end
+                    else
+                        fix_counter = fix_counter - 1;
+                    end
                     
                     % Flip
                     flip_onset = Screen('Flip',DataStruct.PTB.Window);
                     
-                    % Save onset
-                    ER.AddEvent({ EP.Data{evt,1} flip_onset-StartTime })
+                    if frame == 1
+                        
+                        % Save onset
+                        ER.AddEvent({ EP.Data{evt,1} flip_onset-StartTime })
+                        
+                    end
                     
                     % Increment the start angle of the mask
-                    Wedge.startAngle = Wedge.startAngle + Wedge.degPerFrame;
-                    
+                    switch EP.Data{evt,4}
+                        case 'cw'
+                            Wedge.startAngle = Wedge.startAngle + EP.Data{evt,5}* DataStruct.PTB.IFI * Speed;
+                        case 'ccw'
+                            Wedge.startAngle = Wedge.startAngle - EP.Data{evt,5}* DataStruct.PTB.IFI * Speed;
+                    end
                     
                 end % while
                 
                 
         end % switch
         
-        %         if Exit_flag
-        %             break %#ok<*UNRCH>
-        %         end
+        if Exit_flag
+            break %#ok<*UNRCH>
+        end
         
         
     end % for

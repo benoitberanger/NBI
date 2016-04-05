@@ -6,7 +6,7 @@ INOUTDuration = 1; % seconds
 %% Prepare event
 
 % Create and prepare
-header = { 'event_name' , 'onset(s)' , 'duration(s)' , 'rotation' , 'flic_duration(s)' , 'flac_duration(s)' };
+header = { 'event_name' , 'onset(s)' , 'duration(s)' , 'rotation', 'deg/sec' };
 EP     = EventPlanning(header);
 
 % NextOnset = PreviousOnset + PreviousDuration
@@ -17,15 +17,20 @@ NextOnset = @(EP) EP.Data{end,2} + EP.Data{end,3};
 
 % --- Start ---------------------------------------------------------------
 
-EP.AddPlanning({ 'StartTime' 0  0 [] [] [] });
+EP.AddPlanning({ 'StartTime' 0  0 [] [] });
 
 % --- Stim ----------------------------------------------------------------
 
-EP.AddPlanning({ '???' 0  0 [] [] [] });
+EP.AddPlanning({ 'cw' NextOnset(EP) 18 'cw' 20 });
+EP.AddPlanning({ 'cw' NextOnset(EP) 18 'cw' 20 });
+EP.AddPlanning({ 'ccw' NextOnset(EP) 18 'ccw' 20 });
+EP.AddPlanning({ 'ccw' NextOnset(EP) 18 'ccw' 20 });
+EP.AddPlanning({ 'cw' NextOnset(EP) 18 'cw' 20 });
+EP.AddPlanning({ 'ccw' NextOnset(EP) 18 'ccw' 20 });
 
 % --- Stop ----------------------------------------------------------------
 
-EP.AddPlanning({ 'StopTime' NextOnset(EP) 0 [] [] [] });
+EP.AddPlanning({ 'StopTime' NextOnset(EP) 0 [] [] });
 
 
 %% Acceleration
