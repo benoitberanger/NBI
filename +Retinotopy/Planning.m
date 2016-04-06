@@ -21,11 +21,11 @@ EP.AddPlanning({ 'StartTime' 0  0 [] [] });
 
 % --- Stim ----------------------------------------------------------------
 
-EP.AddPlanning({ 'cw' NextOnset(EP) 18 'cw' 20 });
-EP.AddPlanning({ 'cw' NextOnset(EP) 18 'cw' 20 });
+EP.AddPlanning({ 'cw'  NextOnset(EP) 18 'cw'  20 });
+EP.AddPlanning({ 'cw'  NextOnset(EP) 18 'cw'  20 });
 EP.AddPlanning({ 'ccw' NextOnset(EP) 18 'ccw' 20 });
 EP.AddPlanning({ 'ccw' NextOnset(EP) 18 'ccw' 20 });
-EP.AddPlanning({ 'cw' NextOnset(EP) 18 'cw' 20 });
+EP.AddPlanning({ 'cw'  NextOnset(EP) 18 'cw'  20 });
 EP.AddPlanning({ 'ccw' NextOnset(EP) 18 'ccw' 20 });
 
 % --- Stop ----------------------------------------------------------------

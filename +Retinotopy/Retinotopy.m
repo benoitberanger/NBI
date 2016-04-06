@@ -43,18 +43,6 @@ try
     Wedge.startAngle = 90; % Start angle at which we would like our mask to begin (degrees)
     Wedge.arcAngle = 270; % Length of the arc (degrees)
     
-%     % Rate at which our mask will rotate
-%     switch DataStruct.OperationMode
-%         case 'Acquisition'
-%             Wedge.degPerSec = 20;
-%         case 'FastDebug'
-%             Wedge.degPerSec = 20*Speed;
-%         case 'RealisticDebug'
-%             Wedge.degPerSec = 20;
-%     end
-    
-    
-%     Wedge.degPerFrame = Wedge.degPerSec * DataStruct.PTB.IFI;
     Wedge.arcRect = CenterRectOnPoint([0 0 DataStruct.PTB.WindowRect(4)*1.1 DataStruct.PTB.WindowRect(4)*1.1],DataStruct.PTB.CenterH,DataStruct.PTB.CenterV); % The rect in which we will define our arc
     
     
@@ -163,8 +151,6 @@ try
                     
                     frame = frame  + 1 ;
                     
-                    Screen('FillRect',DataStruct.PTB.Window)
-                    
                     if frame > Flic.Frames
                         
                         if mod(frame,Flic.Frames + Flac.Frames) < Flac.Frames
@@ -183,16 +169,28 @@ try
                     % Draw fixation point
                     if fix_counter == 0
                         if rand > 0.99
-                            fix_counter = 2;
+                            fix_counter = 3;
                         else
                             MTMST.DrawFixation;
                         end
-                    else
-                        fix_counter = fix_counter - 1;
                     end
                     
                     % Flip
                     flip_onset = Screen('Flip',DataStruct.PTB.Window);
+                    
+                    % Flash
+                    if fix_counter > 0
+                        RR.AddEvent( { 'Flash' flip_onset-StartTime } );
+                    end
+                    
+                    % Clic
+                    if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
+                        RR.AddEvent( { 'Clic' flip_onset-StartTime } );
+                    end
+                    
+                    if fix_counter > 0
+                        fix_counter = fix_counter - 1;
+                    end
                     
                     if frame == 1
                         
