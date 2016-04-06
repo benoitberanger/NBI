@@ -6,22 +6,28 @@ ER.ComputeDurations;
 ER.BuildGraph;
 TaskData.ER = ER;
 
+% Response Recorder
+RR.ClearEmptyEvents;
+RR.ComputeDurations;
+RR.BuildGraph;
+TaskData.RR = RR;
+
 % KbLogger
+KL.GetQueue;
+KL.Stop;
+KL.ScaleTime(StartTime);
 switch DataStruct.OperationMode
-    
     case 'Acquisition'
-        
-        % Stop recording events
-        KL.Stop;
-        
     case 'FastDebug'
-        
+        TR = 0.950; % seconds
+        nbVolumes = ceil( EP.Data{end,2} / TR ) + 2 ; % nb of volumes for the estimated time of stimulation + 2 to be safe
+        KL.GenerateMRITrigger( TR , nbVolumes );
     case 'RealisticDebug'
-        
-    otherwise
-        
+        TR = 0.950; % seconds
+        nbVolumes = ceil( EP.Data{end,2} / TR ) + 2 ; % nb of volumes for the estimated time of stimulation + 2 to be safe
+        KL.GenerateMRITrigger( TR , nbVolumes );
+    otherwise   
 end
-KL.ScaleTime;
 KL.ComputeDurations;
 KL.BuildGraph;
 TaskData.KL = KL;
@@ -38,6 +44,7 @@ TaskData.StopTime         = StopTime;
 
 assignin('base','EP',EP)
 assignin('base','ER',ER)
+assignin('base','RR',RR)
 assignin('base','KL',KL)
 
 assignin('base','TaskData',TaskData)
@@ -52,9 +59,6 @@ switch DataStruct.Task
         for m = 1 : length(movie)
             Screen('CloseMovie', movie(m).Ptr );
         end
-        
-    case 'MTMST'
-        
         
 end
 
