@@ -19,33 +19,52 @@ NextOnset = @(EP) EP.Data{end,2} + EP.Data{end,3};
 
 EP.AddPlanning({ 'StartTime' 0  0 [] [] [] [] });
 
-% --- Stim ----------------------------------------------------------------
+% ---Stim ----------------------------------------------------------------
+
 
 EP.AddPlanning({ 'Fixation' NextOnset(EP) FixationDuration 0 0 0 '' });
 
-for cycle = 1 : 2
+switch DataStruct.Task
     
-    EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
-    for rep = 1 : 4
-        EP.AddPlanning({ 'leftOUT'  NextOnset(EP) INOUTDuration 1 0 0 'out' });
-        EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
-    end
-    
+    case 'MTMST_Left'
+        
+        for cycle = 1 : 2
+            
+            EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
+            for rep = 1 : 4
+                EP.AddPlanning({ 'leftOUT'  NextOnset(EP) INOUTDuration 1 0 0 'out' });
+                EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
+            end
+            
+%             EP.AddPlanning({ 'rightFIXATION'   NextOnset(EP) INOUTDuration 0 0 -1 'fixation' });
+            
+        end
+        
+        
+    case 'MTMST_Right'
+        
+        
+        for cycle = 1 : 2
+            
+            EP.AddPlanning({ 'rightIN'   NextOnset(EP) INOUTDuration 0 0 1 'in' });
+            for rep = 1 : 4
+                EP.AddPlanning({ 'rightOUT'  NextOnset(EP) INOUTDuration 0 0 1 'out' });
+                EP.AddPlanning({ 'rightIN'   NextOnset(EP) INOUTDuration 0 0 1 'in' });
+            end
+            
+        end
+        
+        
+end
+
+
 %     EP.AddPlanning({ 'centerIN'   NextOnset(EP) INOUTDuration 0 1 0 'in' });
 %     for rep = 1 : 4
 %         EP.AddPlanning({ 'centerOUT'  NextOnset(EP) INOUTDuration 0 1 0 'out' });
 %         EP.AddPlanning({ 'centerIN'   NextOnset(EP) INOUTDuration 0 1 0 'in' });
 %     end
-    
-    EP.AddPlanning({ 'rightIN'   NextOnset(EP) INOUTDuration 0 0 1 'in' });
-    for rep = 1 : 4
-        EP.AddPlanning({ 'rightOUT'  NextOnset(EP) INOUTDuration 0 0 1 'out' });
-        EP.AddPlanning({ 'rightIN'   NextOnset(EP) INOUTDuration 0 0 1 'in' });
-    end
-    
-    EP.AddPlanning({ 'Fixation' NextOnset(EP) FixationDuration 0 0 0 '' });
-    
-end
+
+
 
 % --- Stop ----------------------------------------------------------------
 

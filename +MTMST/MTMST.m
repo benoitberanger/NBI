@@ -8,15 +8,7 @@ try
     
     %% Tunning of the task
     
-    switch DataStruct.Task
-        case 'MTMST_Left'
-            MTMST.PlanningLeft;
-        case 'MTMST_Right'
-            MTMST.PlanningRight;
-        otherwise
-            error( 'task error : %s' , DataStruct.Task )
-    end
-    
+    MTMST.Planning;
     
     % End of preparations
     EP.BuildGraph;
