@@ -75,6 +75,7 @@ try
     % Positive or negative speed ?
     mdirIN  = -ones(NumberOfDots,1);
     mdirOUT = -mdirIN;
+    mdirFIXATAION = zeros(NumberOfDots,1);
     
     
     %% Start recording eye motions
@@ -122,8 +123,10 @@ try
                         mdir = mdirIN;
                     case 'out'
                         mdir = mdirOUT;
+                    case 'fixation'
+                        mdir = mdirFIXATAION;
                     otherwise
-                        mdir = mdirIN; % during Fixation, it will randomize the dot position
+%                         mdir = mdirFIXATAION;
                 end
                 
                 dr = PixelFrameSpeed * mdir;                % change in radius per frame (pixels)

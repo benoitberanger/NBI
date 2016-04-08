@@ -1,7 +1,9 @@
 %% Tuning
 
-FixationDuration = 1; % seconds
+
 INOUTDuration = 1; % seconds
+FixationDuration = 3 * INOUTDuration; % seconds
+
 
 %% Prepare event
 
@@ -22,8 +24,6 @@ EP.AddPlanning({ 'StartTime' 0  0 [] [] [] [] });
 % ---Stim ----------------------------------------------------------------
 
 
-EP.AddPlanning({ 'Fixation' NextOnset(EP) FixationDuration 0 0 0 '' });
-
 switch DataStruct.Task
     
     case 'MTMST_Left'
@@ -36,7 +36,7 @@ switch DataStruct.Task
                 EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
             end
             
-%             EP.AddPlanning({ 'rightFIXATION'   NextOnset(EP) INOUTDuration 0 0 -1 'fixation' });
+            EP.AddPlanning({ 'leftFIXATION'   NextOnset(EP) FixationDuration 1 0 0 'fixation' });
             
         end
         
@@ -52,8 +52,9 @@ switch DataStruct.Task
                 EP.AddPlanning({ 'rightIN'   NextOnset(EP) INOUTDuration 0 0 1 'in' });
             end
             
+            EP.AddPlanning({ 'rightFIXATION'   NextOnset(EP) FixationDuration 0 0 1 'fixation' });
+            
         end
-        
         
 end
 
