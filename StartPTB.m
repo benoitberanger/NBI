@@ -21,12 +21,15 @@ switch DataStruct.WindowedMode
     otherwise
 end
 
+color_depth = 32; % bit
+multisample = 4; % samples for anti-aliasing
+
 try
-    [PTB.Window,PTB.WindowRect] = Screen('OpenWindow',Video.ScreenMode,Video.ScreenBackgroundColor,WindowRect);
+    [PTB.Window,PTB.WindowRect] = Screen('OpenWindow',Video.ScreenMode,Video.ScreenBackgroundColor,WindowRect,color_depth,[],[],multisample);
 catch err
     disp(err)
     Screen('Preference', 'SkipSyncTests', 1)
-    [PTB.Window,PTB.WindowRect] = Screen('OpenWindow',Video.ScreenMode,Video.ScreenBackgroundColor,WindowRect);
+    [PTB.Window,PTB.WindowRect] = Screen('OpenWindow',Video.ScreenMode,Video.ScreenBackgroundColor,WindowRect,color_depth,[],[],multisample);
 end
 
 % Set max priority

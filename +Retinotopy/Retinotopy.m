@@ -35,20 +35,20 @@ try
     FixV = DataStruct.PTB.CenterV;
     
     % Checkerboard
-    Checkerboard.segements = 32;
-    Checkerboard.alternance = 16;
-    Checkerboard.innerLimit = PixelPerDegree*DotVisualAngle*3; % Pixel
-    
+    Checkerboard.segements = 40; % angles
+    Checkerboard.alternance = 24; % radius
+    Checkerboard.innerLimit = PixelPerDegree*DotVisualAngle*1; % Pixel
+
     % Wedge
-    Wedge.startAngle = 90; % Start angle at which we would like our mask to begin (degrees)
-    Wedge.arcAngle = 270; % Length of the arc (degrees)
+    Wedge.startAngle = 45; % Start angle at which we would like our mask to begin (degrees)
+    Wedge.arcAngle = 315; % Length of the arc (degrees)
     
     Wedge.arcRect = CenterRectOnPoint([0 0 DataStruct.PTB.WindowRect(4)*1.1 DataStruct.PTB.WindowRect(4)*1.1],DataStruct.PTB.CenterH,DataStruct.PTB.CenterV); % The rect in which we will define our arc
     
     
     % flic flac
-    Flic.Duration = 0.500;
-    Flac.Duration = 0.100;
+    Flic.Duration = DataStruct.PTB.IFI * 12;
+    Flac.Duration = DataStruct.PTB.IFI * 3;
     
     Flic.flotFrames = Flic.Duration/DataStruct.PTB.IFI;
     Flac.flotFrames = Flac.Duration/DataStruct.PTB.IFI;
@@ -169,7 +169,7 @@ try
                     % Draw fixation point
                     if fix_counter == 0
                         if rand > 0.99
-                            fix_counter = 3;
+                            fix_counter = 4;
                         else
                             MTMST.DrawFixation;
                         end

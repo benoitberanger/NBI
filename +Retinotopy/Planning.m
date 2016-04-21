@@ -1,7 +1,6 @@
 %% Tuning
 
-FixationDuration = 1; % seconds
-INOUTDuration = 1; % seconds
+CompleteTurnDuration = 48;
 
 %% Prepare event
 
@@ -21,12 +20,12 @@ EP.AddPlanning({ 'StartTime' 0  0 [] [] });
 
 % --- Stim ----------------------------------------------------------------
 
-EP.AddPlanning({ 'cw'  NextOnset(EP) 18 'cw'  20 });
-EP.AddPlanning({ 'cw'  NextOnset(EP) 18 'cw'  20 });
-EP.AddPlanning({ 'ccw' NextOnset(EP) 18 'ccw' 20 });
-EP.AddPlanning({ 'ccw' NextOnset(EP) 18 'ccw' 20 });
-EP.AddPlanning({ 'cw'  NextOnset(EP) 18 'cw'  20 });
-EP.AddPlanning({ 'ccw' NextOnset(EP) 18 'ccw' 20 });
+EP.AddPlanning({ 'cw'  NextOnset(EP) CompleteTurnDuration 'cw'  360/CompleteTurnDuration });
+EP.AddPlanning({ 'cw'  NextOnset(EP) CompleteTurnDuration 'cw'  360/CompleteTurnDuration });
+EP.AddPlanning({ 'ccw' NextOnset(EP) CompleteTurnDuration 'ccw' 360/CompleteTurnDuration });
+EP.AddPlanning({ 'ccw' NextOnset(EP) CompleteTurnDuration 'ccw' 360/CompleteTurnDuration });
+EP.AddPlanning({ 'cw'  NextOnset(EP) CompleteTurnDuration 'cw'  360/CompleteTurnDuration });
+EP.AddPlanning({ 'ccw' NextOnset(EP) CompleteTurnDuration 'ccw' 360/CompleteTurnDuration });
 
 % --- Stop ----------------------------------------------------------------
 
