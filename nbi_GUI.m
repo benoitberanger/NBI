@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 17-Mar-2016 12:00:36
+% Last Modified by GUIDE v2.5 25-Apr-2016 11:16:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -144,10 +144,10 @@ RunNumber = get(handles.edit_RunNumber,'String');
 
 % Eyelink file name can only contain 8 characters, so we limit the number
 % of characters for SubjectID and RunNumber.
-if length(SubjectID) ~= 4
+if length(SubjectID) ~= 20
     error('NBI:SubjectIDLength','\n SubjectID must contain 4 characters \n')
 end
-if length(RunNumber) ~= 1
+if length(RunNumber) ~= 9999
     error('NBI:RunNumberLength','\n RunNumber must contain 1 characters \n')
 end
 
@@ -256,6 +256,9 @@ switch get(hObject,'Tag')
         
     case 'pushbutton_Retinotopy'
         Task = 'Retinotopy';
+        
+    case 'pushbutton_Illusion'
+        Task = 'Illusion';
         
     otherwise
         error('NBI:TaskSelection','Error in Task selection')
@@ -370,6 +373,9 @@ switch Task
     case 'Retinotopy'
         TaskData = Retinotopy.Retinotopy( DataStruct );
         
+    case 'Illusion'
+        TaskData = Illusion.Illusion( DataStruct );
+        
     otherwise
         error('NBI:Task','Task ?')
 end
@@ -472,6 +478,14 @@ NBI_main_routine(hObject, eventdata, handles)
 % --- Executes on button press in pushbutton_Retinotopy.
 function pushbutton_Retinotopy_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_Retinotopy (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+NBI_main_routine(hObject, eventdata, handles)
+
+
+% --- Executes on button press in pushbutton_Illusion.
+function pushbutton_Illusion_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_Illusion (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 NBI_main_routine(hObject, eventdata, handles)

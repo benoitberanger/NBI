@@ -49,6 +49,16 @@ try
                 '6' ;
                 };
             
+        case 'Illusion'
+            names = {
+                '1' ;
+                '2' ;
+                '3' ;
+                '4' ;
+                '5' ;
+                '6' ;
+                };
+            
     end
     
     % 'onsets' & 'durations' for SPM
