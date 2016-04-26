@@ -3,7 +3,7 @@ try
     
     nFrames = round(stim.period/scr.fd);
     
-    patchesNumber = 16 ;
+    numberOfPatchesToGenerate = 16 ;
     
     
     %% Generate patches
@@ -11,7 +11,7 @@ try
     % 2D = Stimulus = Illusion
     fprintf('\n Generating 2D noise...')
     noiseArray2D = Illusion.Common.generateNoiseImage(stim,visual, scr.fd);
-    for ti = 1:patchesNumber % for each of the patchesNumber noise patches
+    for ti = 1:numberOfPatchesToGenerate % for each of the patchesNumber noise patches
         noiseArray2D = cat(3, noiseArray2D, Illusion.Common.generateNoiseImage(stim,visual,scr.fd));
     end
     fprintf(' Done \n')
@@ -19,7 +19,7 @@ try
     % 3D = Control = Control
     fprintf('\n Generating 3D noise...')
     noiseArray3D = Illusion.Common.generateNoiseVolume(stim,visual, scr.fd);
-    for ti = 1:patchesNumber
+    for ti = 1:numberOfPatchesToGenerate
         noiseArray3D = cat(4, noiseArray3D, Illusion.Common.generateNoiseVolume(stim,visual,scr.fd));
     end
     fprintf(' Done \n')
@@ -29,10 +29,10 @@ try
     
     fprintf('\n Cut the patches into frames...')
     
-    m_2D = cell(patchesNumber,1);
-    m_3D = cell(patchesNumber,1);
+    m_2D = cell(numberOfPatchesToGenerate,1);
+    m_3D = cell(numberOfPatchesToGenerate,1);
     
-    for ti = 1:patchesNumber % for each patch
+    for ti = 1:numberOfPatchesToGenerate % for each patch
         
         % 2D
         m2D = Illusion.Common.framesIllusion(stim, visual, noiseArray2D(:,:,ti), scr.fd);

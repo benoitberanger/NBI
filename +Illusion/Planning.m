@@ -1,4 +1,4 @@
-function [ EP ] = Planning( DataStruct )
+function [ EP , Speed ] = Planning( DataStruct )
 %% Pre-process the design
 
 % Load design
@@ -79,13 +79,24 @@ end
 %% Tunning
 
 if nargout > 0
-    blocSelected = 1; % temporary
+    
     switch DataStruct.Environement
         
         case 'MRI'
+            blocSelected = str2double( DataStruct.RunNumber );
             
         case 'Training'
-            
+            blocSelected = 1;
+            adjustedBlocs = cell(1);
+            NO = @(adjustedBlocs) adjustedBlocs{blocSelected}{end,2} + adjustedBlocs{blocSelected}{end,4};
+            adjustedBlocs{blocSelected} = { 1 0 0 1.8 'Null' };
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  1 1.8 'Illusion_rotation'} ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  2 1.8 'Illusion_InOut'} ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  3 1.8 'Control_rotation'} ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  4 1.8 'Control_inOut'} ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  5 1.8 'Control_global'} ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  6 1.8 'Control_local_rot'} ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  7 1.8 'Control_local_inOut'} ];
     end
     
 else
@@ -135,6 +146,34 @@ end
 % --- Stop ----------------------------------------------------------------
 
 EP.AddPlanning({ 'StopTime' , NextOnset(EP) , 0 });
+
+
+%% Acceleration
+
+switch DataStruct.OperationMode
+    
+    case 'Acquisition'
+        
+        Speed = 1; %#ok<*NASGU>
+        
+    case 'FastDebug'
+        
+        Speed = 10;
+        
+        new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) );
+        EP.Data(:,2) = new_onsets;
+        
+        new_durations = cellfun( @(x) {x/Speed} , EP.Data(:,3) );
+        EP.Data(:,3) = new_durations;
+        
+    case 'RealisticDebug'
+        
+        Speed = 1;
+        
+    otherwise
+        error( 'DataStruct.OperationMode = %s' , DataStruct.OperationMode )
+        
+end
 
 
 %% Display

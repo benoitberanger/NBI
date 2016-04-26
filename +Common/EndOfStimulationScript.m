@@ -50,7 +50,7 @@ assignin('base','KL',KL)
 assignin('base','TaskData',TaskData)
 
 
-%% Close all movies
+%% Close all movies / textures
 
 switch DataStruct.Task
     
@@ -61,6 +61,9 @@ switch DataStruct.Task
         end
         
 end
+
+% Close all textures
+Screen('Close');
 
 
 %% Close parallel port
