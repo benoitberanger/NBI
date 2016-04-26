@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 25-Apr-2016 11:16:02
+% Last Modified by GUIDE v2.5 26-Apr-2016 11:03:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -491,6 +491,81 @@ function pushbutton_Illusion_Callback(hObject, eventdata, handles)
 NBI_main_routine(hObject, eventdata, handles)
 
 
+% --- Executes on button press in pushbutton_GenerateNoise.
+function pushbutton_GenerateNoise_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_GenerateNoise (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+clc
+sca
+
+% Initialize the main structure
+DataStruct           = struct;
+DataStruct.TimeStamp = datestr(now, 'yyyy-mm-dd HH:MM');
+
+% Set task name for general coherence
+DataStruct.Task = 'GenerateNoise';
+
+% Get stimulation parameters
+DataStruct.Parameters = GetParameters( DataStruct );
+
+% Screen mode selection
+AvalableDisplays = get(handles.listbox_Screens,'String');
+SelectedDisplay = get(handles.listbox_Screens,'Value');
+DataStruct.Parameters.Video.ScreenMode = str2double( AvalableDisplays(SelectedDisplay) );
+
+% Windowed screen ?
+switch get(handles.checkbox_WindowedScreen,'Value')
+    case 1
+        WindowedMode = 'On';
+    case 0
+        WindowedMode = 'Off';
+    otherwise
+        warning('STIMPNEE:WindowedScreen','Error in WindowedScreen') 
+end
+DataStruct.WindowedMode = WindowedMode;
+
+% Set stimuli parameters : noise, spatial & temporal, ...
+Illusion.Common.setParameters % stim (struct)
+Illusion.Common.SetAngles     % angles_*
+
+% Open PTB window
+DataStruct.PTB = StartPTB( DataStruct );
+
+% Link references
+scr.main                   = DataStruct.PTB.Window;
+scr.rect                   = DataStruct.PTB.WindowRect;
+[scr.xres, scr.yres]       = Screen('WindowSize', scr.main);     % heigth and width of screen [pix]
+[scr.centerX, scr.centerY] = WindowCenter(scr.main);             % determine th main window's center
+scr.fd                     = Screen('GetFlipInterval',scr.main); % frame duration [s]
+visual.ppd                 = va2pix( 1 , DataStruct.Parameters.Video.SubjectDistance , DataStruct.Parameters.Video.ScreenWidthM , DataStruct.Parameters.Video.ScreenWidthPx );
+visual.black               = BlackIndex(scr.main);
+visual.white               = WhiteIndex(scr.main);
+visual.bgColor             = round((visual.black + visual.white) / 2);     % background color
+visual.fgColor             = visual.black;
+
+Illusion.Common.ConvertInPix  % stim (struct) -> update
+
+% Close PTB
+% Just to be sure that if there is a problem with PTB, we do not loose all
+% the data drue to a crash.
+try
+    Screen('CloseAll'); % Close PTB window
+    Priority( DataStruct.PTB.oldLevel );
+catch err
+end
+
+pause(0.2); % cooldown the system
+
+% Main process
+Illusion.GenerateNoise
+
+load('m_2D')
+load('m_3D')
+
+fprintf('\n GenerateNoise DONE \n')
+
+
 % --- Executes when selected object is changed in uipanel_OperationMode.
 function uipanel_OperationMode_SelectionChangeFcn(hObject, eventdata, handles)
 % hObject    handle to the selected object in uipanel_OperationMode
@@ -664,4 +739,5 @@ function checkbox_WindowedScreen_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox_WindowedScreen
+
 

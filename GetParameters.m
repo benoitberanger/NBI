@@ -22,19 +22,20 @@ Parameters.Video.ScreenHeightM   = 0.030; % m
 switch DataStruct.Task
     
     case 'NBI'
-        
         Parameters.Video.ScreenBackgroundColor = [128 128 128]; % [R G B] ( from 0 to 255 )
         
     case 'MTMST_Left'
-        
         Parameters.Video.ScreenBackgroundColor = [0 0 0]; % [R G B] ( from 0 to 255 )
         
     case 'MTMST_Right'
-        
         Parameters.Video.ScreenBackgroundColor = [0 0 0]; % [R G B] ( from 0 to 255 )
         
     case 'Retinotopy'
+        Parameters.Video.ScreenBackgroundColor = [128 128 128]; % [R G B] ( from 0 to 255 )
         
+    case 'Illusion'
+        Parameters.Video.ScreenBackgroundColor = [128 128 128]; % [R G B] ( from 0 to 255 )
+    case 'GenerateNoise'
         Parameters.Video.ScreenBackgroundColor = [128 128 128]; % [R G B] ( from 0 to 255 )
         
 end
