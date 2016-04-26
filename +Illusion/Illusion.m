@@ -173,7 +173,7 @@ try
                 frame = 0;
                 fix_counter = 0;
                 
-                while flip_onset < StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 1
+                while flip_onset < StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 2
                     
                     frame = frame + 1;
                     
@@ -182,6 +182,9 @@ try
                     
                     % Fixation dot
                     Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
+                    
+                    % Text
+                    DrawFormattedText(scr.main, [ schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
                     
                     % Flip
                     flip_onset = Screen('Flip', scr.main);
@@ -220,7 +223,7 @@ try
                     DrawFormattedText(scr.main, [ schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
                     
                     % Flip
-                    flip_onset = Screen('Flip', scr.main);
+                    flip_onset = Screen('Flip', scr.main );
                     
                     if frame == 1
                         

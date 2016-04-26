@@ -8,7 +8,7 @@ load( [ pwd filesep '+Illusion' filesep 'NBI_optseq_sequences.mat' ] )
 
 % Minibloc number ?
 miniBloc_idx = cell2mat(optseqsequences(:,1)); %#ok<NODEF>
-[miniBloc_id,~,idx2id] = unique_stable(miniBloc_idx);
+[miniBloc_id,~,idx2id] = unique(miniBloc_idx,'stable');
 
 % Prepare a cell containing all miniblocs
 allBlocs = cell(length(miniBloc_id),1);
@@ -94,12 +94,14 @@ if nargout > 0
             %                 end
             %             end
             
-            adjustedBlocs{blocSelected} = { 1 0 0 1.8 'Null' };
+            adjustedBlocs{blocSelected} = {1 0 1 1.8 'Illusion_rotation'  };
             adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation'  } ];
             adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 1.8 'Illusion_InOut'     } ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 0.9 'Null'               } ];
             adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'   } ];
             adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 4 1.8 'Control_inOut'      } ];
             adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 5 1.8 'Control_global'     } ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 2.7 'Null'               } ];
             adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 6 1.8 'Control_local_rot'  } ];
             adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 7 1.8 'Control_local_inOut'} ];
             
@@ -166,7 +168,7 @@ if nargout > 1
             
         case 'FastDebug'
             
-            Speed = 10;
+            Speed = 5;
             
             new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) );
             EP.Data(:,2) = new_onsets;
