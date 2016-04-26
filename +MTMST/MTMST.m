@@ -40,7 +40,7 @@ try
     % -----------------
     
     DotVisualAngle = 0.15;
-    DotColor = DataStruct.PTB.White;
+    DotColor = [255 0 0];
     
     diameter = round( PixelPerDegree * DotVisualAngle );
     rectOval = [ 0 0 diameter diameter ];
@@ -53,7 +53,8 @@ try
     % -------------------------
     
     DotSpeed.Deg        = 3;    % dot speed (deg/sec)
-    DotFractionKill = 0.005; % fraction of dots to kill each frame (limited lifetime)
+    DotFractionKill_InOut = 0.005; % fraction of dots to kill each frame (limited lifetime)
+    DotFractionKill_Fix = 0; % fraction of dots to kill each frame (limited lifetime)
     
     NumberOfDots     = 200; % number of dots
     MaxiumRadius.Deg  = 7*sqrt(2);   % maximum radius of  annulus (degrees)
@@ -167,6 +168,16 @@ try
                     r = r + dr;							% update polar coordinates too
                     
                     % check to see which dots have gone beyond the borders of the annuli
+                    
+                    % DotFractionKill depends on the condition
+                    switch EP.Data{evt,7}
+                        case 'in'
+                            DotFractionKill = DotFractionKill_InOut;
+                        case 'out'
+                            DotFractionKill = DotFractionKill_InOut;
+                        case 'fixation'
+                            DotFractionKill = DotFractionKill_Fix;
+                    end
                     
                     r_out = find(r > MaxiumRadius.Px | r < MinimumRadius.Px | rand(NumberOfDots,1) < DotFractionKill);	% dots to reposition
                     nout = length(r_out);

@@ -20,12 +20,12 @@ EP.AddPlanning({ 'StartTime' 0  0 [] [] });
 
 % --- Stim ----------------------------------------------------------------
 
-EP.AddPlanning({ 'cw'  NextOnset(EP) CompleteTurnDuration 'cw'  360/CompleteTurnDuration });
-EP.AddPlanning({ 'cw'  NextOnset(EP) CompleteTurnDuration 'cw'  360/CompleteTurnDuration });
-EP.AddPlanning({ 'ccw' NextOnset(EP) CompleteTurnDuration 'ccw' 360/CompleteTurnDuration });
-EP.AddPlanning({ 'ccw' NextOnset(EP) CompleteTurnDuration 'ccw' 360/CompleteTurnDuration });
-EP.AddPlanning({ 'cw'  NextOnset(EP) CompleteTurnDuration 'cw'  360/CompleteTurnDuration });
-EP.AddPlanning({ 'ccw' NextOnset(EP) CompleteTurnDuration 'ccw' 360/CompleteTurnDuration });
+for i = 1 : 4
+    EP.AddPlanning({ 'cw'  NextOnset(EP) CompleteTurnDuration 'cw'  360/CompleteTurnDuration });
+end
+for i = 1 : 4
+    EP.AddPlanning({ 'ccw' NextOnset(EP) CompleteTurnDuration 'ccw' 360/CompleteTurnDuration });
+end
 
 % --- Stop ----------------------------------------------------------------
 

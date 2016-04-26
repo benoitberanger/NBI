@@ -4,11 +4,11 @@ function [ EP , Speed ] = Planning( DataStruct )
 % Load design
 load( [ pwd filesep '+Illusion' filesep 'NBI_optseq_sequences.mat' ] )
 
-% Split each mini-bloc : 
+% Split each mini-bloc :
 
 % Minibloc number ?
 miniBloc_idx = cell2mat(optseqsequences(:,1)); %#ok<NODEF>
-[miniBloc_id,~,idx2id] = unique(miniBloc_idx,'stable');
+[miniBloc_id,~,idx2id] = unique_stable(miniBloc_idx);
 
 % Prepare a cell containing all miniblocs
 allBlocs = cell(length(miniBloc_id),1);
@@ -16,32 +16,30 @@ for b = 1 : length(miniBloc_id)
     allBlocs{b} = optseqsequences( miniBloc_id(b) == idx2id , : );
 end
 
-% Pair each block accordinf to the compressFactor
+% Pair each block according to the compressFactor
 compressFactor = 2;
 
 runBlocs = cell(ceil(length(miniBloc_id)/compressFactor),1);
 skip = 0;
 count = 0;
 for b = 1 : length(miniBloc_id)
-
-    if skip > 0
     
+    if skip > 0
         skip = skip - 1;
-        
     else
         
         count = count + 1;
         
-        for c = 1 : compressFactor
-            
-            if b + c - 1 <= size(allBlocs,1)
-                runBlocs{count} = vertcat( runBlocs{count} , allBlocs{ b + c - 1 } ); % Fusion
-            end
-            
+        for cf = 1 : compressFactor
+            if b + cf - 1 <= size(allBlocs,1)
+                runBlocs{count} = vertcat( runBlocs{count} , allBlocs{ b + cf - 1 } ); % Fusion
+            else
+                % Don't need a fusion : already the last one
+            end            
         end
         
         skip = compressFactor - 1;
-    
+        
     end
     
 end
@@ -60,19 +58,15 @@ for mb = 1 : size(runBlocs,1)
     for z = 2 : length(Zero_idx)
         
         if z + 1 <= length(Zero_idx)
-        
             onsets( Zero_idx(z) : Zero_idx(z+1)-1 ) = onsets( Zero_idx(z) : Zero_idx(z+1)-1 ) + onsets( Zero_idx(z) - 1 ) + durations( Zero_idx(z) ) ;
-            
         else
-            
-        onsets( Zero_idx(z) : end ) = onsets( Zero_idx(z) : end ) + onsets( Zero_idx(z) - 1 ) + durations( Zero_idx(z) ) ;
-        
+            onsets( Zero_idx(z) : end ) = onsets( Zero_idx(z) : end ) + onsets( Zero_idx(z) - 1 ) + durations( Zero_idx(z) ) ;
         end
         
     end
     
     adjustedBlocs{mb}(:,2) = num2cell(onsets);
-
+    
 end
 
 
@@ -89,14 +83,26 @@ if nargout > 0
             blocSelected = 1;
             adjustedBlocs = cell(1);
             NO = @(adjustedBlocs) adjustedBlocs{blocSelected}{end,2} + adjustedBlocs{blocSelected}{end,4};
+            
+            %             adjustedBlocs{blocSelected} = { 1 0 0 1.8 'Null' };
+            %             for ii = 1:5
+            %                 for i = 1:3
+            %                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation'  } ];
+            %                 end
+            %                 for i = 1:3
+            %                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'   } ];
+            %                 end
+            %             end
+            
             adjustedBlocs{blocSelected} = { 1 0 0 1.8 'Null' };
-            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  1 1.8 'Illusion_rotation'} ];
-            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  2 1.8 'Illusion_InOut'} ];
-            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  3 1.8 'Control_rotation'} ];
-            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  4 1.8 'Control_inOut'} ];
-            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  5 1.8 'Control_global'} ];
-            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  6 1.8 'Control_local_rot'} ];
-            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs)  7 1.8 'Control_local_inOut'} ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation'  } ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 1.8 'Illusion_InOut'     } ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'   } ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 4 1.8 'Control_inOut'      } ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 5 1.8 'Control_global'     } ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 6 1.8 'Control_local_rot'  } ];
+            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 7 1.8 'Control_local_inOut'} ];
+            
     end
     
 else
@@ -150,29 +156,33 @@ EP.AddPlanning({ 'StopTime' , NextOnset(EP) , 0 });
 
 %% Acceleration
 
-switch DataStruct.OperationMode
+if nargout > 1
     
-    case 'Acquisition'
+    switch DataStruct.OperationMode
         
-        Speed = 1; %#ok<*NASGU>
-        
-    case 'FastDebug'
-        
-        Speed = 10;
-        
-        new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) );
-        EP.Data(:,2) = new_onsets;
-        
-        new_durations = cellfun( @(x) {x/Speed} , EP.Data(:,3) );
-        EP.Data(:,3) = new_durations;
-        
-    case 'RealisticDebug'
-        
-        Speed = 1;
-        
-    otherwise
-        error( 'DataStruct.OperationMode = %s' , DataStruct.OperationMode )
-        
+        case 'Acquisition'
+            
+            Speed = 1; %#ok<*NASGU>
+            
+        case 'FastDebug'
+            
+            Speed = 10;
+            
+            new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) );
+            EP.Data(:,2) = new_onsets;
+            
+            new_durations = cellfun( @(x) {x/Speed} , EP.Data(:,3) );
+            EP.Data(:,3) = new_durations;
+            
+        case 'RealisticDebug'
+            
+            Speed = 1;
+            
+        otherwise
+            error( 'DataStruct.OperationMode = %s' , DataStruct.OperationMode )
+            
+    end
+    
 end
 
 

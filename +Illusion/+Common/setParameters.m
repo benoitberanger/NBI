@@ -14,8 +14,8 @@ stim.gridSize = 0.2;    % this set the spatial frequency of the noise functions 
 stim.textureSize = 1.5; % increase this if the gaussian envelope appear clipped
 
 % spatial & motion parameters
-stim.internalSpeed = 4;     % degree (visual angle)/ sec
-stim.internalSpeedControl = 2;   % this set the speed of flickering for the control stimulus 
+stim.internalSpeed = 3;     % degree (visual angle)/ sec
+stim.internalSpeedControl = 1.5;   % this set the speed of flickering for the control stimulus 
 stim.ecc = 5.5;             % eccentricity of each set of noise patches at the center of its path
 stim.pathLength = 2.6;      % physical length of motion path of each noise patch
 stim.sep = 2.5;             % distance between noise patches

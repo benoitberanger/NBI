@@ -26,7 +26,7 @@ try
     % Dot
     PixelPerDegree = va2pix( 1 , DataStruct.Parameters.Video.SubjectDistance , DataStruct.Parameters.Video.ScreenWidthM , DataStruct.Parameters.Video.ScreenWidthPx );
     DotVisualAngle = 0.15;
-    DotColor = DataStruct.PTB.Black;
+    DotColor = [255 0 0];
     
     diameter = round( PixelPerDegree * DotVisualAngle );
     rectOval = [ 0 0 diameter diameter ];
@@ -169,7 +169,7 @@ try
                     % Draw fixation point
                     if fix_counter == 0
                         if rand > 0.99
-                            fix_counter = 4;
+                            fix_counter = 6;
                         else
                             MTMST.DrawFixation;
                         end

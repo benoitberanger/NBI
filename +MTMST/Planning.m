@@ -1,8 +1,8 @@
 %% Tuning
 
 
-INOUTDuration = 1; % seconds
-FixationDuration = 3 * INOUTDuration; % seconds
+INOUTDuration    = 1;  % seconds
+FixationDuration = 10; % seconds
 
 
 %% Prepare event
@@ -28,10 +28,9 @@ switch DataStruct.Task
     
     case 'MTMST_Left'
         
-        for cycle = 1 : 2
+        for cycle = 1 : 17
             
-            EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
-            for rep = 1 : 4
+            for rep = 1 : 5
                 EP.AddPlanning({ 'leftOUT'  NextOnset(EP) INOUTDuration 1 0 0 'out' });
                 EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
             end
@@ -44,10 +43,9 @@ switch DataStruct.Task
     case 'MTMST_Right'
         
         
-        for cycle = 1 : 2
+        for cycle = 1 : 17
             
-            EP.AddPlanning({ 'rightIN'   NextOnset(EP) INOUTDuration 0 0 1 'in' });
-            for rep = 1 : 4
+            for rep = 1 : 5
                 EP.AddPlanning({ 'rightOUT'  NextOnset(EP) INOUTDuration 0 0 1 'out' });
                 EP.AddPlanning({ 'rightIN'   NextOnset(EP) INOUTDuration 0 0 1 'in' });
             end
