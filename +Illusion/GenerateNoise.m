@@ -51,8 +51,10 @@ try
     
     fprintf('\n Save the patches...')
     
-    save('m_2D','m_2D','DataStruct','stim','visual','scr');
-    save('m_3D','m_3D','DataStruct','stim','visual','scr');
+    Parameters = DataStruct;
+    
+    save('m_2D','m_2D','Parameters','stim','visual','scr');
+    save('m_3D','m_3D','Parameters','stim','visual','scr');
     
     fprintf(' Done \n')
     

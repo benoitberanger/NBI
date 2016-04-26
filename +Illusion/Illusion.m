@@ -1,6 +1,17 @@
 function [ TaskData ] = Illusion( DataStruct )
 
 try
+    %% Setup
+    
+    % Load the patches
+    load('m_2D')
+    load('m_3D')
+    
+    % Parameters, references, convertions
+    Illusion.preProcess;
+    
+    
+    
     %% Parallel port
     
     Common.PrepareParPort;

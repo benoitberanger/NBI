@@ -110,7 +110,7 @@ end
 
 
 %% Do
-clc
+
 % Create and prepare
 header = { 'event_name' , 'onset(s)' , 'duration(s)' };
 EP     = EventPlanning(header);
@@ -135,7 +135,7 @@ end
 % --- Stop ----------------------------------------------------------------
 
 EP.AddPlanning({ 'StopTime' , NextOnset(EP) , 0 });
-EP.Data
+
 
 %% Display
 
