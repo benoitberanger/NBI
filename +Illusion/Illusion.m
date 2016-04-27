@@ -186,6 +186,9 @@ try
                     % Text
                     DrawFormattedText(scr.main, [ schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
                     
+                    % Tell PTB that no further drawing commands will follow before Screen('Flip')
+                    Screen('DrawingFinished', DataStruct.PTB.Window);
+                    
                     % Flip
                     flip_onset = Screen('Flip', scr.main);
                     
@@ -197,7 +200,7 @@ try
                     end
                     
                 end
-                    
+                
                 
             otherwise
                 
@@ -233,7 +236,7 @@ try
                     end
                     
                 end
-
+                
         end % switch
         
         if Exit_flag

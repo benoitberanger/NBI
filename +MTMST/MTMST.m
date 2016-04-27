@@ -61,7 +61,7 @@ try
     MinimumRadius.Deg = 0.2;    % minumum
     DotSize.Deg       = 0.1;  % width of dot (deg)
     
-
+    
     % -----------------------------------------
     % Transform each visual angles into pixels
     % -----------------------------------------
@@ -79,6 +79,19 @@ try
     mdirFIXATAION = zeros(NumberOfDots,1);
     
     
+    %% Catch the point
+    
+    Catch.N            = 20; % how many catch trials ?
+    Catch.nCatchFrame  = round( 0.100 / DataStruct.PTB.IFI ); % secondes / ifi = frames
+    Catch.stimDuration = EP.Data{end,2}; % secondes
+    % Catch trials onsets are lineary spaced over timen + a random value
+    % defined in the interval [ min , max ]
+    Catch.minrand      = 5;  % min value (secondes) for randomization of the onset
+    Catch.maxrand      = 15; % max value (secondes) for randomization of the onset
+    
+    Common.GenerateCatchFrameNumber
+    
+    
     %% Start recording eye motions
     
     Eyelink.StartRecording( DataStruct );
@@ -88,6 +101,7 @@ try
     
     flip_onset = 0;
     Exit_flag = 0;
+    total_frame = 0;
     
     % Loop over the EventPlanning
     for evt = 1 : size( EP.Data , 1 )
@@ -105,10 +119,10 @@ try
                 
                 Common.StopTimeEvent;
                 
-                
             otherwise
                 
                 frame = 0;
+                fix_counter = 0;
                 
                 % New set of points at each IN/OUT trial
                 r = MaxiumRadius.Px * sqrt(rand(NumberOfDots,1));	% r
@@ -117,7 +131,7 @@ try
                 cs = [cos(t), sin(t)];
                 xy = [r r] .* cs;   % dot positions in Cartesian coordinates (pixels from center)
                 xymatrix = transpose(xy);
-
+                
                 
                 switch EP.Data{evt,7}
                     case 'in'
@@ -127,7 +141,7 @@ try
                     case 'fixation'
                         mdir = mdirFIXATAION;
                     otherwise
-%                         mdir = mdirFIXATAION;
+                        %                         mdir = mdirFIXATAION;
                 end
                 
                 dr = PixelFrameSpeed * mdir;                % change in radius per frame (pixels)
@@ -138,6 +152,7 @@ try
                     % ESCAPE key pressed ?
                     Common.Interrupt;
                     
+                    total_frame = total_frame + 1;
                     frame = frame + 1 ;
                     
                     % Left ?
@@ -158,10 +173,17 @@ try
                         FixH = DataStruct.Parameters.Video.ScreenWidthPx - FixationDotCenter.Px;
                     end
                     
-                    % Fixation dot                    
-                    MTMST.DrawFixation;
+                    % Draw fixation point
+                    if fix_counter == 0
+                        if any( total_frame == Catch.frame )
+                            fix_counter = Catch.nCatchFrame;
+                        else
+                            MTMST.DrawFixation;
+                        end
+                    end
                     
-                    Screen('DrawingFinished', DataStruct.PTB.Window); % Tell PTB that no further drawing commands will follow before Screen('Flip')
+                    % Tell PTB that no further drawing commands will follow before Screen('Flip')
+                    Screen('DrawingFinished', DataStruct.PTB.Window);
                     
                     
                     xy = xy + dxdy;						% move dots
@@ -204,12 +226,27 @@ try
                     flip_onset = Screen('Flip', DataStruct.PTB.Window);
                     
                     
-%                     % Parallel port message
-%                     if strcmp( DataStruct.ParPort , 'On' )
-%                         WriteParPort( current_message );
-%                         WaitSecs( msg.duration );
-%                         WriteParPort( 0 );
-%                     end
+                    
+                    %                     % Parallel port message
+                    %                     if strcmp( DataStruct.ParPort , 'On' )
+                    %                         WriteParPort( current_message );
+                    %                         WaitSecs( msg.duration );
+                    %                         WriteParPort( 0 );
+                    %                     end
+                    
+                    % Flash
+                    if fix_counter > 0
+                        RR.AddEvent( { 'Flash' flip_onset-StartTime } );
+                    end
+                    
+                    % Clic
+                    if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
+                        RR.AddEvent( { 'Clic' flip_onset-StartTime } );
+                    end
+                    
+                    if fix_counter > 0
+                        fix_counter = fix_counter - 1;
+                    end
                     
                     if frame == 1
                         

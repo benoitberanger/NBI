@@ -38,13 +38,12 @@ try
     Checkerboard.segements = 40; % angles
     Checkerboard.alternance = 24; % radius
     Checkerboard.innerLimit = PixelPerDegree*DotVisualAngle*1; % Pixel
-
+    
     % Wedge
     Wedge.startAngle = 45; % Start angle at which we would like our mask to begin (degrees)
     Wedge.arcAngle = 315; % Length of the arc (degrees)
     
     Wedge.arcRect = CenterRectOnPoint([0 0 DataStruct.PTB.WindowRect(4)*1.1 DataStruct.PTB.WindowRect(4)*1.1],DataStruct.PTB.CenterH,DataStruct.PTB.CenterV); % The rect in which we will define our arc
-    
     
     % flic flac
     Flic.Duration = DataStruct.PTB.IFI * 12;
@@ -108,6 +107,18 @@ try
     Flac.Texture=Screen('MakeTexture', DataStruct.PTB.Window, Flac.Image);
     
     
+    %% Catch the point
+    
+    Catch.N            = 20; % how many catch trials ?
+    Catch.nCatchFrame  = round( 0.100 / DataStruct.PTB.IFI ); % secondes / ifi = frames
+    Catch.stimDuration = EP.Data{end,2}; % secondes
+    % Catch trials onsets are lineary spaced over timen + a random value
+    % defined in the interval [ min , max ]
+    Catch.minrand      = 5;  % min value (secondes) for randomization of the onset
+    Catch.maxrand      = 15; % max value (secondes) for randomization of the onset
+    
+    Common.GenerateCatchFrameNumber
+    
     
     %% Start recording eye motions
     
@@ -118,6 +129,7 @@ try
     
     flip_onset = 0;
     Exit_flag = 0;
+    total_frame = 0;
     
     % Loop over the EventPlanning
     for evt = 1 : size( EP.Data , 1 )
@@ -141,7 +153,6 @@ try
             otherwise
                 
                 frame = 0;
-                
                 fix_counter = 0;
                 
                 while flip_onset < StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 1
@@ -149,6 +160,7 @@ try
                     % ESCAPE key pressed ?
                     Common.Interrupt;
                     
+                    total_frame = total_frame + 1;
                     frame = frame  + 1 ;
                     
                     if frame > Flic.Frames
@@ -168,12 +180,15 @@ try
                     
                     % Draw fixation point
                     if fix_counter == 0
-                        if rand > 0.99
-                            fix_counter = 6;
+                        if any( total_frame == Catch.frame )
+                            fix_counter = Catch.nCatchFrame;
                         else
                             MTMST.DrawFixation;
                         end
                     end
+                    
+                    % Tell PTB that no further drawing commands will follow before Screen('Flip')
+                    Screen('DrawingFinished', DataStruct.PTB.Window);
                     
                     % Flip
                     flip_onset = Screen('Flip',DataStruct.PTB.Window);
