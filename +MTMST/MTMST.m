@@ -140,8 +140,6 @@ try
                         mdir = mdirOUT;
                     case 'fixation'
                         mdir = mdirFIXATAION;
-                    otherwise
-                        %                         mdir = mdirFIXATAION;
                 end
                 
                 dr = PixelFrameSpeed * mdir;                % change in radius per frame (pixels)
@@ -154,6 +152,7 @@ try
                     
                     total_frame = total_frame + 1;
                     frame = frame + 1 ;
+                    pp = 0;
                     
                     % Left ?
                     if EP.Data{evt,4}
@@ -195,10 +194,13 @@ try
                     switch EP.Data{evt,7}
                         case 'in'
                             DotFractionKill = DotFractionKill_InOut;
+                            pp = pp + msg.in;
                         case 'out'
                             DotFractionKill = DotFractionKill_InOut;
+                            pp = pp + msg.out;
                         case 'fixation'
                             DotFractionKill = DotFractionKill_Fix;
+                            pp = pp + msg.fixation;
                     end
                     
                     r_out = find(r > MaxiumRadius.Px | r < MinimumRadius.Px | rand(NumberOfDots,1) < DotFractionKill);	% dots to reposition
@@ -225,28 +227,20 @@ try
                     
                     flip_onset = Screen('Flip', DataStruct.PTB.Window);
                     
-                    
-                    
-                    %                     % Parallel port message
-                    %                     if strcmp( DataStruct.ParPort , 'On' )
-                    %                         WriteParPort( current_message );
-                    %                         WaitSecs( msg.duration );
-                    %                         WriteParPort( 0 );
-                    %                     end
-                    
                     % Flash
                     if fix_counter > 0
                         RR.AddEvent( { 'Flash' flip_onset-StartTime } );
+                        pp = pp + msg.flash;
+                        fix_counter = fix_counter - 1;
                     end
                     
                     % Clic
                     if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
                         RR.AddEvent( { 'Clic' flip_onset-StartTime } );
+                        pp = pp + msg.clic;
                     end
                     
-                    if fix_counter > 0
-                        fix_counter = fix_counter - 1;
-                    end
+                    Common.SendParPortMessage
                     
                     if frame == 1
                         

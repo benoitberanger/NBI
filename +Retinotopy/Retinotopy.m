@@ -162,17 +162,21 @@ try
                     
                     total_frame = total_frame + 1;
                     frame = frame  + 1 ;
+                    pp = 0;
                     
                     if frame > Flic.Frames
                         
                         if mod(frame,Flic.Frames + Flac.Frames) < Flac.Frames
                             Screen('DrawTexture', DataStruct.PTB.Window,Flac.Texture)
+                            pp = pp + msg.flac;
                         else
                             Screen('DrawTexture', DataStruct.PTB.Window,Flic.Texture)
+                            pp = pp + msg.flic;
                         end
                         
                     else
                         Screen('DrawTexture', DataStruct.PTB.Window,Flic.Texture)
+                        pp = pp + msg.flic;
                     end
                     
                     % Draw our mask
@@ -196,15 +200,14 @@ try
                     % Flash
                     if fix_counter > 0
                         RR.AddEvent( { 'Flash' flip_onset-StartTime } );
+                        pp = pp + msg.flash;
+                        fix_counter = fix_counter - 1;
                     end
                     
                     % Clic
                     if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
                         RR.AddEvent( { 'Clic' flip_onset-StartTime } );
-                    end
-                    
-                    if fix_counter > 0
-                        fix_counter = fix_counter - 1;
+                        pp = pp + msg.clic;
                     end
                     
                     if frame == 1
@@ -218,10 +221,14 @@ try
                     switch EP.Data{evt,4}
                         case 'cw'
                             Wedge.startAngle = Wedge.startAngle + EP.Data{evt,5}* DataStruct.PTB.IFI * Speed;
+                            pp = pp + msg.cw;
                         case 'ccw'
                             Wedge.startAngle = Wedge.startAngle - EP.Data{evt,5}* DataStruct.PTB.IFI * Speed;
+                            pp = pp + msg.ccw;
                     end
                     
+                    Common.SendParPortMessage
+                    dec2bin(pp,8)
                 end % while
                 
                 
