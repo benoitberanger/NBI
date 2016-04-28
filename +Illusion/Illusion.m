@@ -207,31 +207,51 @@ try
                 frame = 0;
                 fix_counter = 0;
                 
-                for i = as
-                    
-                    frame = frame + 1;
-                    
-                    % ESCAPE key pressed ?
-                    Common.Interrupt;
-                    
-                    % Mothion textures
-                    if ~strcmp(schedule{evt,1},'Null')
-                        Screen('DrawTextures', scr.main, schedule{evt,motiontex_idx}(:,i), [], squeeze(schedule{evt,rect_idx}(:,:,i)), schedule{evt,angles_idx});
-                    end
-                    
-                    % Fixation dot
-                    Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
-                    
-                    % Text
-                    DrawFormattedText(scr.main, [ schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
-                    
-                    % Flip
-                    flip_onset = Screen('Flip', scr.main );
-                    
-                    if frame == 1
+                % Catch trial ?
+                switch EP.Data{evt,5}
+                    case 0
+                        as = seq;
+                        rep = 1;
+                        visual.fgColor = [0 0 0];
+                    case 1
+                        as = seq_tar;
+                        rep = 2;
                         
-                        % Save onset
-                        ER.AddEvent({ EP.Data{evt,1} flip_onset-StartTime })
+                        % Text
+                        %                         DrawFormattedText(scr.main, 'catch' ,'center' , 0 );
+                        %                         Screen('DrawText', scr.main, 'catch' , 100 , 100 )
+                        visual.fgColor = [255 0 0];
+                end
+                
+                for r = 1 : rep
+                    
+                    for i = as
+                        
+                        frame = frame + 1;
+                        
+                        % ESCAPE key pressed ?
+                        Common.Interrupt;
+                        
+                        % Mothion textures
+                        if ~strcmp(schedule{evt,1},'Null')
+                            Screen('DrawTextures', scr.main, schedule{evt,motiontex_idx}(:,i), [], squeeze(schedule{evt,rect_idx}(:,:,i)), schedule{evt,angles_idx});
+                        end
+                        
+                        % Fixation dot
+                        Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
+                        
+                        % Text
+                        DrawFormattedText(scr.main, [ schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
+                        
+                        % Flip
+                        flip_onset = Screen('Flip', scr.main );
+                        
+                        if frame == 1
+                            
+                            % Save onset
+                            ER.AddEvent({ EP.Data{evt,1} flip_onset-StartTime })
+                            
+                        end
                         
                     end
                     
