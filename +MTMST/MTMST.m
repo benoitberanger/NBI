@@ -52,13 +52,13 @@ try
     % Set dot field parameters
     % -------------------------
     
-    DotSpeed.Deg        = 3;    % dot speed (deg/sec)
+    DotSpeed.Deg          = 3;    % dot speed (deg/sec)
     DotFractionKill_InOut = 0.005; % fraction of dots to kill each frame (limited lifetime)
-    DotFractionKill_Fix = 0; % fraction of dots to kill each frame (limited lifetime)
+    DotFractionKill_Fix   = 0; % fraction of dots to kill each frame (limited lifetime)
     
-    NumberOfDots     = 200; % number of dots
+    NumberOfDots      = 500; % number of dots
     MaxiumRadius.Deg  = 7*sqrt(2);   % maximum radius of  annulus (degrees)
-    MinimumRadius.Deg = 0.2;    % minumum
+    MinimumRadius.Deg = 0.1;    % minumum
     DotSize.Deg       = 0.1;  % width of dot (deg)
     
     

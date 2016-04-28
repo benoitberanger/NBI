@@ -136,13 +136,12 @@ try
     switch DataStruct.OperationMode
         
         case 'Acquisition'
-            as = seq;
             
         case 'FastDebug'
-            as = seq( 1 : round(length(seq)/10) );
+            seq     = seq    ( 1 : round(length(seq)/Speed) );
+            seq_tar = seq_tar( 1 : round(length(seq)/Speed) );
             
         case 'RealisticDebug'
-            as = seq;
             
     end
     
@@ -156,12 +155,14 @@ try
             
             case 'StartTime'
                 
+                % Fill background
                 Screen('FillRect',DataStruct.PTB.Window,DataStruct.Parameters.Video.ScreenBackgroundColor);
                 
                 % Draw fixation point
                 Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
                 
                 Common.StartTimeEvent
+                
                 
             case 'StopTime'
                 
@@ -182,9 +183,6 @@ try
                     
                     % Fixation dot
                     Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
-                    
-                    % Text
-                    DrawFormattedText(scr.main, [ schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
                     
                     % Tell PTB that no further drawing commands will follow before Screen('Flip')
                     Screen('DrawingFinished', DataStruct.PTB.Window);
@@ -212,19 +210,15 @@ try
                     case 0
                         as = seq;
                         rep = 1;
-                        visual.fgColor = [0 0 0];
                     case 1
                         as = seq_tar;
                         rep = 2;
-                        
-                        % Text
-                        %                         DrawFormattedText(scr.main, 'catch' ,'center' , 0 );
-                        %                         Screen('DrawText', scr.main, 'catch' , 100 , 100 )
-                        visual.fgColor = [255 0 0];
                 end
                 
+                % Play stimulus
                 for r = 1 : rep
                     
+                    % Play frames
                     for i = as
                         
                         frame = frame + 1;
@@ -241,10 +235,29 @@ try
                         Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
                         
                         % Text
-                        DrawFormattedText(scr.main, [ schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
+                        switch DataStruct.OperationMode
+                            case 'Acquisition'
+                            case 'FastDebug'
+                                DrawFormattedText(scr.main, [ num2str(schedule{evt,5}) , ' ' , schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
+                            case 'RealisticDebug'
+                                DrawFormattedText(scr.main, [ num2str(schedule{evt,5}) , ' ' , schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
+                        end
+                        
+                        % Tell PTB that no further drawing commands will follow before Screen('Flip')
+                        Screen('DrawingFinished', DataStruct.PTB.Window);
                         
                         % Flip
                         flip_onset = Screen('Flip', scr.main );
+                        
+                        % Target
+                        if schedule{evt,5} && frame == 1
+                            RR.AddEvent( { 'Target' flip_onset-StartTime } );
+                        end
+                        
+                        % Clic
+                        if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
+                            RR.AddEvent( { 'Clic' flip_onset-StartTime } );
+                        end
                         
                         if frame == 1
                             
