@@ -58,6 +58,8 @@ try
     % Loop over the EventPlanning
     for evt = 1 : size( EP.Data , 1 )
         
+        Common.CommandWindowDisplay;
+        
         switch EP.Data{evt,1}
             
             case 'StartTime'

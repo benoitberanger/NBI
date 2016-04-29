@@ -22,7 +22,7 @@ switch DataStruct.Task
         msg.control2_pathS_InOut = bin2dec('0 0 0 0 0 1 0 0');
         msg.control2_pathS_Rot   = bin2dec('0 0 0 0 1 0 0 0');
         
-        msg.Fixation             = bin2dec('1 0 0 0 0 0 0 0');
+        msg.Fixation             = bin2dec('0 0 0 1 0 0 0 0');
         
     case 'MTMST_Left'
         
@@ -30,17 +30,11 @@ switch DataStruct.Task
         msg.in       = bin2dec('0 0 0 0 0 0 1 0');
         msg.fixation = bin2dec('0 0 0 0 0 1 0 0');
         
-        msg.flash    = bin2dec('0 1 0 0 0 0 0 0');
-        msg.clic     = bin2dec('1 0 0 0 0 0 0 0');
-        
     case 'MTMST_Right'
         
         msg.out      = bin2dec('0 0 0 0 0 0 0 1');
         msg.in       = bin2dec('0 0 0 0 0 0 1 0');
         msg.fixation = bin2dec('0 0 0 0 0 1 0 0');
-        
-        msg.flash    = bin2dec('0 1 0 0 0 0 0 0');
-        msg.clic     = bin2dec('1 0 0 0 0 0 0 0');
         
     case 'Retinotopy'
         
@@ -49,9 +43,6 @@ switch DataStruct.Task
         
         msg.flic  = bin2dec('0 0 0 0 0 1 0 0');
         msg.flac  = bin2dec('0 0 0 0 1 0 0 0');
-        
-        msg.flash = bin2dec('0 1 0 0 0 0 0 0');
-        msg.clic  = bin2dec('1 0 0 0 0 0 0 0');
         
     case 'Illusion'
         
@@ -65,12 +56,12 @@ switch DataStruct.Task
         
         msg.Null                = bin2dec('0 0 0 0 1 0 0 0');
         
-        msg.flash               = bin2dec('0 1 0 0 0 0 0 0');
-        msg.clic                = bin2dec('1 0 0 0 0 0 0 0');
-        
     otherwise
         
 end
+
+msg.flash               = bin2dec('0 1 0 0 0 0 0 0');
+msg.clic                = bin2dec('1 0 0 0 0 0 0 0');
 
 % Pulse duration
 msg.duration             = 0.005; % seconds
