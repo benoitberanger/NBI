@@ -56,7 +56,7 @@ try
     % 'onsets' & 'durations' for SPM
     onsets    = cell(size(names));
     durations = cell(size(names));
-    
+
     % Shortcut
     EventData = DataStruct.TaskData.ER.Data;
     

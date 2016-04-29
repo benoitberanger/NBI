@@ -25,7 +25,7 @@ try
     
     % Dot
     PixelPerDegree = va2pix( 1 , DataStruct.Parameters.Video.SubjectDistance , DataStruct.Parameters.Video.ScreenWidthM , DataStruct.Parameters.Video.ScreenWidthPx );
-    DotVisualAngle = 0.15;
+    DotVisualAngle = 0.30;
     DotColor = [255 0 0];
     
     diameter = round( PixelPerDegree * DotVisualAngle );

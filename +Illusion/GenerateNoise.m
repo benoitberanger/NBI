@@ -3,7 +3,7 @@ try
     
     nFrames = round(stim.period/scr.fd);
     
-    numberOfPatchesToGenerate = 16 ;
+    numberOfPatchesToGenerate = 64 ;
     
     
     %% Generate patches

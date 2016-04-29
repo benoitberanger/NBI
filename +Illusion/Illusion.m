@@ -59,9 +59,6 @@ try
     
     conditions_with_patches = 7;
     
-    % shuffleAll = Shuffle(repmat((1:nPatches)',[1 conditions_with_patches]));
-    shuffleAll = repmat((1:nPatches)',[1 conditions_with_patches]);
-    
     rect_idx      = size(EP.Data,2) + 1;
     angles_idx    = rect_idx + 1;
     motiontex_idx = angles_idx + 1;
@@ -72,42 +69,45 @@ try
         
         schedule(s,1:length(EP.Header)) = EP.Data(s,:);
         
+        randPatches = Shuffle(1:nPatches);
+        patchesOrder = randPatches(1:16);
+        
         switch EP.Data{s,1}
             
             case 'Control_inOut'
                 schedule{s,rect_idx}      = rectAll_InOut;
                 schedule{s,angles_idx}    = angles_other;
-                schedule{s,motiontex_idx} = motionTex3D(shuffleAll(:,1),:);
+                schedule{s,motiontex_idx} = motionTex3D(patchesOrder,:);
                 
             case 'Control_rotation'
                 schedule{s,rect_idx}      = rectAll_Rotation;
                 schedule{s,angles_idx}    = angles_other;
-                schedule{s,motiontex_idx} = motionTex3D(shuffleAll(:,2),:);
+                schedule{s,motiontex_idx} = motionTex3D(patchesOrder,:);
                 
             case 'Control_global'
                 schedule{s,rect_idx}      = rectAll_Illusion;
                 schedule{s,angles_idx}    = angles_other;
-                schedule{s,motiontex_idx} = motionTex3D(shuffleAll(:,3),:);
+                schedule{s,motiontex_idx} = motionTex3D(patchesOrder,:);
                 
             case 'Illusion_InOut'
                 schedule{s,rect_idx}      = rectAll_Illusion;
                 schedule{s,angles_idx}    = angles_expanding;
-                schedule{s,motiontex_idx} = motionTex2D(shuffleAll(:,4),:);
+                schedule{s,motiontex_idx} = motionTex2D(patchesOrder,:);
                 
             case 'Illusion_rotation'
                 schedule{s,rect_idx}      = rectAll_Illusion;
                 schedule{s,angles_idx}    = angles_rotating;
-                schedule{s,motiontex_idx} = motionTex2D(shuffleAll(:,5),:);
+                schedule{s,motiontex_idx} = motionTex2D(patchesOrder,:);
                 
             case 'Control_local_inOut'
                 schedule{s,rect_idx}      = rectAll_NoPath;
                 schedule{s,angles_idx}    = angles_rotating;
-                schedule{s,motiontex_idx} = motionTex2D(shuffleAll(:,5),:);
+                schedule{s,motiontex_idx} = motionTex2D(patchesOrder,:);
                 
             case 'Control_local_rot'
                 schedule{s,rect_idx}      = rectAll_NoPath;
                 schedule{s,angles_idx}    = angles_expanding;
-                schedule{s,motiontex_idx} = motionTex2D(shuffleAll(:,5),:);
+                schedule{s,motiontex_idx} = motionTex2D(patchesOrder,:);
                 
             case 'Null'
                 schedule{s,rect_idx}      = [];

@@ -46,7 +46,14 @@ try
     rectOval = [ 0 0 diameter diameter ];
     
     FixationDotCenter.Px = DotFieldCenter.Px*2 + FieldBorderToDot.Px;
-    FixH = FixationDotCenter.Px;
+    
+    % Initialize fixation point position
+    switch DataStruct.Task
+        case 'MTMST_Right'
+            FixH = DataStruct.Parameters.Video.ScreenWidthPx - FixationDotCenter.Px;
+        case 'MTMST_Left'
+            FixH = FixationDotCenter.Px;
+    end
     
     % -------------------------
     % Set dot field parameters
@@ -133,7 +140,6 @@ try
                 cs = [cos(t), sin(t)];
                 xy = [r r] .* cs;   % dot positions in Cartesian coordinates (pixels from center)
                 xymatrix = transpose(xy);
-                
                 
                 switch EP.Data{evt,7}
                     case 'in'
