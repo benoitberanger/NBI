@@ -16,7 +16,7 @@ try
                 'Response'             ;
                 };
             
-        case 'EyelinkCalibrationNPI'
+        case 'EyelinkCalibration'
             names = {'EyeLinkCalibration'};
             
         case 'MTMST_Left'

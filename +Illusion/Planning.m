@@ -9,7 +9,8 @@ load( [ pwd filesep '+Illusion' filesep 'NBI_optseq_sequences.mat' ] )
 
 % Miniblock number ?
 miniBlock_idx = cell2mat(optseqsequences(:,1)); %#ok<NODEF>
-[miniBlock_id,~,idx2id] = unique(miniBlock_idx,'stable');
+% [miniBlock_id,~,idx2id] = unique(miniBlock_idx,'stable');
+[miniBlock_id,~,idx2id] = unique(miniBlock_idx);
 
 % Prepare a cell containing all miniblocs
 allBlocks = cell(length(miniBlock_id),1);

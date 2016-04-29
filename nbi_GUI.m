@@ -144,7 +144,7 @@ RunNumber = get(handles.edit_RunNumber,'String');
 
 % Eyelink file name can only contain 8 characters, so we limit the number
 % of characters for SubjectID and RunNumber.
-if length(SubjectID) > 20
+if length(SubjectID) > 4
     error('NBI:SubjectIDLength','\n SubjectID ? \n')
 end
 if length(RunNumber) > 9999
@@ -292,6 +292,11 @@ switch get(get(handles.uipanel_EyelinkMode,'SelectedObject'),'Tag')
         if strcmp(DataStruct.SaveMode,'NoSave')
             error('NBI:EyelinkMode',' \n ---> Save mode should be turned on when using Eyelink <--- \n ')
         end
+        
+        EyelinkFile = [ SubjectID '_' Task(1) '_' RunNumber ];
+        
+        handles.EyelinkFile = EyelinkFile;
+        DataStruct.EyelinkFile = EyelinkFile;
         
         handles.EyelinkToolboxAvailable = EyelinkToolboxAvailable;
         DataStruct.EyelinkToolboxAvailable = EyelinkToolboxAvailable;

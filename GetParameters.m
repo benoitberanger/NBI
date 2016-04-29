@@ -38,6 +38,9 @@ switch DataStruct.Task
     case 'GenerateNoise'
         Parameters.Video.ScreenBackgroundColor = [128 128 128]; % [R G B] ( from 0 to 255 )
         
+    case 'EyelinkCalibration'
+        Parameters.Video.ScreenBackgroundColor = [128 128 128]; % [R G B] ( from 0 to 255 )
+        
 end
 
 Parameters.Toolbox = 'PsychToolbox';
