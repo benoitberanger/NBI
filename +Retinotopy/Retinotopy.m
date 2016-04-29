@@ -228,7 +228,7 @@ try
                     end
                     
                     Common.SendParPortMessage
-                    dec2bin(pp,8)
+                    
                 end % while
                 
                 

@@ -63,7 +63,7 @@ switch DataStruct.Task
         msg.Control_local_inOut = bin2dec('0 0 0 0 0 1 1 0');
         msg.Control_local_rot   = bin2dec('0 0 0 0 0 1 1 1');
         
-        msg.Null                = bin2dec('0 0 1 0 0 0 0 0');
+        msg.Null                = bin2dec('0 0 0 0 1 0 0 0');
         
         msg.flash               = bin2dec('0 1 0 0 0 0 0 0');
         msg.clic                = bin2dec('1 0 0 0 0 0 0 0');

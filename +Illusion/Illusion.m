@@ -176,10 +176,19 @@ try
                 
                 while flip_onset < StartTime + EP.Data{evt+1,2} - DataStruct.PTB.slack * 2
                     
-                    frame = frame + 1;
-                    
                     % ESCAPE key pressed ?
                     Common.Interrupt;
+                    
+                    frame = frame + 1;
+                    pp = msg.Null;
+                    
+                    % Clic : we never know... maybe the subject can clic in
+                    % Null conditoon (slow reaction time, mistake,
+                    % whatever, ...)
+                    if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
+                        RR.AddEvent( { 'Clic' flip_onset-StartTime } );
+                        pp = pp + msg.clic;
+                    end
                     
                     % Fixation dot
                     Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
@@ -189,6 +198,8 @@ try
                     
                     % Flip
                     flip_onset = Screen('Flip', scr.main);
+                    
+                    Common.SendParPortMessage
                     
                     if frame == 1
                         
@@ -221,10 +232,11 @@ try
                     % Play frames
                     for i = as
                         
-                        frame = frame + 1;
-                        
                         % ESCAPE key pressed ?
                         Common.Interrupt;
+                        
+                        frame = frame + 1;
+                        pp = msg.(EP.Data{evt,1});
                         
                         % Mothion textures
                         if ~strcmp(schedule{evt,1},'Null')
@@ -250,14 +262,18 @@ try
                         flip_onset = Screen('Flip', scr.main );
                         
                         % Target
-                        if schedule{evt,5} && frame == 1
+                        if schedule{evt,5}
                             RR.AddEvent( { 'Target' flip_onset-StartTime } );
+                            pp = pp + msg.flash;
                         end
                         
                         % Clic
                         if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
                             RR.AddEvent( { 'Clic' flip_onset-StartTime } );
+                            pp = pp + msg.clic;
                         end
+                        
+                        Common.SendParPortMessage
                         
                         if frame == 1
                             
@@ -291,4 +307,3 @@ catch err %#ok<*NASGU>
 end
 
 end
-
