@@ -230,7 +230,7 @@ try
                         rep = 1;
                     case 1
                         as = seq_tar;
-                        rep = 2;
+                        rep = 3;
                 end
                 
                 % Play stimulus
