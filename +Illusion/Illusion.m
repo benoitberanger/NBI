@@ -152,6 +152,11 @@ try
     for evt = 1 : size( EP.Data , 1 )
         
         Common.CommandWindowDisplay;
+        switch EP.Data{evt,5}
+            case 1
+            fprintf( ' ---> CATCH TRIAL \n' )
+            case 0
+        end
         
         switch EP.Data{evt,1}
             
@@ -273,6 +278,7 @@ try
                         if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
                             RR.AddEvent( { 'Clic' flip_onset-StartTime } );
                             pp = pp + msg.clic;
+                            fprintf( ' <--- CLIC \n' )
                         end
                         
                         Common.SendParPortMessage
