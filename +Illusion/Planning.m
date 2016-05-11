@@ -163,14 +163,14 @@ if nargout > 0
     switch DataStruct.Environement
         
         case 'MRI'
-            blocSelected = str2double( DataStruct.RunNumber );
+            blocSelected = str2double( DataStruct.BlocNumber );
             
         case 'Training'
             blocSelected = 1;
             adjustedBlocs = cell(1);
             NO = @(adjustedBlocs) adjustedBlocs{blocSelected}{end,2} + adjustedBlocs{blocSelected}{end,4};
             
-            switch str2double( DataStruct.RunNumber )
+            switch str2double( DataStruct.BlocNumber )
                 
                 case 1
                     adjustedBlocs{blocSelected} = {1 0 1 1.8 'Null' 0 };
