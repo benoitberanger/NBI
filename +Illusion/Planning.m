@@ -163,24 +163,24 @@ if nargout > 0
     switch DataStruct.Environement
         
         case 'MRI'
-            blocSelected = str2double( DataStruct.BlocNumber );
+            blocSelected = DataStruct.BlocNumber ;
             
         case 'Training'
             blocSelected = 1;
             adjustedBlocs = cell(1);
             NO = @(adjustedBlocs) adjustedBlocs{blocSelected}{end,2} + adjustedBlocs{blocSelected}{end,4};
             
-            switch str2double( DataStruct.BlocNumber )
+            switch DataStruct.BlocNumber 
                 
                 case 1
-                    adjustedBlocs{blocSelected} = {1 0 1 1.8 'Null' 0 };
+                    adjustedBlocs{blocSelected} = {1 0 0 1.8 'Null' 0 };
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation'   0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 1.8 'Illusion_InOut'      1 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 0.9 'Null'                0 } ];
+                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 0.9 'Null'                0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'    0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 4 1.8 'Control_inOut'       0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 5 1.8 'Control_global'      1 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 2.7 'Null'                0 } ];
+                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 2.7 'Null'                0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 6 1.8 'Control_local_rot'   1 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 7 1.8 'Control_local_inOut' 0 } ];
                     
@@ -201,7 +201,7 @@ if nargout > 0
                 case 3
                     rep = 3;
                     
-                    adjustedBlocs{blocSelected} = {1 0 1 1.8 'Null' 0 };
+                    adjustedBlocs{blocSelected} = {1 0 0 1.8 'Null' 0 };
                     for i = 1:rep-1
                         adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation'   0 } ];
                     end
@@ -212,7 +212,7 @@ if nargout > 0
                     end
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 1.8 'Illusion_InOut'      1 } ];
                     
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 0.9 'Null'                0 } ];
+                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 0.9 'Null'                0 } ];
                     
                     for i = 1:rep
                         adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'    0 } ];
@@ -229,7 +229,7 @@ if nargout > 0
                     end
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 5 1.8 'Control_global'      1 } ];
                     
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 2.7 'Null'                0 } ];
+                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 2.7 'Null'                0 } ];
                     
                     for i = 1:rep
                         adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 6 1.8 'Control_local_rot'   0 } ];
@@ -256,14 +256,14 @@ if nargout > 0
                     end
                     
                 otherwise
-                    adjustedBlocs{blocSelected} = {1 0 1 1.8 'Null' 0 };
+                    adjustedBlocs{blocSelected} = {1 0 0 1.8 'Null' 0 };
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation'   0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 1.8 'Illusion_InOut'      0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 0.9 'Null'                0 } ];
+                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 0.9 'Null'                0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'    0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 4 1.8 'Control_inOut'       0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 5 1.8 'Control_global'      0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 2.7 'Null'                0 } ];
+                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 2.7 'Null'                0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 6 1.8 'Control_local_rot'   0 } ];
                     adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 7 1.8 'Control_local_inOut' 0 } ];
                     
@@ -289,7 +289,7 @@ NextOnset = @(EP) EP.Data{end,2} + EP.Data{end,3};
 
 % --- Start ---------------------------------------------------------------
 
-EP.AddPlanning({ 'StartTime' , 0 , 0 , 0 , 0 });
+EP.AddPlanning({ 'StartTime' , 0 , -1 , 0 , 0 });
 
 % --- Stim ----------------------------------------------------------------
 
@@ -303,7 +303,7 @@ end
 
 % --- Stop ----------------------------------------------------------------
 
-EP.AddPlanning({ 'StopTime' , NextOnset(EP) , 0 , 0 , 0 });
+EP.AddPlanning({ 'StopTime' , NextOnset(EP) , -2 , 0 , 0 });
 
 
 %% Acceleration

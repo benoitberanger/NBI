@@ -184,6 +184,7 @@ try
                     if fix_counter == 0
                         if any( total_frame == Catch.frame )
                             fix_counter = Catch.nCatchFrame;
+                            Common.CATCHecho;
                         else
                             MTMST.DrawFixation;
                         end
@@ -246,6 +247,7 @@ try
                     if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
                         RR.AddEvent( { 'Clic' flip_onset-StartTime } );
                         pp = pp + msg.clic;
+                        Common.CLICKecho;
                     end
                     
                     Common.SendParPortMessage
