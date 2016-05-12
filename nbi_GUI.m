@@ -170,7 +170,6 @@ switch get(hObject,'Tag')
         error('NBI:TaskSelection','Error in Task selection')
 end
 
-handles.Task    = Task;
 DataStruct.Task = Task;
 
 
@@ -185,24 +184,16 @@ switch get(get(handles.uipanel_Environement,'SelectedObject'),'Tag')
         warning('NBI:ModeSelection','Error in Environement selection')
 end
 
-handles.Environement    = Environement;
 DataStruct.Environement = Environement;
 
 
 %% Subject ID & Run number
 
 SubjectID = get(handles.edit_SubjectID,'String');
-% RunNumber = get(handles.edit_RunNumber,'String');
 
-% Eyelink file name can only contain 8 characters, so we limit the number
-% of characters for SubjectID and RunNumber.
-if length(SubjectID) > 4
-    error('NBI:SubjectIDLength','\n SubjectID ? \n')
+if length(SubjectID) ~= 4
+    error('NBI:SubjectIDLength','\n SubjectID must be 4 char \n')
 end
-% if length(RunNumber) > 9999
-%     error('NBI:RunNumberLength','\n RunNumber ? \n')
-% end
-
 
 % Prepare path
 DataPath = [fileparts(pwd) filesep 'data' filesep SubjectID filesep];
@@ -243,7 +234,6 @@ switch get(get(handles.uipanel_SaveMode,'SelectedObject'),'Tag')
         warning('NBI:SaveSelection','Error in SaveMode selection')
 end
 
-handles.SaveMode    = SaveMode;
 DataStruct.SaveMode = SaveMode;
 
 
@@ -260,7 +250,6 @@ switch get(get(handles.uipanel_OperationMode,'SelectedObject'),'Tag')
         warning('NBI:ModeSelection','Error in Mode selection')
 end
 
-handles.OperationMode    = OperationMode;
 DataStruct.OperationMode = OperationMode;
 
 
@@ -313,23 +302,49 @@ switch get(get(handles.uipanel_EyelinkMode,'SelectedObject'),'Tag')
         % 'Eyelink.m' exists ?
         status = which('Eyelink.m');
         if isempty(status)
-            EyelinkToolboxAvailable = 0;
-        else
-            EyelinkToolboxAvailable = 1;
+            error('NBI:EyelinkToolbox','no ''Eyelink.m'' detected in the path')
         end
         
         % Save mode ?
         if strcmp(DataStruct.SaveMode,'NoSave')
-            error('NBI:EyelinkMode',' \n ---> Save mode should be turned on when using Eyelink <--- \n ')
+            error('NBI:SaveModeForEyelink',' \n ---> Save mode should be turned on when using Eyelink <--- \n ')
         end
         
-        EyelinkFile = [ SubjectID '_' Task(1) '_' RunNumber ];
+        % Eyelink connected ?
+        status = Eyelink('IsConnected');
+        fprintf('\n Eyelink connection status : \n')
+        switch status
+            case 1
+                fprintf('connected \n')
+            case -1
+                fprintf('dummy-connected \n')
+            case 2
+                fprintf('broadcast-connected \n')
+            case 0
+                fprintf('NOT CONNECTED \n')
+                error('NBI:Eyelink:Connection','Eyelink not connected')
+        end
         
-        handles.EyelinkFile = EyelinkFile;
+        % File name for the eyelink : 8 char maximum
+        switch Task
+            case 'NBI'
+                task = 'NB';
+            case 'EyelinkCalibration'
+                task = 'EC';
+            case 'MTMST_Left'
+                task = 'ML';
+            case 'MTMST_Right'
+                task = 'MR';
+            case 'Retinotopy'
+                task = 'RT';
+            case 'Illusion'
+                task = ['I' get(handles.edit_IlluBlock,'String')];
+            otherwise
+                error('NBI:Task','Task ?')
+        end
+        EyelinkFile = [ SubjectID task sprintf('%.2d',str2double(RunNumber)) ];
+        
         DataStruct.EyelinkFile = EyelinkFile;
-        
-        handles.EyelinkToolboxAvailable = EyelinkToolboxAvailable;
-        DataStruct.EyelinkToolboxAvailable = EyelinkToolboxAvailable;
         
     otherwise
         
@@ -337,7 +352,6 @@ switch get(get(handles.uipanel_EyelinkMode,'SelectedObject'),'Tag')
         
 end
 
-handles.EyelinkMode    = EyelinkMode;
 DataStruct.EyelinkMode = EyelinkMode;
 
 

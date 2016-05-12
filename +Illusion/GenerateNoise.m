@@ -4,7 +4,7 @@ try
     nFrames = round(stim.period/scr.fd);
     
     numberOfPatchesToGenerate = 64 ;
-    
+    fprintf('\n Patches to generate : %d ',numberOfPatchesToGenerate)
     
     %% Generate patches
     
@@ -12,6 +12,7 @@ try
     fprintf('\n Generating 2D noise...')
     noiseArray2D = Illusion.Common.generateNoiseImage(stim,visual, scr.fd);
     for ti = 1:numberOfPatchesToGenerate % for each of the patchesNumber noise patches
+        fprintf('\n %d ',ti)
         noiseArray2D = cat(3, noiseArray2D, Illusion.Common.generateNoiseImage(stim,visual,scr.fd));
     end
     fprintf(' Done \n')
@@ -20,6 +21,7 @@ try
     fprintf('\n Generating 3D noise...')
     noiseArray3D = Illusion.Common.generateNoiseVolume(stim,visual, scr.fd);
     for ti = 1:numberOfPatchesToGenerate
+        fprintf('\n %d ',ti)
         noiseArray3D = cat(4, noiseArray3D, Illusion.Common.generateNoiseVolume(stim,visual,scr.fd));
     end
     fprintf(' Done \n')
