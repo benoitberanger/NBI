@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 11-May-2016 12:31:55
+% Last Modified by GUIDE v2.5 12-May-2016 13:35:49
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -404,9 +404,9 @@ switch Task
         TaskData = Retinotopy.Retinotopy( DataStruct );
         
     case 'Illusion'
-        BlocNumber            = str2double( get(handles.edit_IlluBloc,'String') );
-        DataStruct.BlocNumber = BlocNumber;
-        TaskData              = Illusion.Illusion( DataStruct );
+        BlockNumber            = str2double( get(handles.edit_IlluBlock,'String') );
+        DataStruct.BlockNumber = BlockNumber;
+        TaskData               = Illusion.Illusion( DataStruct );
         
     otherwise
         error('NBI:Task','Task ?')
@@ -551,7 +551,7 @@ switch get(handles.checkbox_WindowedScreen,'Value')
     case 0
         WindowedMode = 'Off';
     otherwise
-        warning('STIMPNEE:WindowedScreen','Error in WindowedScreen') 
+        warning('STIMPNEE:WindowedScreen','Error in WindowedScreen')
 end
 DataStruct.WindowedMode = WindowedMode;
 
@@ -755,25 +755,25 @@ function checkbox_WindowedScreen_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox_WindowedScreen
 
 
-function edit_IlluBloc_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_IlluBloc (see GCBO)
+function edit_IlluBlock_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_IlluBlock (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit_IlluBloc as text
-%        str2double(get(hObject,'String')) returns contents of edit_IlluBloc as a double
+% Hints: get(hObject,'String') returns contents of edit_IlluBlock as text
+%        str2double(get(hObject,'String')) returns contents of edit_IlluBlock as a double
 
-bloc = str2double(get(hObject,'String'));
+block = str2double(get(hObject,'String'));
 
-if bloc ~= round(bloc) || bloc < 0 || bloc > 8
-    set(hObject,'String','1'); 
-    error('bloc number must be from 0 to 8')
+if block ~= round(block) || block < 0 || block > 8
+    set(hObject,'String','1');
+    error('block number must be from 0 to 8')
 end
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_IlluBloc_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_IlluBloc (see GCBO)
+function edit_IlluBlock_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_IlluBlock (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -782,5 +782,5 @@ function edit_IlluBloc_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-set(hObject,'TooltipString','Bloc number of Illusion : from 0 to 8')
+set(hObject,'TooltipString','Block number of Illusion : from 0 to 8')
 

@@ -12,7 +12,7 @@ miniBlock_idx = cell2mat(optseqsequences(:,1)); %#ok<NODEF>
 % [miniBlock_id,~,idx2id] = unique(miniBlock_idx,'stable');
 [miniBlock_id,~,idx2id] = unique(miniBlock_idx);
 
-% Prepare a cell containing all miniblocs
+% Prepare a cell containing all miniblocks
 allBlocks = cell(length(miniBlock_id),1);
 for b = 1 : length(miniBlock_id)
     allBlocks{b} = optseqsequences( miniBlock_id(b) == idx2id , : );
@@ -130,9 +130,9 @@ for b = 1 : length(miniBlock_id)
     
 end
 
-%% Adjust onset of the event after fusion of miniblocs
+%% Adjust onset of the event after fusion of miniblocks
 
-adjustedBlocs = runBlocks;
+adjustedBlocks = runBlocks;
 
 for mb = 1 : size(runBlocks,1)
     
@@ -151,7 +151,7 @@ for mb = 1 : size(runBlocks,1)
         
     end
     
-    adjustedBlocs{mb}(:,2) = num2cell(onsets);
+    adjustedBlocks{mb}(:,2) = num2cell(onsets);
     
 end
 
@@ -163,109 +163,109 @@ if nargout > 0
     switch DataStruct.Environement
         
         case 'MRI'
-            blocSelected = DataStruct.BlocNumber ;
+            blockSelected = DataStruct.BlockNumber ;
             
         case 'Training'
-            blocSelected = 1;
-            adjustedBlocs = cell(1);
-            NO = @(adjustedBlocs) adjustedBlocs{blocSelected}{end,2} + adjustedBlocs{blocSelected}{end,4};
+            blockSelected = 1;
+            adjustedBlocks = cell(1);
+            NO = @(adjustedBlocks) adjustedBlocks{blockSelected}{end,2} + adjustedBlocks{blockSelected}{end,4};
             
-            switch DataStruct.BlocNumber 
+            switch DataStruct.BlockNumber
                 
                 case 1
-                    adjustedBlocs{blocSelected} = {1 0 0 1.8 'Null' 0 };
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation'   0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 1.8 'Illusion_InOut'      1 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 0.9 'Null'                0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'    0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 4 1.8 'Control_inOut'       0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 5 1.8 'Control_global'      1 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 2.7 'Null'                0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 6 1.8 'Control_local_rot'   1 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 7 1.8 'Control_local_inOut' 0 } ];
+                    adjustedBlocks{blockSelected} = {1 0 0 1.8 'Null' 0 };
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Illusion_rotation'   0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 2 1.8 'Illusion_InOut'      1 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 0 0.9 'Null'                0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 3 1.8 'Control_rotation'    0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 4 1.8 'Control_inOut'       0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 5 1.8 'Control_global'      1 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 0 2.7 'Null'                0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 6 1.8 'Control_local_rot'   1 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 7 1.8 'Control_local_inOut' 0 } ];
                     
                     
                 case 2
-                    adjustedBlocs{blocSelected} = { 1 0 0 1.8 'Null' 0 };
+                    adjustedBlocks{blockSelected} = { 1 0 0 1.8 'Null' 0 };
                     for ii = 1:5
                         for i = 1:3
-                            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation' 0 } ];
+                            adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Illusion_rotation' 0 } ];
                         end
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation' 1 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Illusion_rotation' 1 } ];
                         for i = 1:3
-                            adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'  0 } ];
+                            adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 3 1.8 'Control_rotation'  0 } ];
                         end
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'  1 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 3 1.8 'Control_rotation'  1 } ];
                     end
                     
                 case 3
                     rep = 3;
                     
-                    adjustedBlocs{blocSelected} = {1 0 0 1.8 'Null' 0 };
+                    adjustedBlocks{blockSelected} = {1 0 0 1.8 'Null' 0 };
                     for i = 1:rep-1
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation'   0 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Illusion_rotation'   0 } ];
                     end
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation'   1 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Illusion_rotation'   1 } ];
                     
                     for i = 1:rep
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 1.8 'Illusion_InOut'      0 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 2 1.8 'Illusion_InOut'      0 } ];
                     end
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 1.8 'Illusion_InOut'      1 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 2 1.8 'Illusion_InOut'      1 } ];
                     
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 0.9 'Null'                0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 0 0.9 'Null'                0 } ];
                     
                     for i = 1:rep
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'    0 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 3 1.8 'Control_rotation'    0 } ];
                     end
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'    1 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 3 1.8 'Control_rotation'    1 } ];
                     
                     for i = 1:rep
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 4 1.8 'Control_inOut'       0 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 4 1.8 'Control_inOut'       0 } ];
                     end
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 4 1.8 'Control_inOut'       1 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 4 1.8 'Control_inOut'       1 } ];
                     
                     for i = 1:rep
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 5 1.8 'Control_global'      0 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 5 1.8 'Control_global'      0 } ];
                     end
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 5 1.8 'Control_global'      1 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 5 1.8 'Control_global'      1 } ];
                     
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 2.7 'Null'                0 } ];
-                    
-                    for i = 1:rep
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 6 1.8 'Control_local_rot'   0 } ];
-                    end
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 6 1.8 'Control_local_rot'   1 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 0 2.7 'Null'                0 } ];
                     
                     for i = 1:rep
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 7 1.8 'Control_local_inOut' 0 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 6 1.8 'Control_local_rot'   0 } ];
                     end
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 7 1.8 'Control_local_inOut' 1 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 6 1.8 'Control_local_rot'   1 } ];
+                    
+                    for i = 1:rep
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 7 1.8 'Control_local_inOut' 0 } ];
+                    end
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 7 1.8 'Control_local_inOut' 1 } ];
                     
                 case 4
-                    adjustedBlocs{blocSelected} = { 1 0 0 1.8 'Null' 0 };
+                    adjustedBlocks{blockSelected} = { 1 0 0 1.8 'Null' 0 };
                     for ii = 1:10
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_InOut' 0 } ];
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation' 0 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Illusion_InOut' 0 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Illusion_rotation' 0 } ];
                     end
                     
                 case 5
-                    adjustedBlocs{blocSelected} = { 1 0 0 1.8 'Null' 0 };
+                    adjustedBlocks{blockSelected} = { 1 0 0 1.8 'Null' 0 };
                     for ii = 1:10
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Control_inOut' 0 } ];
-                        adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Control_rotation' 0 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Control_inOut' 0 } ];
+                        adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Control_rotation' 0 } ];
                     end
                     
                 otherwise
-                    adjustedBlocs{blocSelected} = {1 0 0 1.8 'Null' 0 };
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 1 1.8 'Illusion_rotation'   0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 2 1.8 'Illusion_InOut'      0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 0.9 'Null'                0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 3 1.8 'Control_rotation'    0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 4 1.8 'Control_inOut'       0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 5 1.8 'Control_global'      0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 0 2.7 'Null'                0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 6 1.8 'Control_local_rot'   0 } ];
-                    adjustedBlocs{blocSelected} = [adjustedBlocs{blocSelected} ; {1 NO(adjustedBlocs) 7 1.8 'Control_local_inOut' 0 } ];
+                    adjustedBlocks{blockSelected} = {1 0 0 1.8 'Null' 0 };
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Illusion_rotation'   0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 2 1.8 'Illusion_InOut'      0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 0 0.9 'Null'                0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 3 1.8 'Control_rotation'    0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 4 1.8 'Control_inOut'       0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 5 1.8 'Control_global'      0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 0 2.7 'Null'                0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 6 1.8 'Control_local_rot'   0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 7 1.8 'Control_local_inOut' 0 } ];
                     
             end % switch Run
             
@@ -273,12 +273,12 @@ if nargout > 0
     
 else
     
-    blocSelected = 1;
+    blockSelected = 1;
     
 end
 
 
-%% Add the adjustedBlocs into the Planning object
+%% Add the adjustedBlocks into the Planning object
 
 % Create and prepare
 header = { 'event_name' , 'onset(s)' , 'duration(s)' 'condition_ID' 'catch_trial'};
@@ -293,7 +293,7 @@ EP.AddPlanning({ 'StartTime' , 0 , -1 , 0 , 0 });
 
 % --- Stim ----------------------------------------------------------------
 
-displayBlock = adjustedBlocs{ blocSelected };
+displayBlock = adjustedBlocks{ blockSelected };
 
 for trial = 1 : size( displayBlock , 1 )
     
