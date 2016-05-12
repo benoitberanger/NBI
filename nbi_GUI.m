@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 12-May-2016 13:35:49
+% Last Modified by GUIDE v2.5 12-May-2016 18:43:15
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -311,19 +311,7 @@ switch get(get(handles.uipanel_EyelinkMode,'SelectedObject'),'Tag')
         end
         
         % Eyelink connected ?
-        status = Eyelink('IsConnected');
-        fprintf('\n Eyelink connection status : \n')
-        switch status
-            case 1
-                fprintf('connected \n')
-            case -1
-                fprintf('dummy-connected \n')
-            case 2
-                fprintf('broadcast-connected \n')
-            case 0
-                fprintf('NOT CONNECTED \n')
-                error('NBI:Eyelink:Connection','Eyelink not connected')
-        end
+        Eyelink.IsConnected
         
         % File name for the eyelink : 8 char maximum
         switch Task
@@ -679,8 +667,14 @@ function uipanel_EyelinkMode_SelectionChangeFcn(hObject, eventdata, handles)
 switch get(eventdata.NewValue,'Tag') % Get Tag of selected object.
     case 'radiobutton_EyelinkOff'
         set(handles.pushbutton_EyelinkCalibration,'Visible','off')
+        set(handles.pushbutton_IsConnected,'Visible','off')
+        set(handles.pushbutton_ForceShutDown,'Visible','off')
+        set(handles.pushbutton_Initialize,'Visible','off')
     case 'radiobutton_EyelinkOn'
         set(handles.pushbutton_EyelinkCalibration,'Visible','on')
+        set(handles.pushbutton_IsConnected,'Visible','on')
+        set(handles.pushbutton_ForceShutDown,'Visible','on')
+        set(handles.pushbutton_Initialize,'Visible','on')
 end
 
 
@@ -797,4 +791,33 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 set(hObject,'TooltipString','Block number of Illusion : from 0 to 8')
+
+
+
+% --- Executes on button press in pushbutton_IsConnected.
+function pushbutton_IsConnected_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_IsConnected (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+Eyelink.IsConnected;
+
+
+
+% --- Executes on button press in pushbutton_Initialize.
+function pushbutton_Initialize_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_Initialize (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+Eyelink.Initialize;
+
+
+% --- Executes on button press in pushbutton_ForceShutDown.
+function pushbutton_ForceShutDown_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_ForceShutDown (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+Eyelink.ForceShutDown;
 
