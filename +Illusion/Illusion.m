@@ -184,14 +184,6 @@ try
                     frame = frame + 1;
                     pp = msg.Null;
                     
-                    % Clic : we never know... maybe the subject can clic in
-                    % Null conditoon (slow reaction time, mistake,
-                    % whatever, ...)
-                    if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
-                        RR.AddEvent( { 'Clic' flip_onset-StartTime } );
-                        pp = pp + msg.clic;
-                    end
-                    
                     % Fixation dot
                     Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
                     
@@ -203,7 +195,7 @@ try
                     
                     % Clic
                     if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
-                        RR.AddEvent( { 'Clic' flip_onset-StartTime } );
+                        RR.AddEvent( { 'Clic' flip_onset-StartTime DataStruct.PTB.IFI } );
                         pp = pp + msg.clic;
                         Common.CLICKecho;
                     end
@@ -276,13 +268,12 @@ try
                         
                         % Target
                         if schedule{evt,5}
-                            RR.AddEvent( { 'Target' flip_onset-StartTime } );
                             pp = pp + msg.flash;
                         end
                         
                         % Clic
                         if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
-                            RR.AddEvent( { 'Clic' flip_onset-StartTime } );
+                            RR.AddEvent( { 'Clic' flip_onset-StartTime DataStruct.PTB.IFI } );
                             pp = pp + msg.clic;
                             Common.CLICKecho;
                         end
@@ -294,6 +285,7 @@ try
                             switch EP.Data{evt,5}
                                 case 1
                                     Common.CATCHecho;
+                                    RR.AddEvent( { 'Target' flip_onset-StartTime EP.Data{evt,3} } );
                                 case 0
                             end
                             
