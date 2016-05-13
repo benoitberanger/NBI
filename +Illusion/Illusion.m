@@ -152,11 +152,6 @@ try
     for evt = 1 : size( EP.Data , 1 )
         
         Common.CommandWindowDisplay;
-        switch EP.Data{evt,5}
-            case 1
-            fprintf( ' ---> CATCH TRIAL \n' )
-            case 0
-        end
         
         switch EP.Data{evt,1}
             
@@ -189,14 +184,6 @@ try
                     frame = frame + 1;
                     pp = msg.Null;
                     
-                    % Clic : we never know... maybe the subject can clic in
-                    % Null conditoon (slow reaction time, mistake,
-                    % whatever, ...)
-                    if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
-                        RR.AddEvent( { 'Clic' flip_onset-StartTime } );
-                        pp = pp + msg.clic;
-                    end
-                    
                     % Fixation dot
                     Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
                     
@@ -206,9 +193,22 @@ try
                     % Flip
                     flip_onset = Screen('Flip', scr.main);
                     
+                    % Clic
+                    if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
+                        RR.AddEvent( { 'Clic' flip_onset-StartTime DataStruct.PTB.IFI } );
+                        pp = pp + msg.clic;
+                        Common.CLICKecho;
+                    end
+                    
                     Common.SendParPortMessage
                     
                     if frame == 1
+                        
+                        switch EP.Data{evt,5}
+                            case 1
+                                Common.CATCHecho;
+                            case 0
+                        end
                         
                         % Save onset
                         ER.AddEvent({ EP.Data{evt,1} flip_onset-StartTime })
@@ -246,9 +246,7 @@ try
                         pp = msg.(EP.Data{evt,1});
                         
                         % Mothion textures
-                        if ~strcmp(schedule{evt,1},'Null')
-                            Screen('DrawTextures', scr.main, schedule{evt,motiontex_idx}(:,i), [], squeeze(schedule{evt,rect_idx}(:,:,i)), schedule{evt,angles_idx});
-                        end
+                        Screen('DrawTextures', scr.main, schedule{evt,motiontex_idx}(:,i), [], squeeze(schedule{evt,rect_idx}(:,:,i)), schedule{evt,angles_idx});
                         
                         % Fixation dot
                         Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
@@ -270,20 +268,26 @@ try
                         
                         % Target
                         if schedule{evt,5}
-                            RR.AddEvent( { 'Target' flip_onset-StartTime } );
                             pp = pp + msg.flash;
                         end
                         
                         % Clic
                         if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
-                            RR.AddEvent( { 'Clic' flip_onset-StartTime } );
+                            RR.AddEvent( { 'Clic' flip_onset-StartTime DataStruct.PTB.IFI } );
                             pp = pp + msg.clic;
-                            fprintf( ' <--- CLIC \n' )
+                            Common.CLICKecho;
                         end
                         
                         Common.SendParPortMessage
                         
                         if frame == 1
+                            
+                            switch EP.Data{evt,5}
+                                case 1
+                                    Common.CATCHecho;
+                                    RR.AddEvent( { 'Target' flip_onset-StartTime EP.Data{evt,3} } );
+                                case 0
+                            end
                             
                             % Save onset
                             ER.AddEvent({ EP.Data{evt,1} flip_onset-StartTime })

@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 26-Apr-2016 11:03:26
+% Last Modified by GUIDE v2.5 12-May-2016 18:43:15
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -86,7 +86,14 @@ set(handles.uipanel_EyelinkMode,'SelectedObject',handles.radiobutton_EyelinkOn)
 set( handles.checkbox_ParPort , 'Value' , 1 )
 handles = checkbox_ParPort_Callback( handles.checkbox_ParPort , eventdata , handles );
 
+% Windowed screen
 set(handles.checkbox_WindowedScreen,'Value',0)
+
+% Set invisible the unused objects
+set(handles.text_RunNumber,'Visible','off')
+set(handles.edit_RunNumber,'Visible','off')
+set(handles.pushbutton_RunNumber_m1,'Visible','off')
+set(handles.pushbutton_RunNumber_p1,'Visible','off')
 
 
 %% Try to pick a random seed for the RNG
@@ -137,24 +144,33 @@ DataStruct           = struct;
 DataStruct.TimeStamp = datestr(now, 'yyyy-mm-dd HH:MM');
 
 
-%% Subject ID & Run number
+%% Task selection
 
-SubjectID = get(handles.edit_SubjectID,'String');
-RunNumber = get(handles.edit_RunNumber,'String');
-
-% Eyelink file name can only contain 8 characters, so we limit the number
-% of characters for SubjectID and RunNumber.
-if length(SubjectID) > 4
-    error('NBI:SubjectIDLength','\n SubjectID ? \n')
+switch get(hObject,'Tag')
+    
+    case 'pushbutton_EyelinkCalibration'
+        Task = 'EyelinkCalibration';
+        
+    case 'pushbutton_NBI'
+        Task = 'NBI';
+        
+    case 'pushbutton_MTMST_Left'
+        Task = 'MTMST_Left';
+        
+    case 'pushbutton_MTMST_Right'
+        Task = 'MTMST_Right';
+        
+    case 'pushbutton_Retinotopy'
+        Task = 'Retinotopy';
+        
+    case 'pushbutton_Illusion'
+        Task = 'Illusion';
+        
+    otherwise
+        error('NBI:TaskSelection','Error in Task selection')
 end
-if length(RunNumber) > 9999
-    error('NBI:RunNumberLength','\n RunNumber ? \n')
-end
 
-handles.SubjectID       = SubjectID;
-handles.RunNumber       = RunNumber;
-DataStruct.SubjectID    = SubjectID;
-DataStruct.RunNumber    = RunNumber;
+DataStruct.Task = Task;
 
 
 %% Environement selection
@@ -168,8 +184,43 @@ switch get(get(handles.uipanel_Environement,'SelectedObject'),'Tag')
         warning('NBI:ModeSelection','Error in Environement selection')
 end
 
-handles.Environement    = Environement;
 DataStruct.Environement = Environement;
+
+
+%% Subject ID & Run number
+
+SubjectID = get(handles.edit_SubjectID,'String');
+
+if length(SubjectID) ~= 4
+    error('NBI:SubjectIDLength','\n SubjectID must be 4 char \n')
+end
+
+% Prepare path
+DataPath = [fileparts(pwd) filesep 'data' filesep SubjectID filesep];
+DataPathNoRun = sprintf('%s_%s_%s_', SubjectID, Task, Environement);
+
+% Fetch content of the directory
+dirContent = dir(DataPath);
+
+% Is there file of the previous run ?
+previousRun = nan(length(dirContent),1);
+for f = 1 : length(dirContent)
+    split = regexp(dirContent(f).name,DataPathNoRun,'split');
+    if length(split) == 2 && str2double(split{2}(1)) % yes there is a file
+        previousRun(f) = str2double(split{2}(1)); % save the previous run numbers
+    else % no file found
+        previousRun(f) = 0; % affect zero
+    end
+end
+
+LastRunNumber = max(previousRun); % If no previous run, LastRunNumber is 0
+RunNumber = num2str(LastRunNumber + 1);
+DataFile = sprintf('%s%s_%s_%s_%s', DataPath, SubjectID, Task, Environement, RunNumber );
+
+DataStruct.SubjectID = SubjectID;
+DataStruct.RunNumber = RunNumber;
+DataStruct.DataPath  = DataPath;
+DataStruct.DataFile  = DataFile;
 
 
 %% Save mode selection
@@ -183,7 +234,6 @@ switch get(get(handles.uipanel_SaveMode,'SelectedObject'),'Tag')
         warning('NBI:SaveSelection','Error in SaveMode selection')
 end
 
-handles.SaveMode    = SaveMode;
 DataStruct.SaveMode = SaveMode;
 
 
@@ -200,7 +250,6 @@ switch get(get(handles.uipanel_OperationMode,'SelectedObject'),'Tag')
         warning('NBI:ModeSelection','Error in Mode selection')
 end
 
-handles.OperationMode    = OperationMode;
 DataStruct.OperationMode = OperationMode;
 
 
@@ -238,36 +287,6 @@ handles.ParPort    = ParPort;
 DataStruct.ParPort = ParPort;
 
 
-%% Task selection
-
-switch get(hObject,'Tag')
-    
-    case 'pushbutton_EyelinkCalibration'
-        Task = 'EyelinkCalibration';
-        
-    case 'pushbutton_NBI'
-        Task = 'NBI';
-        
-    case 'pushbutton_MTMST_Left'
-        Task = 'MTMST_Left';
-        
-    case 'pushbutton_MTMST_Right'
-        Task = 'MTMST_Right';
-        
-    case 'pushbutton_Retinotopy'
-        Task = 'Retinotopy';
-        
-    case 'pushbutton_Illusion'
-        Task = 'Illusion';
-        
-    otherwise
-        error('NBI:TaskSelection','Error in Task selection')
-end
-
-handles.Task    = Task;
-DataStruct.Task = Task;
-
-
 %% Check if Eyelink toolbox is available
 
 switch get(get(handles.uipanel_EyelinkMode,'SelectedObject'),'Tag')
@@ -283,23 +302,37 @@ switch get(get(handles.uipanel_EyelinkMode,'SelectedObject'),'Tag')
         % 'Eyelink.m' exists ?
         status = which('Eyelink.m');
         if isempty(status)
-            EyelinkToolboxAvailable = 0;
-        else
-            EyelinkToolboxAvailable = 1;
+            error('NBI:EyelinkToolbox','no ''Eyelink.m'' detected in the path')
         end
         
         % Save mode ?
         if strcmp(DataStruct.SaveMode,'NoSave')
-            error('NBI:EyelinkMode',' \n ---> Save mode should be turned on when using Eyelink <--- \n ')
+            error('NBI:SaveModeForEyelink',' \n ---> Save mode should be turned on when using Eyelink <--- \n ')
         end
         
-        EyelinkFile = [ SubjectID '_' Task(1) '_' RunNumber ];
+        % Eyelink connected ?
+        Eyelink.IsConnected
         
-        handles.EyelinkFile = EyelinkFile;
+        % File name for the eyelink : 8 char maximum
+        switch Task
+            case 'NBI'
+                task = 'NB';
+            case 'EyelinkCalibration'
+                task = 'EC';
+            case 'MTMST_Left'
+                task = 'ML';
+            case 'MTMST_Right'
+                task = 'MR';
+            case 'Retinotopy'
+                task = 'RT';
+            case 'Illusion'
+                task = ['I' get(handles.edit_IlluBlock,'String')];
+            otherwise
+                error('NBI:Task','Task ?')
+        end
+        EyelinkFile = [ SubjectID task sprintf('%.2d',str2double(RunNumber)) ];
+        
         DataStruct.EyelinkFile = EyelinkFile;
-        
-        handles.EyelinkToolboxAvailable = EyelinkToolboxAvailable;
-        DataStruct.EyelinkToolboxAvailable = EyelinkToolboxAvailable;
         
     otherwise
         
@@ -307,23 +340,17 @@ switch get(get(handles.uipanel_EyelinkMode,'SelectedObject'),'Tag')
         
 end
 
-handles.EyelinkMode    = EyelinkMode;
 DataStruct.EyelinkMode = EyelinkMode;
 
 
-%% Path management
+%% Security : NEVER overwrite a file
+% If erasing a file is needed, we need to do it manually
 
 if strcmp(SaveMode,'SaveData') && strcmp(OperationMode,'Acquisition')
-    
-    DataPath = [fileparts(pwd) filesep 'data' filesep SubjectID filesep];
-    DataFile = sprintf('%s%s_%s_%s_%s', DataPath, SubjectID, Task, Environement, RunNumber);
     
     if exist([DataFile '.mat'], 'file')
         error('MATLAB:FileAlreadyExists',' \n ---> \n The file %s.mat already exists .  <--- \n \n',DataFile);
     end
-    
-    DataStruct.DataPath = DataPath;
-    DataStruct.DataFile = DataFile;
     
 end
 
@@ -379,7 +406,9 @@ switch Task
         TaskData = Retinotopy.Retinotopy( DataStruct );
         
     case 'Illusion'
-        TaskData = Illusion.Illusion( DataStruct );
+        BlockNumber            = str2double( get(handles.edit_IlluBlock,'String') );
+        DataStruct.BlockNumber = BlockNumber;
+        TaskData               = Illusion.Illusion( DataStruct );
         
     otherwise
         error('NBI:Task','Task ?')
@@ -388,11 +417,9 @@ end
 DataStruct.TaskData = TaskData;
 
 
-%% Save files
+%% Save files on the fly : just a security in case of crash of the end the script
 
-if strcmp(SaveMode,'SaveData') && strcmp(OperationMode,'Acquisition')
-    save([fileparts(pwd) filesep 'data' filesep 'LastDataStruct'],'DataStruct');
-end
+save([fileparts(pwd) filesep 'data' filesep 'LastDataStruct'],'DataStruct');
 
 
 %% Close PTB
@@ -526,7 +553,7 @@ switch get(handles.checkbox_WindowedScreen,'Value')
     case 0
         WindowedMode = 'Off';
     otherwise
-        warning('STIMPNEE:WindowedScreen','Error in WindowedScreen') 
+        warning('STIMPNEE:WindowedScreen','Error in WindowedScreen')
 end
 DataStruct.WindowedMode = WindowedMode;
 
@@ -640,8 +667,14 @@ function uipanel_EyelinkMode_SelectionChangeFcn(hObject, eventdata, handles)
 switch get(eventdata.NewValue,'Tag') % Get Tag of selected object.
     case 'radiobutton_EyelinkOff'
         set(handles.pushbutton_EyelinkCalibration,'Visible','off')
+        set(handles.pushbutton_IsConnected,'Visible','off')
+        set(handles.pushbutton_ForceShutDown,'Visible','off')
+        set(handles.pushbutton_Initialize,'Visible','off')
     case 'radiobutton_EyelinkOn'
         set(handles.pushbutton_EyelinkCalibration,'Visible','on')
+        set(handles.pushbutton_IsConnected,'Visible','on')
+        set(handles.pushbutton_ForceShutDown,'Visible','on')
+        set(handles.pushbutton_Initialize,'Visible','on')
 end
 
 
@@ -721,7 +754,6 @@ function handles = checkbox_ParPort_Callback(hObject, eventdata, handles)
 GUI.Checkbox_ParPort_Callback;
 
 
-
 % --- Executes on button press in checkbox_WindowedScreen.
 function checkbox_WindowedScreen_Callback(hObject, eventdata, handles)
 % hObject    handle to checkbox_WindowedScreen (see GCBO)
@@ -730,4 +762,62 @@ function checkbox_WindowedScreen_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox_WindowedScreen
 
+
+function edit_IlluBlock_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_IlluBlock (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_IlluBlock as text
+%        str2double(get(hObject,'String')) returns contents of edit_IlluBlock as a double
+
+block = str2double(get(hObject,'String'));
+
+if block ~= round(block) || block < 0 || block > 8
+    set(hObject,'String','1');
+    error('block number must be from 0 to 8')
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_IlluBlock_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_IlluBlock (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+set(hObject,'TooltipString','Block number of Illusion : from 0 to 8')
+
+
+
+% --- Executes on button press in pushbutton_IsConnected.
+function pushbutton_IsConnected_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_IsConnected (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+Eyelink.IsConnected;
+
+
+
+% --- Executes on button press in pushbutton_Initialize.
+function pushbutton_Initialize_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_Initialize (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+Eyelink.Initialize;
+
+
+% --- Executes on button press in pushbutton_ForceShutDown.
+function pushbutton_ForceShutDown_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_ForceShutDown (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+Eyelink.ForceShutDown;
 

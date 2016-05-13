@@ -11,7 +11,7 @@ if keyCode(DataStruct.Parameters.Keybinds.Stop_Escape_ASCII)
     
     % Record StopTime
     ER.AddStopTime( 'StopTime' , StopTime - StartTime );
-    RR.AddStopTime( 'StopTime' , StopTime - StartTime );
+    RR.AddEvent( { 'StopTime' , StopTime - StartTime , 0 } );
     
     ShowCursor;
     Priority( DataStruct.PTB.oldLevel );
