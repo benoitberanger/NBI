@@ -2,6 +2,7 @@ function [ names , onsets , durations ] = SPMnod( DataStruct )
 %SPMNOD Build 'names', 'onsets', 'durations' for SPM
 
 try
+    %% Preparation
     
     % 'names' for SPM
     switch DataStruct.Task
@@ -56,16 +57,73 @@ try
     % 'onsets' & 'durations' for SPM
     onsets    = cell(size(names));
     durations = cell(size(names));
-
+    
     % Shortcut
     EventData = DataStruct.TaskData.ER.Data;
     
-    % Display 'durations' inside Display_cell for diagnostic
-    for k = 2:size(EventData)
-        EventData{k-1,3} = EventData{k,2} - sum(cell2mat(EventData(k-1,2)));
+    
+    %% MTMST special : transform into bloc
+    
+    if regexp(DataStruct.Task,'MTMST') % 'MTMST' task ?
+        
+        % Fetch tag 'left' / 'right'
+        LR = lower(DataStruct.Task(7:end));
+        
+        % Where is  In or OUT event ?
+        inout_idx1 = regexp(EventData(:,1),'IN|OUT');
+        inout_idx2 = ~cellfun(@isempty,inout_idx1);
+        %         inout_idx3 = find(inout_idx2);
+        
+        % Prepare a cell that will receive the blocs
+        EventData_compressed = cell(size(EventData));
+        EventData_compressed(1,:) = EventData(1,:);
+        
+        blocDuration = 0;
+        blocStartTime = 0;
+        evt_count = 1;
+        for evt = 2 : size(EventData,1)
+            
+            if inout_idx2(evt) % if 'IN' or 'OUT'
+                
+                if blocDuration == 0 % new bloc
+                    blocStartTime = EventData{evt,2}; % store start time
+                    blocDuration = blocDuration + EventData{evt,3}; % add duration
+                else
+                    blocDuration = blocDuration + EventData{evt,3}; % add duration
+                end
+                
+            else % 'FIXATION' or 'StopTime'
+                
+                % Store bloc
+                evt_count = evt_count + 1;
+                EventData_compressed{evt_count,1} = [LR 'INOUT'];
+                EventData_compressed{evt_count,2} = blocStartTime;
+                EventData_compressed{evt_count,3} = blocDuration;
+                blocDuration = 0;
+                
+                % Store FIXATION
+                evt_count = evt_count + 1;
+                EventData_compressed(evt_count,:) = EventData(evt,:);
+                
+            end
+            
+        end
+        
+        % Clean empty lines
+        empty_idx = cellfun( @isempty , EventData_compressed(:,1) );
+        EventData_compressed( empty_idx , : ) = [];
+        
+        % Upper loop add an incorrect bloc for the last event
+        EventData_compressed(end-1,:) = [];
+        
+        % Store the new cell
+        EventData = EventData_compressed;
+        
     end
     
-    % Onsets building
+    
+    %% Onsets building
+    
     for event = 1:size(EventData,1)
         
         switch EventData{event,1}
@@ -85,20 +143,16 @@ try
                 onsets{6} = [onsets{6} ; EventData{event,2}];
                 
                 % MTMST_Left
-            case 'leftOUT'
+            case 'leftINOUT'
                 onsets{1} = [onsets{1} ; EventData{event,2}];
-            case 'leftIN'
-                onsets{2} = [onsets{2} ; EventData{event,2}];
             case 'leftFIXATION'
-                onsets{3} = [onsets{3} ; EventData{event,2}];
+                onsets{2} = [onsets{2} ; EventData{event,2}];
                 
                 % MTMST_Right
-            case 'rightOUT'
+            case 'rightINOUT'
                 onsets{1} = [onsets{1} ; EventData{event,2}];
-            case 'rightIN'
-                onsets{2} = [onsets{2} ; EventData{event,2}];
             case 'rightFIXATION'
-                onsets{3} = [onsets{3} ; EventData{event,2}];
+                onsets{2} = [onsets{2} ; EventData{event,2}];
                 
                 % Retinotopy
             case 'cw'
@@ -129,7 +183,8 @@ try
     end
     
     
-    % Duratins building
+    %% Duratins building
+    
     for event = 1:size(EventData,1)
         
         switch EventData{event,1}
@@ -149,20 +204,16 @@ try
                 durations{6} = [ durations{6} ; EventData{event+1,2}-EventData{event,2}] ;
                 
                 % MTMST_Left
-            case 'leftOUT'
+            case 'leftINOUT'
                 durations{1} = [ durations{1} ; EventData{event+1,2}-EventData{event,2}] ;
-            case 'leftIN'
-                durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
             case 'leftFIXATION'
-                durations{3} = [ durations{3} ; EventData{event+1,2}-EventData{event,2}] ;
+                durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
                 
                 % MTMST_Right
-            case 'rightOUT'
+            case 'rightINOUT'
                 durations{1} = [ durations{1} ; EventData{event+1,2}-EventData{event,2}] ;
-            case 'rightIN'
-                durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
             case 'rightFIXATION'
-                durations{3} = [ durations{3} ; EventData{event+1,2}-EventData{event,2}] ;
+                durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
                 
                 % Retinotopy
             case 'cw'
