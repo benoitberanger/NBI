@@ -289,7 +289,7 @@ NextOnset = @(EP) EP.Data{end,2} + EP.Data{end,3};
 
 % --- Start ---------------------------------------------------------------
 
-EP.AddPlanning({ 'StartTime' , 0 , -1 , 0 , 0 });
+EP.AddPlanning({ 'StartTime' , 0 , 0 , -1 , 0 });
 
 % --- Stim ----------------------------------------------------------------
 
@@ -303,7 +303,7 @@ end
 
 % --- Stop ----------------------------------------------------------------
 
-EP.AddPlanning({ 'StopTime' , NextOnset(EP) , -2 , 0 , 0 });
+EP.AddPlanning({ 'StopTime' , NextOnset(EP) , 0 , -2 , 0 });
 
 
 %% Acceleration
