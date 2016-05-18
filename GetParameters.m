@@ -1,10 +1,10 @@
 function [ Parameters ] = GetParameters( DataStruct )
 % GETPARAMETERS Prepare common parameters
 %
-% CONFIG fORRP 932 :
-%
-%
-%
+% Response buttuns (fORRP 932) :
+% USB
+% HHSC - 1x2 - CYL
+% HID NAR 12345
 
 
 %% Set parameters
