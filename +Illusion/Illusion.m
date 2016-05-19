@@ -252,12 +252,14 @@ try
                         Illusion.drawFixation(visual.fgColor,[scr.centerX, scr.centerY],scr,visual)
                         
                         % Text
-                        switch DataStruct.OperationMode
-                            case 'Acquisition'
-                            case 'FastDebug'
-                                DrawFormattedText(scr.main, [ num2str(schedule{evt,5}) , ' ' , schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
-                            case 'RealisticDebug'
-                                DrawFormattedText(scr.main, [ num2str(schedule{evt,5}) , ' ' , schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
+                        if ~IsLinux % on UbuntuStudio 14.04, problem of X11 fonts => DrawText crashs
+                            switch DataStruct.OperationMode
+                                case 'Acquisition'
+                                case 'FastDebug'
+                                    DrawFormattedText(scr.main, [ num2str(schedule{evt,5}) , ' ' , schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
+                                case 'RealisticDebug'
+                                    DrawFormattedText(scr.main, [ num2str(schedule{evt,5}) , ' ' , schedule{evt,1} , ' ' , num2str(schedule{evt,2}) ] );
+                            end
                         end
                         
                         % Tell PTB that no further drawing commands will follow before Screen('Flip')
