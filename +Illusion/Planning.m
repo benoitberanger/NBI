@@ -152,6 +152,7 @@ for mb = 1 : size(runBlocks,1)
     end
     
     adjustedBlocks{mb}(:,2) = num2cell(onsets);
+    adjustedBlocks{mb}(end+1,:) = {adjustedBlocks{mb}{end,1} adjustedBlocks{mb}{end,2}+adjustedBlocks{mb}{end,4} 0 9*0.900 'Null' 0 };
     
 end
 
