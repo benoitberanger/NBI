@@ -202,14 +202,16 @@ try
                     
                     % Flash
                     if fix_counter > 0
-                        RR.AddEvent( { 'Flash' flip_onset-StartTime DataStruct.PTB.IFI } );
+                        if fix_counter == Catch.nCatchFrame
+                            RR.AddEvent( { 'Catch' flip_onset-StartTime DataStruct.PTB.IFI*Catch.nCatchFrame } );
+                        end
                         pp = pp + msg.flash;
                         fix_counter = fix_counter - 1;
                     end
                     
                     % Clic
                     if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
-                        RR.AddEvent( { 'Clic' flip_onset-StartTime DataStruct.PTB.IFI } );
+                        RR.AddEvent( { 'Click' flip_onset-StartTime DataStruct.PTB.IFI } );
                         pp = pp + msg.clic;
                         Common.CLICKecho;
                     end

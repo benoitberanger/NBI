@@ -252,6 +252,38 @@ try
     end
     
     
+    %% Add Catch trials and Clicks
+    
+    N = length(names);
+    
+    % CATCH
+    
+    catch_idx = regexp(DataStruct.TaskData.RR.Data(:,1),'Catch');
+    catch_idx = ~cellfun(@isempty,catch_idx);
+    catch_idx = find(catch_idx);
+    
+    names{N+1}     = 'CATCH';
+    onsets{N+1}    = cell2mat(DataStruct.TaskData.RR.Data(catch_idx,2));
+    durations{N+1} = cell2mat(DataStruct.TaskData.RR.Data(catch_idx,3));
+    
+    % CLICK
+    
+    clic_spot = regexp(DataStruct.TaskData.KL.KbEvents(:,1),KbName(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII));
+    clic_spot = ~cellfun(@isempty,clic_spot);
+    clic_spot = find(clic_spot);
+    
+    names{N+2} = 'CLICK';
+    if ~isempty(DataStruct.TaskData.KL.KbEvents{clic_spot,2})
+        clic_idx = cell2mat(DataStruct.TaskData.KL.KbEvents{clic_spot,2}(:,2)) == 1;
+        clic_idx = find(clic_idx);
+        onsets{N+2}    = cell2mat(DataStruct.TaskData.KL.KbEvents{clic_spot,2}(clic_idx,1));
+        durations{N+2} = cell2mat(DataStruct.TaskData.KL.KbEvents{clic_spot,2}(clic_idx,3));
+    else
+        onsets{N+2}    = [];
+        durations{N+2} = [];
+    end
+
+    
 catch err
     
     sca

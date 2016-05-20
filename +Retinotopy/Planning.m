@@ -42,7 +42,7 @@ switch DataStruct.OperationMode
         
     case 'FastDebug'
         
-        Speed = 10;
+        Speed = 20;
         
         new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) );
         EP.Data(:,2) = new_onsets;

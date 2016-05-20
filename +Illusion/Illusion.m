@@ -196,7 +196,7 @@ try
                     
                     % Clic
                     if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
-                        RR.AddEvent( { 'Clic' flip_onset-StartTime DataStruct.PTB.IFI } );
+                        RR.AddEvent( { 'Click' flip_onset-StartTime DataStruct.PTB.IFI } );
                         pp = pp + msg.clic;
                         Common.CLICKecho;
                     end
@@ -276,7 +276,7 @@ try
                         
                         % Clic
                         if keyCode(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII)
-                            RR.AddEvent( { 'Clic' flip_onset-StartTime DataStruct.PTB.IFI } );
+                            RR.AddEvent( { 'Click' flip_onset-StartTime DataStruct.PTB.IFI } );
                             pp = pp + msg.clic;
                             Common.CLICKecho;
                         end
@@ -288,7 +288,7 @@ try
                             switch EP.Data{evt,5}
                                 case 1
                                     Common.CATCHecho;
-                                    RR.AddEvent( { 'Target' flip_onset-StartTime EP.Data{evt,3} } );
+                                    RR.AddEvent( { 'Catch' flip_onset-StartTime EP.Data{evt,3} } );
                                 case 0
                             end
                             
