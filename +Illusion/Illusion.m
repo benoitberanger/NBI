@@ -55,6 +55,7 @@ try
     
     DotVisualAngle = 2*round(visual.ppd*0.1);
     
+    
     %% Parse the planning
     
     conditions_with_patches = 7;
@@ -308,6 +309,7 @@ try
         
         
     end % for
+    
     
     %% End of stimulation
     

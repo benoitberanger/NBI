@@ -80,6 +80,9 @@ for b = 1 : length(miniBlock_id)
         currentBlock{ allOnsets_idx(projOnset_idx(ct),ct) , 6 } = 1;
     end
     
+    % Add 9 TR=900ms at the end end of each uncombined mini-block
+    currentBlock(end+1,:) = {currentBlock{end,1} currentBlock{end,2}+currentBlock{end,4} 0 9*0.900 'Null' 0 }; %#ok<AGROW>
+    
     % Save the catch trials
     allBlocks{b} = currentBlock;
     
@@ -144,15 +147,14 @@ for mb = 1 : size(runBlocks,1)
     for z = 2 : length(Zero_idx)
         
         if z + 1 <= length(Zero_idx)
-            onsets( Zero_idx(z) : Zero_idx(z+1)-1 ) = onsets( Zero_idx(z) : Zero_idx(z+1)-1 ) + onsets( Zero_idx(z) - 1 ) + durations( Zero_idx(z) ) ;
+            onsets( Zero_idx(z) : Zero_idx(z+1)-1 ) = onsets( Zero_idx(z) : Zero_idx(z+1)-1 ) + onsets( Zero_idx(z) - 1 ) + durations( Zero_idx(z) - 1 ) ;
         else
-            onsets( Zero_idx(z) : end ) = onsets( Zero_idx(z) : end ) + onsets( Zero_idx(z) - 1 ) + durations( Zero_idx(z) ) ;
+            onsets( Zero_idx(z) : end ) = onsets( Zero_idx(z) : end ) + onsets( Zero_idx(z) - 1 ) + durations( Zero_idx(z) - 1 ) ;
         end
         
     end
     
     adjustedBlocks{mb}(:,2) = num2cell(onsets);
-    adjustedBlocks{mb}(end+1,:) = {adjustedBlocks{mb}{end,1} adjustedBlocks{mb}{end,2}+adjustedBlocks{mb}{end,4} 0 9*0.900 'Null' 0 };
     
 end
 
@@ -309,7 +311,7 @@ EP.AddPlanning({ 'StopTime' , NextOnset(EP) , 0 , -2 , 0 });
 
 %% Acceleration
 
-if nargout > 1
+if nargout > 0
     
     switch DataStruct.OperationMode
         
