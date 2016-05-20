@@ -166,18 +166,15 @@ try
                     if EP.Data{evt,4}
                         Screen('DrawDots', DataStruct.PTB.Window, xymatrix, DotSize.Px, DataStruct.PTB.White , [DotFieldCenter.Px DataStruct.PTB.CenterV],1);  % change 1 to 0 to draw square dots
                         Screen('FillRect', DataStruct.PTB.Window , DataStruct.PTB.Black , MaskRect )
-                        FixH = FixationDotCenter.Px;
                     end
                     % Center ?
                     if EP.Data{evt,5}
                         Screen('DrawDots', DataStruct.PTB.Window, xymatrix, DotSize.Px, DataStruct.PTB.White , [DataStruct.PTB.CenterH DataStruct.PTB.CenterV],1);  % change 1 to 0 to draw square dots
-                        FixH = DataStruct.PTB.CenterH;
                     end
                     % Right ?
                     if EP.Data{evt,6}
                         Screen('DrawDots', DataStruct.PTB.Window, xymatrix, DotSize.Px, DataStruct.PTB.White , [DataStruct.Parameters.Video.ScreenWidthPx-DotFieldCenter.Px DataStruct.PTB.CenterV],1);  % change 1 to 0 to draw square dots
                         Screen('FillRect', DataStruct.PTB.Window , DataStruct.PTB.Black , MaskRect - [ DotFieldCenter.Px*2 0 DotFieldCenter.Px*2 0 ] )
-                        FixH = DataStruct.Parameters.Video.ScreenWidthPx - FixationDotCenter.Px;
                     end
                     
                     % Draw fixation point

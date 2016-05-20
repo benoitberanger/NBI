@@ -94,6 +94,7 @@ set(handles.text_RunNumber,'Visible','off')
 set(handles.edit_RunNumber,'Visible','off')
 set(handles.pushbutton_RunNumber_m1,'Visible','off')
 set(handles.pushbutton_RunNumber_p1,'Visible','off')
+set(handles.pushbutton_NBI,'Visible','off')
 
 
 %% Try to pick a random seed for the RNG

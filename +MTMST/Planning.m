@@ -29,30 +29,24 @@ switch DataStruct.Task
     case 'MTMST_Left'
         
         for cycle = 1 : 17
-            
             for rep = 1 : 5
-                EP.AddPlanning({ 'leftOUT'  NextOnset(EP) INOUTDuration 1 0 0 'out' });
-                EP.AddPlanning({ 'leftIN'   NextOnset(EP) INOUTDuration 1 0 0 'in' });
+                EP.AddPlanning({ 'leftOUT'      NextOnset(EP) INOUTDuration    1 0 0 'out'      });
+                EP.AddPlanning({ 'leftIN'       NextOnset(EP) INOUTDuration    1 0 0 'in'       });
             end
-            
-            EP.AddPlanning({ 'leftFIXATION'   NextOnset(EP) FixationDuration 1 0 0 'fixation' });
-            
+            EP.AddPlanning({     'leftFIXATION' NextOnset(EP) FixationDuration 1 0 0 'fixation' });
         end
-        
+        EP.AddPlanning({         'leftREST'     NextOnset(EP) FixationDuration 0 0 0 ''         });
         
     case 'MTMST_Right'
         
-        
         for cycle = 1 : 17
-            
             for rep = 1 : 5
-                EP.AddPlanning({ 'rightOUT'  NextOnset(EP) INOUTDuration 0 0 1 'out' });
-                EP.AddPlanning({ 'rightIN'   NextOnset(EP) INOUTDuration 0 0 1 'in' });
+                EP.AddPlanning({ 'rightOUT'      NextOnset(EP) INOUTDuration    0 0 1 'out'      });
+                EP.AddPlanning({ 'rightIN'       NextOnset(EP) INOUTDuration    0 0 1 'in'       });
             end
-            
-            EP.AddPlanning({ 'rightFIXATION'   NextOnset(EP) FixationDuration 0 0 1 'fixation' });
-            
+            EP.AddPlanning({     'rightFIXATION' NextOnset(EP) FixationDuration 0 0 1 'fixation' });
         end
+        EP.AddPlanning({         'rightREST'     NextOnset(EP) FixationDuration 0 0 0 ''         });
         
 end
 

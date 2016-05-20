@@ -22,16 +22,16 @@ try
             
         case 'MTMST_Left'
             names = {
-                'leftOUT'      ;
-                'leftIN'       ;
+                'leftINOUT'    ;
                 'leftFIXATION' ;
+                'leftREST'     ;
                 };
             
         case 'MTMST_Right'
             names = {
-                'rightOUT'      ;
-                'rightIN'       ;
+                'rightINOUT'    ;
                 'rightFIXATION' ;
+                'rightREST'     ;
                 };
             
         case 'Retinotopy'
@@ -113,8 +113,8 @@ try
         empty_idx = cellfun( @isempty , EventData_compressed(:,1) );
         EventData_compressed( empty_idx , : ) = [];
         
-        % Upper loop add an incorrect bloc for the last event
-        EventData_compressed(end-1,:) = [];
+        % Upper loop add an incorrect bloc for the last events
+        EventData_compressed([end-1 end-3],:) = [];
         
         % Store the new cell
         EventData = EventData_compressed;
@@ -147,12 +147,16 @@ try
                 onsets{1} = [onsets{1} ; EventData{event,2}];
             case 'leftFIXATION'
                 onsets{2} = [onsets{2} ; EventData{event,2}];
+            case 'leftREST'
+                onsets{3} = [onsets{3} ; EventData{event,2}];
                 
                 % MTMST_Right
             case 'rightINOUT'
                 onsets{1} = [onsets{1} ; EventData{event,2}];
             case 'rightFIXATION'
                 onsets{2} = [onsets{2} ; EventData{event,2}];
+            case 'rightREST'
+                onsets{3} = [onsets{3} ; EventData{event,2}];
                 
                 % Retinotopy
             case 'cw'
@@ -208,12 +212,16 @@ try
                 durations{1} = [ durations{1} ; EventData{event+1,2}-EventData{event,2}] ;
             case 'leftFIXATION'
                 durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
+            case 'leftREST'
+                durations{3} = [ durations{3} ; EventData{event+1,2}-EventData{event,2}] ;
                 
                 % MTMST_Right
             case 'rightINOUT'
                 durations{1} = [ durations{1} ; EventData{event+1,2}-EventData{event,2}] ;
             case 'rightFIXATION'
                 durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
+            case 'rightREST'
+                durations{3} = [ durations{3} ; EventData{event+1,2}-EventData{event,2}] ;
                 
                 % Retinotopy
             case 'cw'
