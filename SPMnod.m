@@ -258,7 +258,7 @@ try
     
     % CATCH
     
-    catch_idx = regexp(DataStruct.TaskData.RR.Data(:,1),'Catch');
+    catch_idx = regexp(DataStruct.TaskData.RR.Data(:,1),'Catch|Flash');
     catch_idx = ~cellfun(@isempty,catch_idx);
     catch_idx = find(catch_idx);
     
@@ -276,13 +276,18 @@ try
     if ~isempty(DataStruct.TaskData.KL.KbEvents{clic_spot,2})
         clic_idx = cell2mat(DataStruct.TaskData.KL.KbEvents{clic_spot,2}(:,2)) == 1;
         clic_idx = find(clic_idx);
+        % The last click can be be unfinished : button down + end of stim =
+        % no button up
+        if isempty(DataStruct.TaskData.KL.KbEvents{clic_spot,2}{clic_idx(end),3})
+            DataStruct.TaskData.KL.KbEvents{clic_spot,2}{clic_idx(end),3} =  DataStruct.TaskData.ER.Data{end,2} - DataStruct.TaskData.KL.KbEvents{clic_spot,2}{clic_idx(end),1};
+        end
         onsets{N+2}    = cell2mat(DataStruct.TaskData.KL.KbEvents{clic_spot,2}(clic_idx,1));
         durations{N+2} = cell2mat(DataStruct.TaskData.KL.KbEvents{clic_spot,2}(clic_idx,3));
     else
         onsets{N+2}    = [];
         durations{N+2} = [];
     end
-
+    
     
 catch err
     
