@@ -453,6 +453,9 @@ if strcmp(SaveMode,'SaveData') && strcmp(OperationMode,'Acquisition')
     
     save(DataFile, 'DataStruct', 'names', 'onsets', 'durations');
     save([DataFile '_SPM'], 'names', 'onsets', 'durations');
+   
+    % BrainVoyager data organization
+    spm2bv( names , onsets , durations , DataStruct.DataFile )
     
 end
 
