@@ -54,6 +54,14 @@ PTB.Black = BlackIndex( PTB.Window );
 PTB.White = WhiteIndex( PTB.Window );
 
 
+%% Warm up
+
+GetSecs;
+KbCheck;
+Screen('Flip',PTB.Window);
+WaitSecs(0.100);
+
+
 %% Echo in command window
 
 disp('---------------------');
