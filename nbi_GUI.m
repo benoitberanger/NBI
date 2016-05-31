@@ -214,7 +214,12 @@ for f = 1 : length(dirContent)
     end
 end
 
-LastRunNumber = max(previousRun); % If no previous run, LastRunNumber is 0
+LastRunNumber = max(previousRun);
+% If no previous run, LastRunNumber is 0
+if isempty(LastRunNumber)
+    LastRunNumber = 0;
+end
+
 RunNumber = num2str(LastRunNumber + 1);
 DataFile = sprintf('%s%s_%s_%s_%s', DataPath, SubjectID, Task, Environement, RunNumber );
 
@@ -453,7 +458,7 @@ if strcmp(SaveMode,'SaveData') && strcmp(OperationMode,'Acquisition')
     
     save(DataFile, 'DataStruct', 'names', 'onsets', 'durations');
     save([DataFile '_SPM'], 'names', 'onsets', 'durations');
-   
+    
     % BrainVoyager data organization
     spm2bv( names , onsets , durations , DataStruct.DataFile )
     
