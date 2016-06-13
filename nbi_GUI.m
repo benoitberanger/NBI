@@ -165,7 +165,9 @@ switch get(hObject,'Tag')
         Task = 'Retinotopy';
         
     case 'pushbutton_Illusion'
-        Task = 'Illusion';
+        Task                   = 'Illusion';
+        BlockNumber            = str2double( get(handles.edit_IlluBlock,'String') );
+        DataStruct.BlockNumber = BlockNumber;
         
     otherwise
         error('NBI:TaskSelection','Error in Task selection')
@@ -198,7 +200,12 @@ end
 
 % Prepare path
 DataPath = [fileparts(pwd) filesep 'data' filesep SubjectID filesep];
-DataPathNoRun = sprintf('%s_%s_%s_', SubjectID, Task, Environement);
+switch Task
+    case 'Illusion'
+        DataPathNoRun = sprintf('%s_%s_B%d_%s_', SubjectID, Task, BlockNumber, Environement);
+    otherwise
+        DataPathNoRun = sprintf('%s_%s_%s_', SubjectID, Task, Environement);
+end
 
 % Fetch content of the directory
 dirContent = dir(DataPath);
@@ -221,7 +228,14 @@ if isempty(LastRunNumber)
 end
 
 RunNumber = num2str(LastRunNumber + 1);
-DataFile = sprintf('%s%s_%s_%s_%s', DataPath, SubjectID, Task, Environement, RunNumber );
+
+
+switch Task
+    case 'Illusion'
+        DataFile = sprintf('%s%s_%s_B%d_%s_%s', DataPath, SubjectID, Task, BlockNumber, Environement, RunNumber );
+    otherwise
+        DataFile = sprintf('%s%s_%s_%s_%s', DataPath, SubjectID, Task, Environement, RunNumber );
+end
 
 DataStruct.SubjectID = SubjectID;
 DataStruct.RunNumber = RunNumber;
@@ -412,9 +426,7 @@ switch Task
         TaskData = Retinotopy.Retinotopy( DataStruct );
         
     case 'Illusion'
-        BlockNumber            = str2double( get(handles.edit_IlluBlock,'String') );
-        DataStruct.BlockNumber = BlockNumber;
-        TaskData               = Illusion.Illusion( DataStruct );
+        TaskData = Illusion.Illusion( DataStruct );
         
     otherwise
         error('NBI:Task','Task ?')
@@ -477,6 +489,14 @@ assignin('base', 'durations', durations);
 
 Eyelink.StopRecording( DataStruct )
 
+
+%% Ready for another run
+
+WaitSecs(0.100);
+fprintf('\n')
+fprintf('--------------------- \n')
+fprintf('Ready for another run \n')
+fprintf('--------------------- \n')
 
 
 % -------------------------------------------------------------------------
