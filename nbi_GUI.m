@@ -96,6 +96,9 @@ set(handles.pushbutton_RunNumber_m1,'Visible','off')
 set(handles.pushbutton_RunNumber_p1,'Visible','off')
 set(handles.pushbutton_NBI,'Visible','off')
 
+% Invisible objects @ opening
+set(handles.text_LastFileNameAnnouncer,'Visible','off')
+set(handles.text_LastFileName,'Visible','off')
 
 %% Try to pick a random seed for the RNG
 
@@ -491,6 +494,10 @@ Eyelink.StopRecording( DataStruct )
 
 
 %% Ready for another run
+
+set(handles.text_LastFileNameAnnouncer,'Visible','on')
+set(handles.text_LastFileName,'Visible','on')
+set(handles.text_LastFileName,'String',DataFile(length(DataPath)+1:end))
 
 WaitSecs(0.100);
 fprintf('\n')
