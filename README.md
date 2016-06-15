@@ -22,6 +22,17 @@ Psychtoolbox : http://psychtoolbox.org/
 StimTemplate : https://github.com/benoitberanger/StimTemplate.git
 
 
+# Setup
+
+Data are printed in ../data
+
+So the common directory setup is :
+
+/NBI/code -> this Git repository
+
+/NBI/data -> the directory receiving stimation data
+
+
 # OS
 
 Optimized for Windows, but also works on Linux and Mac
