@@ -23,6 +23,9 @@ EP.AddPlanning({ 'StartTime' 0  0 [] [] [] [] });
 
 % ---Stim ----------------------------------------------------------------
 
+if nargout < 1
+    DataStruct.Task = 'MTMST_Left';
+end
 
 switch DataStruct.Task
     
@@ -66,27 +69,47 @@ EP.AddPlanning({ 'StopTime' NextOnset(EP) 0 [] [] [] [] });
 
 %% Acceleration
 
-switch DataStruct.OperationMode
+if nargout > 0
     
-    case 'Acquisition'
+    switch DataStruct.OperationMode
         
-        Speed = 1;
-        
-    case 'FastDebug'
-        
-        Speed = 10;
-        
-        new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) );
-        EP.Data(:,2) = new_onsets;
-        
-        new_durations = cellfun( @(x) {x/Speed} , EP.Data(:,3) );
-        EP.Data(:,3) = new_durations;
-        
-    case 'RealisticDebug'
-        
-        Speed = 1;
-        
-    otherwise
-        error( 'DataStruct.OperationMode = %s' , DataStruct.OperationMode )
-        
+        case 'Acquisition'
+            
+            Speed = 1;
+            
+        case 'FastDebug'
+            
+            Speed = 10;
+            
+            new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) );
+            EP.Data(:,2) = new_onsets;
+            
+            new_durations = cellfun( @(x) {x/Speed} , EP.Data(:,3) );
+            EP.Data(:,3) = new_durations;
+            
+        case 'RealisticDebug'
+            
+            Speed = 1;
+            
+        otherwise
+            error( 'DataStruct.OperationMode = %s' , DataStruct.OperationMode )
+            
+    end
+    
+end
+
+
+%% Display
+
+% To prepare the planning and visualize it, we can execute the function
+% without output argument
+
+if nargout < 1
+    
+    fprintf( '\n' )
+    fprintf(' \n Total stim duration : %g seconds \n' , NextOnset(EP) )
+    fprintf( '\n' )
+    
+    EP.Plot
+    
 end

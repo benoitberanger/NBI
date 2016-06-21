@@ -34,6 +34,8 @@ EP.AddPlanning({ 'StopTime' NextOnset(EP) 0 [] [] });
 
 %% Acceleration
 
+if nargout > 0
+
 switch DataStruct.OperationMode
     
     case 'Acquisition'
@@ -58,3 +60,22 @@ switch DataStruct.OperationMode
         error( 'DataStruct.OperationMode = %s' , DataStruct.OperationMode )
         
 end
+
+end
+
+
+%% Display
+
+% To prepare the planning and visualize it, we can execute the function
+% without output argument
+
+if nargout < 1
+    
+    fprintf( '\n' )
+    fprintf(' \n Total stim duration : %g seconds \n' , NextOnset(EP) )
+    fprintf( '\n' )
+    
+    EP.Plot
+   
+end
+
