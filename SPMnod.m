@@ -260,7 +260,7 @@ try
         
         % CATCH
         
-        catch_idx = regexp(DataStruct.TaskData.RR.Data(:,1),'Catch|Flash');
+        catch_idx = regexp(DataStruct.TaskData.RR.Data(:,1),'Catch|Flash|Target');
         catch_idx = ~cellfun(@isempty,catch_idx);
         catch_idx = find(catch_idx);
         
