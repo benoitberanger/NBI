@@ -15,19 +15,19 @@ TaskData.RR = RR;
 % KbLogger
 KL.GetQueue;
 KL.Stop;
-KL.ScaleTime(StartTime);
 switch DataStruct.OperationMode
     case 'Acquisition'
     case 'FastDebug'
         TR = 0.950; % seconds
         nbVolumes = ceil( EP.Data{end,2} / TR ) + 2 ; % nb of volumes for the estimated time of stimulation + 2 to be safe
-        KL.GenerateMRITrigger( TR , nbVolumes );
+        KL.GenerateMRITrigger( TR , nbVolumes , StartTime );
     case 'RealisticDebug'
         TR = 0.950; % seconds
         nbVolumes = ceil( EP.Data{end,2} / TR ) + 2 ; % nb of volumes for the estimated time of stimulation + 2 to be safe
-        KL.GenerateMRITrigger( TR , nbVolumes );
+        KL.GenerateMRITrigger( TR , nbVolumes , StartTime );
     otherwise   
 end
+KL.ScaleTime;
 KL.ComputeDurations;
 KL.BuildGraph;
 TaskData.KL = KL;
