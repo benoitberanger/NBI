@@ -79,7 +79,7 @@ set(handles.uipanel_SaveMode,'SelectedObject',handles.radiobutton_SaveData)
 set(handles.uipanel_Environement,'SelectedObject',handles.radiobutton_MRI)
 set(handles.uipanel_OperationMode,'SelectedObject',handles.radiobutton_Acquisition)
 set(handles.edit_RunNumber,'String','1')
-set(handles.edit_SubjectID,'String','xxxx')
+set(handles.edit_SubjectID,'String','') % No preseted subject ID : error will be raised in Acquisition
 set(handles.uipanel_EyelinkMode,'SelectedObject',handles.radiobutton_EyelinkOn)
 
 % ParPort
