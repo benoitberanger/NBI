@@ -21,7 +21,7 @@ switch DataStruct.WindowedMode
     otherwise
 end
 
-color_depth = 32; % bit
+color_depth = []; % bit, only assigna specific value for backward compatibility
 multisample = 4; % samples for anti-aliasing
 
 try

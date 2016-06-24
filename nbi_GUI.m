@@ -193,12 +193,45 @@ end
 DataStruct.Environement = Environement;
 
 
+%% Save mode selection
+
+switch get(get(handles.uipanel_SaveMode,'SelectedObject'),'Tag')
+    case 'radiobutton_SaveData'
+        SaveMode = 'SaveData';
+    case 'radiobutton_NoSave'
+        SaveMode = 'NoSave';
+    otherwise
+        warning('NBI:SaveSelection','Error in SaveMode selection')
+end
+
+DataStruct.SaveMode = SaveMode;
+
+
+%% Mode selection
+
+switch get(get(handles.uipanel_OperationMode,'SelectedObject'),'Tag')
+    case 'radiobutton_Acquisition'
+        OperationMode = 'Acquisition';
+    case 'radiobutton_FastDebug'
+        OperationMode = 'FastDebug';
+    case 'radiobutton_RealisticDebug'
+        OperationMode = 'RealisticDebug';
+    otherwise
+        warning('NBI:ModeSelection','Error in Mode selection')
+end
+
+DataStruct.OperationMode = OperationMode;
+
+
 %% Subject ID & Run number
 
 SubjectID = get(handles.edit_SubjectID,'String');
 
 if length(SubjectID) ~= 4
     error('NBI:SubjectIDLength','\n SubjectID must be 4 char \n')
+end
+if ~strcmp(SubjectID,upper(SubjectID))
+    warning('NBI:SubjectIDupper','SuubjectID should be upper case ?')
 end
 
 % Prepare path
@@ -244,36 +277,6 @@ DataStruct.SubjectID = SubjectID;
 DataStruct.RunNumber = RunNumber;
 DataStruct.DataPath  = DataPath;
 DataStruct.DataFile  = DataFile;
-
-
-%% Save mode selection
-
-switch get(get(handles.uipanel_SaveMode,'SelectedObject'),'Tag')
-    case 'radiobutton_SaveData'
-        SaveMode = 'SaveData';
-    case 'radiobutton_NoSave'
-        SaveMode = 'NoSave';
-    otherwise
-        warning('NBI:SaveSelection','Error in SaveMode selection')
-end
-
-DataStruct.SaveMode = SaveMode;
-
-
-%% Mode selection
-
-switch get(get(handles.uipanel_OperationMode,'SelectedObject'),'Tag')
-    case 'radiobutton_Acquisition'
-        OperationMode = 'Acquisition';
-    case 'radiobutton_FastDebug'
-        OperationMode = 'FastDebug';
-    case 'radiobutton_RealisticDebug'
-        OperationMode = 'RealisticDebug';
-    otherwise
-        warning('NBI:ModeSelection','Error in Mode selection')
-end
-
-DataStruct.OperationMode = OperationMode;
 
 
 %% Controls for SubjectID depending on the Mode selected
