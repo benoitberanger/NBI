@@ -81,8 +81,13 @@ for b = 1 : length(miniBlock_id)
     end
     
     % Add 9 TR=900ms at the end end of each uncombined mini-block
-    currentBlock(end+1,:) = {currentBlock{end,1} currentBlock{end,2}+currentBlock{end,4} 0 9*0.900 'Null' 0 }; %#ok<AGROW>
-    
+    switch currentBlock{end,5}
+        case 'Null'
+            currentBlock{end,4} = currentBlock{end,4} + 9*0.900;
+        otherwise
+            currentBlock(end+1,:) = {currentBlock{end,1} currentBlock{end,2}+currentBlock{end,4} 0 9*0.900 'Null' 0 }; %#ok<*AGROW>
+    end
+
     % Save the catch trials
     allBlocks{b} = currentBlock;
     
