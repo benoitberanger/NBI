@@ -22,7 +22,7 @@ function varargout = nbi_GUI(varargin)
 
 % Edit the above text to modify the response to help nbi_GUI
 
-% Last Modified by GUIDE v2.5 12-May-2016 18:43:15
+% Last Modified by GUIDE v2.5 11-Jul-2016 14:36:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -99,6 +99,8 @@ set(handles.pushbutton_NBI,'Visible','off')
 % Invisible objects @ opening
 set(handles.text_LastFileNameAnnouncer,'Visible','off')
 set(handles.text_LastFileName,'Visible','off')
+set(handles.text_RecordName,'Visible','off')
+set(handles.edit_RecordName,'Visible','off')
 
 %% Try to pick a random seed for the RNG
 
@@ -221,6 +223,22 @@ switch get(get(handles.uipanel_OperationMode,'SelectedObject'),'Tag')
 end
 
 DataStruct.OperationMode = OperationMode;
+
+
+%% Record video ?
+
+switch get(get(handles.uipanel_RecordVideo,'SelectedObject'),'Tag')
+    case 'radiobutton_RecordOn'
+        RecordVideo          = 'On';
+        VideoName            = [ get(handles.edit_RecordName,'String') '.mov'];
+        DataStruct.VideoName = VideoName;
+    case 'radiobutton_RecordOff'
+        RecordVideo          = 'Off';
+    otherwise
+        warning('NBI:RecordVideo','Error in Record Video')
+end
+
+DataStruct.RecordVideo = RecordVideo;
 
 
 %% Subject ID & Run number
@@ -859,4 +877,47 @@ function pushbutton_ForceShutDown_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 Eyelink.ForceShutDown;
+
+
+
+
+function edit_RecordName_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_RecordName (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_RecordName as text
+%        str2double(get(hObject,'String')) returns contents of edit_RecordName as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_RecordName_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_RecordName (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes when selected object is changed in uipanel_RecordVideo.
+function uipanel_RecordVideo_SelectionChangeFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uipanel_RecordVideo 
+% eventdata  structure with the following fields (see UIBUTTONGROUP)
+%	EventName: string 'SelectionChanged' (read only)
+%	OldValue: handle of the previously selected object or empty if none was selected
+%	NewValue: handle of the currently selected object
+% handles    structure with handles and user data (see GUIDATA)
+
+switch get(eventdata.NewValue,'Tag') % Get Tag of selected object.
+    case 'radiobutton_RecordOn'
+        set(handles.text_RecordName,'Visible','On')
+        set(handles.edit_RecordName,'Visible','On')
+    case 'radiobutton_RecordOff'
+        set(handles.text_RecordName,'Visible','off')
+        set(handles.edit_RecordName,'Visible','off')
+end
 

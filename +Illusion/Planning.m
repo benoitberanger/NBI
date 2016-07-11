@@ -263,6 +263,15 @@ if nargout > 0
                         adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Control_rotation' 0 } ];
                     end
                     
+                case 6
+                    adjustedBlocks{blockSelected} = {1 0 6 1.8 'Control_local_rot'   0 };
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 6 1.8 'Control_local_rot'   0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 6 1.8 'Control_local_rot'   0 } ];
+                case 7
+                    adjustedBlocks{blockSelected} = {1 0 7 1.8 'Control_local_inOut' 0 } ;
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 7 1.8 'Control_local_inOut' 0 } ];
+                    adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 7 1.8 'Control_local_inOut' 0 } ];
+                    
                 otherwise
                     adjustedBlocks{blockSelected} = {1 0 0 1.8 'Null' 0 };
                     adjustedBlocks{blockSelected} = [adjustedBlocks{blockSelected} ; {1 NO(adjustedBlocks) 1 1.8 'Illusion_rotation'   0 } ];

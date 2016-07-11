@@ -99,6 +99,11 @@ try
     Common.GenerateCatchFrameNumber
     
     
+    %% Record movie
+    
+    Common.Movie.CreateMovie;
+    
+    
     %% Start recording eye motions
     
     Eyelink.StartRecording( DataStruct );
@@ -258,6 +263,8 @@ try
                         
                     end
                     
+                    Common.Movie.AddFrameToMovie;
+                    
                 end
                 
                 
@@ -275,6 +282,8 @@ try
     %% End of stimulation
     
     Common.EndOfStimulationScript;
+    
+    Common.Movie.FinalizeMovie;
     
     
 catch err %#ok<*NASGU>
