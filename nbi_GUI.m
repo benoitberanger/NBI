@@ -1,916 +1,845 @@
-function varargout = nbi_GUI(varargin)
-% NBI_GUI MATLAB code for nbi_GUI.fig
-%      NBI_GUI, by itself, creates a new NBI_GUI or raises the existing
-%      singleton*.
-%
-%      H = NBI_GUI returns the handle to a new NBI_GUI or the handle to
-%      the existing singleton*.
-%
-%      NBI_GUI('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in NBI_GUI.M with the given input arguments.
-%
-%      NBI_GUI('Property','Value',...) creates a new NBI_GUI or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before nbi_GUI_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to nbi_GUI_OpeningFcn via varargin.
-%
-%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
-%      instance to run (singleton)".
-%
-% See also: GUIDE, GUIDATA, GUIHANDLES
+function nbi_GUI
 
-% Edit the above text to modify the response to help nbi_GUI
+% global handles
 
-% Last Modified by GUIDE v2.5 11-Jul-2016 14:36:52
+%% Open a singleton figure
 
-% Begin initialization code - DO NOT EDIT
-gui_Singleton = 1;
-gui_State = struct('gui_Name',       mfilename, ...
-    'gui_Singleton',  gui_Singleton, ...
-    'gui_OpeningFcn', @nbi_GUI_OpeningFcn, ...
-    'gui_OutputFcn',  @nbi_GUI_OutputFcn, ...
-    'gui_LayoutFcn',  [] , ...
-    'gui_Callback',   []);
-if nargin && ischar(varargin{1})
-    gui_State.gui_Callback = str2func(varargin{1});
+% Is the GUI already open ?
+figPtr = findall(0,'Tag',mfilename);
+
+if isempty(figPtr) % Create the figure
+    
+    clc
+    
+    % Create a figure
+    figHandle = figure( ...
+        'HandleVisibility', 'off',... % close all does not close the figure
+        'MenuBar'         , 'none'                   , ...
+        'Toolbar'         , 'none'                   , ...
+        'Name'            , mfilename                , ...
+        'NumberTitle'     , 'off'                    , ...
+        'Units'           , 'Normalized'             , ...
+        'Position'        , [0.05, 0.05, 0.50, 0.90] , ...
+        'Tag'             , mfilename                );
+    
+    figureBGcolor = [0.9 0.9 0.9]; set(figHandle,'Color',figureBGcolor);
+    buttonBGcolor = figureBGcolor - 0.1;
+    editBGcolor   = [1.0 1.0 1.0];
+    
+    % Create GUI handles : pointers to access the graphic objects
+    handles = guihandles(figHandle);
+    
+    
+    %% Panel proportions
+    
+    panelProp.xposP = 0.05; % xposition of panel normalized : from 0 to 1
+    panelProp.wP    = 1 - panelProp.xposP * 2;
+    
+    panelProp.vect  = ...
+        [1 1 2 2 1 1 2]; % relative proportions of each panel, from bottom to top
+    
+    panelProp.vectLength    = length(panelProp.vect);
+    panelProp.vectTotal     = sum(panelProp.vect);
+    panelProp.adjustedTotal = panelProp.vectTotal + 1;
+    panelProp.unitWidth     = 1/panelProp.adjustedTotal;
+    panelProp.interWidth    = panelProp.unitWidth/panelProp.vectLength;
+    
+    panelProp.countP = panelProp.vectLength + 1;
+    panelProp.yposP  = @(countP) panelProp.unitWidth*sum(panelProp.vect(1:countP-1)) + 1*countP*panelProp.interWidth;
+    
+    
+    %% Panel : Subject & Run
+    
+    p_sr.x = panelProp.xposP;
+    p_sr.w = panelProp.wP;
+    
+    panelProp.countP = panelProp.countP - 1;
+    p_sr.y = panelProp.yposP(panelProp.countP);
+    p_sr.h = panelProp.unitWidth*panelProp.vect(panelProp.countP);
+    
+    handles.uipanel_SubjectRun = uipanel(handles.(mfilename),...
+        'Title','Subject & Run',...
+        'Units', 'Normalized',...
+        'Position',[p_sr.x p_sr.y p_sr.w p_sr.h],...
+        'BackgroundColor',figureBGcolor);
+    
+    p_sr.nbO       = 3; % Number of objects
+    p_sr.Ow        = 1/(p_sr.nbO + 1); % Object width
+    p_sr.countO    = 0; % Object counter
+    p_sr.xposO     = @(countO) p_sr.Ow/(p_sr.nbO+1)*countO + (countO-1)*p_sr.Ow;
+    p_sr.yposOmain = 0.1;
+    p_sr.hOmain    = 0.6;
+    p_sr.yposOhdr  = 0.7;
+    p_sr.hOhdr     = 0.2;
+    
+    
+    % ---------------------------------------------------------------------
+    % Edit : Subject ID
+    
+    p_sr.countO = p_sr.countO + 1;
+    e_sid.x = p_sr.xposO(p_sr.countO);
+    e_sid.y = p_sr.yposOmain ;
+    e_sid.w = p_sr.Ow;
+    e_sid.h = p_sr.hOmain;
+    handles.edit_SubjectID = uicontrol(handles.uipanel_SubjectRun,...
+        'Style','edit',...
+        'Units', 'Normalized',...
+        'Position',[e_sid.x e_sid.y e_sid.w e_sid.h],...
+        'BackgroundColor',editBGcolor,...
+        'String','');
+    
+    
+    % ---------------------------------------------------------------------
+    % Text : Subject ID
+    
+    t_sid.x = p_sr.xposO(p_sr.countO);
+    t_sid.y = p_sr.yposOhdr ;
+    t_sid.w = p_sr.Ow;
+    t_sid.h = p_sr.hOhdr;
+    handles.text_SubjectID = uicontrol(handles.uipanel_SubjectRun,...
+        'Style','text',...
+        'Units', 'Normalized',...
+        'Position',[t_sid.x t_sid.y t_sid.w t_sid.h],...
+        'String','Subject ID',...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : Check SubjectID data
+    
+    p_sr.countO = p_sr.countO + 1;
+    b_csidd.x = p_sr.xposO(p_sr.countO);
+    b_csidd.y = p_sr.yposOmain;
+    b_csidd.w = p_sr.Ow;
+    b_csidd.h = p_sr.hOmain;
+    handles.pushbutton_Check_SubjectID_data = uicontrol(handles.uipanel_SubjectRun,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_csidd.x b_csidd.y b_csidd.w b_csidd.h],...
+        'String','Check SubjectID data',...
+        'BackgroundColor',buttonBGcolor,...
+        'TooltipString','Display in Command Window the content of data/(SubjectID)',...
+        'Callback',@(hObject,eventdata)GUI.Pushbutton_Check_SubjectID_data_Callback(handles.edit_SubjectID,eventdata));
+    
+    
+    % ---------------------------------------------------------------------
+    % Text : Last file name annoucer
+    
+    p_sr.countO = p_sr.countO + 1;
+    t_lfna.x = p_sr.xposO(p_sr.countO);
+    t_lfna.y = p_sr.yposOhdr ;
+    t_lfna.w = p_sr.Ow;
+    t_lfna.h = p_sr.hOhdr;
+    handles.text_LastFileNameAnnouncer = uicontrol(handles.uipanel_SubjectRun,...
+        'Style','text',...
+        'Units', 'Normalized',...
+        'Position',[t_lfna.x t_lfna.y t_lfna.w t_lfna.h],...
+        'String','Last file name',...
+        'BackgroundColor',figureBGcolor,...
+        'Visible','Off');
+    
+    
+    % ---------------------------------------------------------------------
+    % Text : Last file name
+    
+    t_lfn.x = p_sr.xposO(p_sr.countO);
+    t_lfn.y = p_sr.yposOmain ;
+    t_lfn.w = p_sr.Ow;
+    t_lfn.h = p_sr.hOmain;
+    handles.text_LastFileName = uicontrol(handles.uipanel_SubjectRun,...
+        'Style','text',...
+        'Units', 'Normalized',...
+        'Position',[t_lfn.x t_lfn.y t_lfn.w t_lfn.h],...
+        'String','',...
+        'BackgroundColor',figureBGcolor,...
+        'Visible','Off');
+    
+    
+    %% Panel : Save mode
+    
+    p_sm.x = panelProp.xposP;
+    p_sm.w = panelProp.wP;
+    
+    panelProp.countP = panelProp.countP - 1;
+    p_sm.y = panelProp.yposP(panelProp.countP);
+    p_sm.h = panelProp.unitWidth*panelProp.vect(panelProp.countP);
+    
+    handles.uipanel_SaveMode = uibuttongroup(handles.(mfilename),...
+        'Title','Save mode',...
+        'Units', 'Normalized',...
+        'Position',[p_sm.x p_sm.y p_sm.w p_sm.h],...
+        'BackgroundColor',figureBGcolor);
+    
+    p_sm.nbO    = 2; % Number of objects
+    p_sm.Ow     = 1/(p_sm.nbO + 1); % Object width
+    p_sm.countO = 0; % Object counter
+    p_sm.xposO  = @(countO) p_sm.Ow/(p_sm.nbO+1)*countO + (countO-1)*p_sm.Ow;
+    
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : Save Data
+    
+    p_sm.countO = p_sm.countO + 1;
+    r_sd.x   = p_sm.xposO(p_sm.countO);
+    r_sd.y   = 0.1 ;
+    r_sd.w   = p_sm.Ow;
+    r_sd.h   = 0.8;
+    r_sd.tag = 'radiobutton_SaveData';
+    handles.(r_sd.tag) = uicontrol(handles.uipanel_SaveMode,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_sd.x r_sd.y r_sd.w r_sd.h],...
+        'String','Save data',...
+        'TooltipString','Save data to : /data/SubjectID/SubjectID_Task_RunNumber',...
+        'HorizontalAlignment','Center',...
+        'Tag',r_sd.tag,...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : No save
+    
+    p_sm.countO = p_sm.countO + 1;
+    r_ns.x   = p_sm.xposO(p_sm.countO);
+    r_ns.y   = 0.1 ;
+    r_ns.w   = p_sm.Ow;
+    r_ns.h   = 0.8;
+    r_ns.tag = 'radiobutton_NoSave';
+    handles.(r_ns.tag) = uicontrol(handles.uipanel_SaveMode,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_ns.x r_ns.y r_ns.w r_ns.h],...
+        'String','No save',...
+        'TooltipString','In Acquisition mode, Save mode must be engaged',...
+        'HorizontalAlignment','Center',...
+        'Tag',r_ns.tag,...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    %% Panel : Environement
+    
+    p_env.x = panelProp.xposP;
+    p_env.w = panelProp.wP;
+    
+    panelProp.countP = panelProp.countP - 1;
+    p_env.y = panelProp.yposP(panelProp.countP);
+    p_env.h = panelProp.unitWidth*panelProp.vect(panelProp.countP);
+    
+    handles.uipanel_Environement = uibuttongroup(handles.(mfilename),...
+        'Title','Environement',...
+        'Units', 'Normalized',...
+        'Position',[p_env.x p_env.y p_env.w p_env.h],...
+        'BackgroundColor',figureBGcolor);
+    
+    p_env.nbO    = 2; % Number of objects
+    p_env.Ow     = 1/(p_env.nbO + 1); % Object width
+    p_env.countO = 0; % Object counter
+    p_env.xposO  = @(countO) p_env.Ow/(p_env.nbO+1)*countO + (countO-1)*p_env.Ow;
+    
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : MRI
+    
+    p_env.countO = p_env.countO + 1;
+    r_mri.x   = p_env.xposO(p_env.countO);
+    r_mri.y   = 0.1 ;
+    r_mri.w   = p_env.Ow;
+    r_mri.h   = 0.8;
+    r_mri.tag = 'radiobutton_MRI';
+    handles.(r_mri.tag) = uicontrol(handles.uipanel_Environement,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_mri.x r_mri.y r_mri.w r_mri.h],...
+        'String','MRI',...
+        'TooltipString','fMRI task',...
+        'HorizontalAlignment','Center',...
+        'Tag',(r_mri.tag),...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : Training
+    
+    p_env.countO = p_env.countO + 1;
+    r_tain.x   = p_env.xposO(p_env.countO);
+    r_tain.y   = 0.1 ;
+    r_tain.w   = p_env.Ow;
+    r_tain.h   = 0.8;
+    r_tain.tag = 'radiobutton_Training';
+    handles.(r_tain.tag) = uicontrol(handles.uipanel_Environement,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_tain.x r_tain.y r_tain.w r_tain.h],...
+        'String','Training',...
+        'TooltipString','Training inside the MRI, just before the scan',...
+        'HorizontalAlignment','Center',...
+        'Tag',(r_tain.tag),...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    %% Panel : Eyelink mode
+    
+    el_shift = 0.30;
+    
+    p_el.x = panelProp.xposP + el_shift;
+    p_el.w = panelProp.wP - el_shift ;
+    
+    panelProp.countP = panelProp.countP - 1;
+    p_el.y = panelProp.yposP(panelProp.countP);
+    p_el.h = panelProp.unitWidth*panelProp.vect(panelProp.countP);
+    
+    handles.uipanel_EyelinkMode = uibuttongroup(handles.(mfilename),...
+        'Title','Eyelink mode',...
+        'Units', 'Normalized',...
+        'Position',[p_el.x p_el.y p_el.w p_el.h],...
+        'BackgroundColor',figureBGcolor,...
+        'SelectionChangeFcn',@uipanel_EyelinkMode_SelectionChangeFcn);
+    
+    
+    % ---------------------------------------------------------------------
+    % Checkbox : Windowed screen
+    
+    c_ws.x = panelProp.xposP;
+    c_ws.w = el_shift - panelProp.xposP;
+    
+    c_ws.y = panelProp.yposP(panelProp.countP) ;
+    c_ws.h = p_el.h * 0.3;
+    
+    handles.checkbox_WindowedScreen = uicontrol(handles.(mfilename),...
+        'Style','checkbox',...
+        'Units', 'Normalized',...
+        'Position',[c_ws.x c_ws.y c_ws.w c_ws.h],...
+        'String','Windowed screen',...
+        'HorizontalAlignment','Center',...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % Listbox : Screens
+    
+    l_sc.x = panelProp.xposP;
+    l_sc.w = el_shift - panelProp.xposP;
+    
+    l_sc.y = c_ws.y + c_ws.h ;
+    l_sc.h = p_el.h * 0.5;
+    
+    handles.listbox_Screens = uicontrol(handles.(mfilename),...
+        'Style','listbox',...
+        'Units', 'Normalized',...
+        'Position',[l_sc.x l_sc.y l_sc.w l_sc.h],...
+        'String',{'a' 'b' 'c'},...
+        'TooltipString','Select the display mode   PTB : 0 for extended display (over all screens) , 1 for screen 1 , 2 for screen 2 , etc.',...
+        'HorizontalAlignment','Center',...
+        'CreateFcn',@GUI.Listbox_Screens_CreateFcn);
+    
+    
+    % ---------------------------------------------------------------------
+    % Text : ScreenMode
+    
+    t_sm.x = panelProp.xposP;
+    t_sm.w = el_shift - panelProp.xposP;
+    
+    t_sm.y = l_sc.y + l_sc.h ;
+    t_sm.h = p_el.h * 0.15;
+    
+    handles.text_ScreenMode = uicontrol(handles.(mfilename),...
+        'Style','text',...
+        'Units', 'Normalized',...
+        'Position',[t_sm.x t_sm.y t_sm.w t_sm.h],...
+        'String','Screen mode selection',...
+        'TooltipString','Output of Screen(''Screens'')   Use ''Screen Screens?'' in Command window for help',...
+        'HorizontalAlignment','Center',...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    p_el_up.nbO    = 6; % Number of objects
+    p_el_up.Ow     = 1/(p_el_up.nbO + 1); % Object width
+    p_el_up.countO = 0; % Object counter
+    p_el_up.xposO  = @(countO) p_el_up.Ow/(p_el_up.nbO+1)*countO + (countO-1)*p_el_up.Ow;
+    p_el_up.y      = 0.6;
+    p_el_up.h      = 0.3;
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : Eyelink ON
+    
+    p_el_up.countO = p_el_up.countO + 1;
+    r_elon.x   = p_el_up.xposO(p_el_up.countO);
+    r_elon.y   = p_el_up.y ;
+    r_elon.w   = p_el_up.Ow;
+    r_elon.h   = p_el_up.h;
+    r_elon.tag = 'radiobutton_EyelinkOn';
+    handles.(r_elon.tag) = uicontrol(handles.uipanel_EyelinkMode,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_elon.x r_elon.y r_elon.w r_elon.h],...
+        'String','On',...
+        'HorizontalAlignment','Center',...
+        'Tag',r_elon.tag,...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : Eyelink OFF
+    
+    p_el_up.countO = p_el_up.countO + 1;
+    r_eloff.x   = p_el_up.xposO(p_el_up.countO);
+    r_eloff.y   = p_el_up.y ;
+    r_eloff.w   = p_el_up.Ow;
+    r_eloff.h   = p_el_up.h;
+    r_eloff.tag = 'radiobutton_EyelinkOff';
+    handles.(r_eloff.tag) = uicontrol(handles.uipanel_EyelinkMode,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_eloff.x r_eloff.y r_eloff.w r_eloff.h],...
+        'String','Off',...
+        'HorizontalAlignment','Center',...
+        'Tag',r_eloff.tag,...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % Checkbox : Parallel port
+    
+    p_el_up.countO = p_el_up.countO + 1;
+    c_pp.x = p_el_up.xposO(p_el_up.countO);
+    c_pp.y = p_el_up.y ;
+    c_pp.w = p_el_up.Ow*2;
+    c_pp.h = p_el_up.h;
+    handles.checkbox_ParPort = uicontrol(handles.uipanel_EyelinkMode,...
+        'Style','checkbox',...
+        'Units', 'Normalized',...
+        'Position',[c_pp.x c_pp.y c_pp.w c_pp.h],...
+        'String','Parallel port',...
+        'HorizontalAlignment','Center',...
+        'TooltipString','Send messages via parallel port : useful for Eyelink',...
+        'BackgroundColor',figureBGcolor,...
+        'Value',1,...
+        'Callback',@GUI.Checkbox_ParPort_Callback,...
+        'CreateFcn',@GUI.Checkbox_ParPort_Callback);
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    p_el_dw.nbO    = 3; % Number of objects
+    p_el_dw.Ow     = 1/(p_el_dw.nbO + 1); % Object width
+    p_el_dw.countO = 0; % Object counter
+    p_el_dw.xposO  = @(countO) p_el_dw.Ow/(p_el_dw.nbO+1)*countO + (countO-1)*p_el_dw.Ow;
+    p_el_dw.y      = 0.1;
+    p_el_dw.h      = 0.4 ;
+    
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : Eyelink Initialize
+    
+    p_el_dw.countO = p_el_dw.countO + 1;
+    b_init.x = p_el_dw.xposO(p_el_dw.countO);
+    b_init.y = p_el_dw.y ;
+    b_init.w = p_el_dw.Ow;
+    b_init.h = p_el_dw.h;
+    handles.pushbutton_Initialize = uicontrol(handles.uipanel_EyelinkMode,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_init.x b_init.y b_init.w b_init.h],...
+        'String','Initialize',...
+        'BackgroundColor',buttonBGcolor,...
+        'Callback','Eyelink.Initialize');
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : Eyelink IsConnected
+    
+    p_el_dw.countO = p_el_dw.countO + 1;
+    b_isco.x = p_el_dw.xposO(p_el_dw.countO);
+    b_isco.y = p_el_dw.y ;
+    b_isco.w = p_el_dw.Ow;
+    b_isco.h = p_el_dw.h;
+    handles.pushbutton_IsConnected = uicontrol(handles.uipanel_EyelinkMode,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_isco.x b_isco.y b_isco.w b_isco.h],...
+        'String','IsConnected',...
+        'BackgroundColor',buttonBGcolor,...
+        'Callback','Eyelink.IsConnected');
+    
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : Eyelink Calibration
+    
+    p_el_dw.countO = p_el_dw.countO + 1;
+    b_cal.x = p_el_dw.xposO(p_el_dw.countO);
+    b_cal.y = p_el_dw.y ;
+    b_cal.w = p_el_dw.Ow;
+    b_cal.h = p_el_dw.h;
+    handles.pushbutton_EyelinkCalibration = uicontrol(handles.uipanel_EyelinkMode,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_cal.x b_cal.y b_cal.w b_cal.h],...
+        'String','Calibration',...
+        'BackgroundColor',buttonBGcolor,...
+        'Callback','Eyelink.Calibration');
+    
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : Eyelink force shutdown
+    
+    b_fsd.x = c_pp.x + c_pp.h;
+    b_fsd.y = p_el_up.y ;
+    b_fsd.w = p_el_dw.Ow*1.25;
+    b_fsd.h = p_el_dw.h;
+    handles.pushbutton_ForceShutDown = uicontrol(handles.uipanel_EyelinkMode,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_fsd.x b_fsd.y b_fsd.w b_fsd.h],...
+        'String','ForceShutDown',...
+        'BackgroundColor',buttonBGcolor,...
+        'Callback','Eyelink.ForceShutDown');
+    
+    
+    %% Panel : Task
+    
+    p_tk.x = panelProp.xposP;
+    p_tk.w = panelProp.wP;
+    
+    panelProp.countP = panelProp.countP - 1;
+    p_tk.y = panelProp.yposP(panelProp.countP);
+    p_tk.h = panelProp.unitWidth*panelProp.vect(panelProp.countP);
+    
+    handles.uipanel_Task = uibuttongroup(handles.(mfilename),...
+        'Title','Task',...
+        'Units', 'Normalized',...
+        'Position',[p_tk.x p_tk.y p_tk.w p_tk.h],...
+        'BackgroundColor',figureBGcolor);
+    
+    p_tk.nbO    = 5; % Number of objects
+    p_tk.Ow     = 1/(p_tk.nbO + 1); % Object width
+    p_tk.countO = 0; % Object counter
+    p_tk.xposO  = @(countO) p_tk.Ow/(p_tk.nbO+1)*countO + (countO-1)*p_tk.Ow;
+    
+    buttun_y = 0.20;
+    buttun_h = 0.60;
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : MTMST Left
+    
+    p_tk.countO  = p_tk.countO + 1;
+    b_mtmstL.x   = p_tk.xposO(p_tk.countO);
+    b_mtmstL.y   = buttun_y;
+    b_mtmstL.w   = p_tk.Ow;
+    b_mtmstL.h   = buttun_h;
+    b_mtmstL.tag = 'pushbutton_MTMST_Left';
+    handles.(b_mtmstL.tag) = uicontrol(handles.uipanel_Task,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_mtmstL.x b_mtmstL.y b_mtmstL.w b_mtmstL.h],...
+        'String','MT/MST Right',...
+        'BackgroundColor',buttonBGcolor,...
+        'Tag',b_mtmstL.tag,...
+        'Callback',@nbi_main);
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : MTMST Right
+    
+    p_tk.countO = p_tk.countO + 1;
+    b_mtmstR.x   = p_tk.xposO(p_tk.countO);
+    b_mtmstR.y   = buttun_y;
+    b_mtmstR.w   = p_tk.Ow;
+    b_mtmstR.h   = buttun_h;
+    b_mtmstR.tag = 'pushbutton_MTMST_Right';
+    handles.(b_mtmstR.tag) = uicontrol(handles.uipanel_Task,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_mtmstR.x b_mtmstR.y b_mtmstR.w b_mtmstR.h],...
+        'String','MT/MST Right',...
+        'BackgroundColor',buttonBGcolor,...
+        'Tag',b_mtmstR.tag,...
+        'Callback',@nbi_main);
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : Retinotopy
+    
+    p_tk.countO = p_tk.countO + 1;
+    b_ret.x   = p_tk.xposO(p_tk.countO);
+    b_ret.y   = buttun_y;
+    b_ret.w   = p_tk.Ow;
+    b_ret.h   = buttun_h;
+    b_ret.tag = 'pushbutton_Retinotopy';
+    handles.(b_ret.tag) = uicontrol(handles.uipanel_Task,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_ret.x b_ret.y b_ret.w b_ret.h],...
+        'String','Retinotopy',...
+        'BackgroundColor',buttonBGcolor,...
+        'Tag',b_ret.tag,...
+        'Callback',@nbi_main);
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    illu_y      = 0.4;
+    illu_h      = 0.5;
+    illu_factor = 1.40;
+    illu_w      = p_tk.Ow*illu_factor;
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : Illusion
+    
+    p_tk.countO = p_tk.countO + 1;
+    b_illu.x = p_tk.xposO(p_tk.countO);
+    b_illu.y = illu_y;
+    b_illu.w = illu_w;
+    b_illu.h = illu_h;
+    b_illu.tag = 'pushbutton_Illusion';
+    handles.(b_illu.tag) = uicontrol(handles.uipanel_Task,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_illu.x b_illu.y b_illu.w b_illu.h],...
+        'String','Illusion',...
+        'BackgroundColor',buttonBGcolor,...
+        'Tag',b_illu.tag,...
+        'Callback',@nbi_main);
+    
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : Block number
+    
+    p_tk.countO = p_tk.countO + 1;
+    e_bn.x = p_tk.xposO(p_tk.countO)+p_tk.Ow*(illu_factor-1);
+    e_bn.y = illu_y*1.05;
+    e_bn.w = 2*p_tk.Ow - illu_w;
+    e_bn.h = illu_h*0.90;
+    handles.edit_IlluBlock = uicontrol(handles.uipanel_Task,...
+        'Style','edit',...
+        'Units', 'Normalized',...
+        'Position',[e_bn.x e_bn.y e_bn.w e_bn.h],...
+        'String','1',...
+        'TooltipString','Block number of Illusion : from 0 to 8',...
+        'BackgroundColor',editBGcolor,...
+        'Callback',@edit_IlluBlock_Callback);
+    
+    
+    % ---------------------------------------------------------------------
+    % Pushbutton : Generate noise
+    
+    b_illu.x = b_illu.x;
+    b_illu.y = 0.1;
+    b_illu.w = illu_w;
+    b_illu.h = 0.2;
+    handles.pushbutton_GenerateNoise = uicontrol(handles.uipanel_Task,...
+        'Style','pushbutton',...
+        'Units', 'Normalized',...
+        'Position',[b_illu.x b_illu.y b_illu.w b_illu.h],...
+        'String','Generate Noise',...
+        'BackgroundColor',buttonBGcolor,...
+        'TooltipString','Generate the noise patches : it may take while...',...
+        'Callback',@Illusion.PrepareNoiseGeneration);
+    
+    
+    %% Panel : Record video
+    
+    p_rv.x = panelProp.xposP;
+    p_rv.w = panelProp.wP;
+    
+    panelProp.countP = panelProp.countP - 1;
+    p_rv.y = panelProp.yposP(panelProp.countP);
+    p_rv.h = panelProp.unitWidth*panelProp.vect(panelProp.countP);
+    
+    handles.uipanel_RecordVideo = uibuttongroup(handles.(mfilename),...
+        'Title','Record mode',...
+        'Units', 'Normalized',...
+        'Position',[p_rv.x p_rv.y p_rv.w p_rv.h],...
+        'BackgroundColor',figureBGcolor,...
+        'SelectionChangeFcn',@uipanel_RecordVideo_SelectionChangeFcn);
+    
+    p_rv.nbO    = 3; % Number of objects
+    p_rv.Ow     = 1/(p_rv.nbO + 1); % Object width
+    p_rv.countO = 0; % Object counter
+    p_rv.xposO  = @(countO) p_rv.Ow/(p_rv.nbO+1)*countO + (countO-1)*p_rv.Ow;
+    
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : Record video OFF
+    
+    p_rv.countO = p_rv.countO + 1;
+    r_rvoff.x   = p_rv.xposO(p_rv.countO);
+    r_rvoff.y   = 0.1 ;
+    r_rvoff.w   = p_rv.Ow;
+    r_rvoff.h   = 0.8;
+    r_rvoff.tag = 'radiobutton_RecordOff';
+    handles.(r_rvoff.tag) = uicontrol(handles.uipanel_RecordVideo,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_rvoff.x r_rvoff.y r_rvoff.w r_rvoff.h],...
+        'String','Off',...
+        'HorizontalAlignment','Center',...
+        'Tag',r_rvoff.tag,...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : Record video ON
+    
+    p_rv.countO = p_rv.countO + 1;
+    r_rvon.x   = p_rv.xposO(p_rv.countO);
+    r_rvon.y   = 0.1 ;
+    r_rvon.w   = p_rv.Ow;
+    r_rvon.h   = 0.8;
+    r_rvon.tag = 'radiobutton_RecordOn';
+    handles.(r_rvon.tag) = uicontrol(handles.uipanel_RecordVideo,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_rvon.x r_rvon.y r_rvon.w r_rvon.h],...
+        'String','On',...
+        'HorizontalAlignment','Center',...
+        'Tag',r_rvon.tag,...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % Text : File name
+    
+    t_fn.x = p_rv.xposO(p_rv.countO) + p_rv.Ow/2;
+    t_fn.y = 0.2 ;
+    t_fn.w = p_rv.Ow;
+    t_fn.h = 0.4;
+    handles.text_RecordName = uicontrol(handles.uipanel_RecordVideo,...
+        'Style','text',...
+        'Units', 'Normalized',...
+        'Position',[t_fn.x t_fn.y t_fn.w t_fn.h],...
+        'String','File name : ',...
+        'HorizontalAlignment','Center',...
+        'Visible','Off',...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % Edit : File name
+    
+    p_rv.countO = p_rv.countO + 1;
+    e_fn.x = p_rv.xposO(p_rv.countO);
+    e_fn.y = 0.1 ;
+    e_fn.w = p_rv.Ow;
+    e_fn.h = 0.8;
+    handles.edit_RecordName = uicontrol(handles.uipanel_RecordVideo,...
+        'Style','edit',...
+        'Units', 'Normalized',...
+        'Position',[e_fn.x e_fn.y e_fn.w e_fn.h],...
+        'String','',...
+        'Visible','Off',...
+        'BackgroundColor',editBGcolor,...
+        'HorizontalAlignment','Center');
+    
+    
+    %% Panel : Operation mode
+    
+    p_op.x = panelProp.xposP;
+    p_op.w = panelProp.wP;
+    
+    panelProp.countP = panelProp.countP - 1;
+    p_op.y = panelProp.yposP(panelProp.countP);
+    p_op.h = panelProp.unitWidth*panelProp.vect(panelProp.countP);
+    
+    handles.uipanel_OperationMode = uibuttongroup(handles.(mfilename),...
+        'Title','Operation mode',...
+        'Units', 'Normalized',...
+        'Position',[p_op.x p_op.y p_op.w p_op.h],...
+        'BackgroundColor',figureBGcolor);
+    
+    p_op.nbO    = 3; % Number of objects
+    p_op.Ow     = 1/(p_op.nbO + 1); % Object width
+    p_op.countO = 0; % Object counter
+    p_op.xposO  = @(countO) p_op.Ow/(p_op.nbO+1)*countO + (countO-1)*p_op.Ow;
+    
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : Acquisition
+    
+    p_op.countO = p_op.countO + 1;
+    r_aq.x = p_op.xposO(p_op.countO);
+    r_aq.y = 0.1 ;
+    r_aq.w = p_op.Ow;
+    r_aq.h = 0.8;
+    r_aq.tag = 'radiobutton_Acquisition';
+    handles.(r_aq.tag) = uicontrol(handles.uipanel_OperationMode,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_aq.x r_aq.y r_aq.w r_aq.h],...
+        'String','Acquisition',...
+        'TooltipString','Should be used for all the environements',...
+        'HorizontalAlignment','Center',...
+        'Tag',r_aq.tag,...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : FastDebug
+    
+    p_op.countO = p_op.countO + 1;
+    r_fd.x   = p_op.xposO(p_op.countO);
+    r_fd.y   = 0.1 ;
+    r_fd.w   = p_op.Ow;
+    r_fd.h   = 0.8;
+    r_fd.tag = 'radiobutton_FastDebug';
+    handles.radiobutton_FastDebug = uicontrol(handles.uipanel_OperationMode,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_fd.x r_fd.y r_fd.w r_fd.h],...
+        'String','FastDebug',...
+        'TooltipString','Only to work on the scripts',...
+        'HorizontalAlignment','Center',...
+        'Tag',r_fd.tag,...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    % ---------------------------------------------------------------------
+    % RadioButton : RealisticDebug
+    
+    p_op.countO = p_op.countO + 1;
+    r_rd.x   = p_op.xposO(p_op.countO);
+    r_rd.y   = 0.1 ;
+    r_rd.w   = p_op.Ow;
+    r_rd.h   = 0.8;
+    r_rd.tag = 'radiobutton_RealisticDebug';
+    handles.(r_rd.tag) = uicontrol(handles.uipanel_OperationMode,...
+        'Style','radiobutton',...
+        'Units', 'Normalized',...
+        'Position',[r_rd.x r_rd.y r_rd.w r_rd.h],...
+        'String','RealisticDebug',...
+        'TooltipString','Only to work on the scripts',...
+        'HorizontalAlignment','Center',...
+        'Tag',r_rd.tag,...
+        'BackgroundColor',figureBGcolor);
+    
+    
+    %% End of opening
+    
+    % IMPORTANT
+    guidata(figHandle,handles)
+    % After creating the figure, dont forget the line
+    % guidata(figHandle,handles) . It allows smart retrive like
+    % handles=guidata(hObject)
+    
+    % assignin('base','handles',handles)
+    % disp(handles)
+    
+    
+else % Figure exists so brings it to the focus
+    
+    figure(figPtr);
+    
+    % close(figPtr);
+    % progGUI;
+    
 end
 
-if nargout
-    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
-else
-    gui_mainfcn(gui_State, varargin{:});
-end
-% End initialization code - DO NOT EDIT
+end % function
 
 
-% --- Executes just before nbi_GUI is made visible.
-function nbi_GUI_OpeningFcn(hObject, eventdata, handles, varargin) %#ok<*INUSL>
-% This function has no output args, see OutputFcn.
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to nbi_GUI (see VARARGIN)
-
-% Choose default command line output for nbi_GUI
-handles.output = hObject;
-
-
-%% Cross-platform compatibility
-
-% Use default background color of the platform
-defaultBackground = get(0,'defaultUicontrolBackgroundColor');
-set(handles.figure1,'Color',defaultBackground)
-
-% Use a fixed width fontname for the platform
-FWFN = get(0,'FixedWidthFontName');
-ListHandles = fieldnames(handles);
-for h = 1 : length( ListHandles )
-    if ~( strcmp( ListHandles{h} , 'figure1' ) || strcmp( ListHandles{h} , 'output' ) ) && isnumeric(handles.(ListHandles{h})) && ishghandle(handles.(ListHandles{h}))
-        % set(handles.(ListHandles{h}),'FontName',FWFN)
-        set(handles.(ListHandles{h}),'FontName','default')
-    end
-end
-
-
-%% IMPORTANT : Set defauls values
-
-set(handles.uipanel_SaveMode,'SelectedObject',handles.radiobutton_SaveData)
-set(handles.uipanel_Environement,'SelectedObject',handles.radiobutton_MRI)
-set(handles.uipanel_OperationMode,'SelectedObject',handles.radiobutton_Acquisition)
-set(handles.edit_RunNumber,'String','1')
-set(handles.edit_SubjectID,'String','') % No preseted subject ID : error will be raised in Acquisition
-set(handles.uipanel_EyelinkMode,'SelectedObject',handles.radiobutton_EyelinkOn)
-
-% ParPort
-set( handles.checkbox_ParPort , 'Value' , 1 )
-handles = checkbox_ParPort_Callback( handles.checkbox_ParPort , eventdata , handles );
-
-% Windowed screen
-set(handles.checkbox_WindowedScreen,'Value',0)
-
-% Set invisible the unused objects
-set(handles.text_RunNumber,'Visible','off')
-set(handles.edit_RunNumber,'Visible','off')
-set(handles.pushbutton_RunNumber_m1,'Visible','off')
-set(handles.pushbutton_RunNumber_p1,'Visible','off')
-set(handles.pushbutton_NBI,'Visible','off')
-
-% Invisible objects @ opening
-set(handles.text_LastFileNameAnnouncer,'Visible','off')
-set(handles.text_LastFileName,'Visible','off')
-set(handles.text_RecordName,'Visible','off')
-set(handles.edit_RecordName,'Visible','off')
-
-%% Try to pick a random seed for the RNG
-
-% Try one time
-try
-    rng('shuffle')
-catch err
-end
-
-% Try a second time
-try
-    rng('default')
-    rng('shuffle')
-catch err
-end
-
-
-%% Update handles structure
-guidata(hObject, handles);
-
-% UIWAIT makes nbi_GUI wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
-
-
-% --- Outputs from this function are returned to the command line.
-function varargout = nbi_GUI_OutputFcn(hObject, eventdata, handles)
-% varargout  cell array for returning output args (see VARARGOUT);
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Get default command line output from handles structure
-varargout{1} = handles.output;
-
-
+%% GUI Functions
 
 % -------------------------------------------------------------------------
-%                            NBI_main_routine
-% -------------------------------------------------------------------------
-function NBI_main_routine(hObject, eventdata, handles)
-
-clc
-sca
-
-% Initialize the main structure
-DataStruct           = struct;
-DataStruct.TimeStamp = datestr(now, 'yyyy-mm-dd HH:MM');
-
-
-%% Task selection
-
-switch get(hObject,'Tag')
-    
-    case 'pushbutton_EyelinkCalibration'
-        Task = 'EyelinkCalibration';
-        
-    case 'pushbutton_NBI'
-        Task = 'NBI';
-        
-    case 'pushbutton_MTMST_Left'
-        Task = 'MTMST_Left';
-        
-    case 'pushbutton_MTMST_Right'
-        Task = 'MTMST_Right';
-        
-    case 'pushbutton_Retinotopy'
-        Task = 'Retinotopy';
-        
-    case 'pushbutton_Illusion'
-        Task                   = 'Illusion';
-        BlockNumber            = str2double( get(handles.edit_IlluBlock,'String') );
-        DataStruct.BlockNumber = BlockNumber;
-        
-    otherwise
-        error('NBI:TaskSelection','Error in Task selection')
-end
-
-DataStruct.Task = Task;
-
-
-%% Environement selection
-
-switch get(get(handles.uipanel_Environement,'SelectedObject'),'Tag')
-    case 'radiobutton_MRI'
-        Environement = 'MRI';
-    case 'radiobutton_Training'
-        Environement = 'Training';
-    otherwise
-        warning('NBI:ModeSelection','Error in Environement selection')
-end
-
-DataStruct.Environement = Environement;
-
-
-%% Save mode selection
-
-switch get(get(handles.uipanel_SaveMode,'SelectedObject'),'Tag')
-    case 'radiobutton_SaveData'
-        SaveMode = 'SaveData';
-    case 'radiobutton_NoSave'
-        SaveMode = 'NoSave';
-    otherwise
-        warning('NBI:SaveSelection','Error in SaveMode selection')
-end
-
-DataStruct.SaveMode = SaveMode;
-
-
-%% Mode selection
-
-switch get(get(handles.uipanel_OperationMode,'SelectedObject'),'Tag')
-    case 'radiobutton_Acquisition'
-        OperationMode = 'Acquisition';
-    case 'radiobutton_FastDebug'
-        OperationMode = 'FastDebug';
-    case 'radiobutton_RealisticDebug'
-        OperationMode = 'RealisticDebug';
-    otherwise
-        warning('NBI:ModeSelection','Error in Mode selection')
-end
-
-DataStruct.OperationMode = OperationMode;
-
-
-%% Record video ?
-
-switch get(get(handles.uipanel_RecordVideo,'SelectedObject'),'Tag')
-    case 'radiobutton_RecordOn'
-        RecordVideo          = 'On';
-        VideoName            = [ get(handles.edit_RecordName,'String') '.mov'];
-        DataStruct.VideoName = VideoName;
-    case 'radiobutton_RecordOff'
-        RecordVideo          = 'Off';
-    otherwise
-        warning('NBI:RecordVideo','Error in Record Video')
-end
-
-DataStruct.RecordVideo = RecordVideo;
-
-
-%% Subject ID & Run number
-
-SubjectID = get(handles.edit_SubjectID,'String');
-
-if length(SubjectID) ~= 4
-    error('NBI:SubjectIDLength','\n SubjectID must be 4 char \n')
-end
-if ~strcmp(SubjectID,upper(SubjectID))
-    warning('NBI:SubjectIDupper','SuubjectID should be upper case ?')
-end
-
-% Prepare path
-DataPath = [fileparts(pwd) filesep 'data' filesep SubjectID filesep];
-switch Task
-    case 'Illusion'
-        DataPathNoRun = sprintf('%s_%s_B%d_%s_', SubjectID, Task, BlockNumber, Environement);
-    otherwise
-        DataPathNoRun = sprintf('%s_%s_%s_', SubjectID, Task, Environement);
-end
-
-% Fetch content of the directory
-dirContent = dir(DataPath);
-
-% Is there file of the previous run ?
-previousRun = nan(length(dirContent),1);
-for f = 1 : length(dirContent)
-    split = regexp(dirContent(f).name,DataPathNoRun,'split');
-    if length(split) == 2 && str2double(split{2}(1)) % yes there is a file
-        previousRun(f) = str2double(split{2}(1)); % save the previous run numbers
-    else % no file found
-        previousRun(f) = 0; % affect zero
-    end
-end
-
-LastRunNumber = max(previousRun);
-% If no previous run, LastRunNumber is 0
-if isempty(LastRunNumber)
-    LastRunNumber = 0;
-end
-
-RunNumber = num2str(LastRunNumber + 1);
-
-
-switch Task
-    case 'Illusion'
-        DataFile = sprintf('%s%s_%s_B%d_%s_%s', DataPath, SubjectID, Task, BlockNumber, Environement, RunNumber );
-    otherwise
-        DataFile = sprintf('%s%s_%s_%s_%s', DataPath, SubjectID, Task, Environement, RunNumber );
-end
-
-DataStruct.SubjectID = SubjectID;
-DataStruct.RunNumber = RunNumber;
-DataStruct.DataPath  = DataPath;
-DataStruct.DataFile  = DataFile;
-
-
-%% Controls for SubjectID depending on the Mode selected
-
-switch OperationMode
-    
-    case 'Acquisition'
-        
-        % Empty subject ID
-        if isempty(SubjectID)
-            error('NBI:MissingSubjectID','\n For acquisition, SubjectID is required \n')
-        end
-        
-        % Acquisition => save data
-        if ~get(handles.radiobutton_SaveData,'Value')
-            warning('NBI:DataShouldBeSaved','\n\n\n In acquisition mode, data should be saved \n\n\n')
-        end
-        
-end
-
-
-%% Parallel port ?
-
-switch get( handles.checkbox_ParPort , 'Value' )
-    
-    case 1
-        ParPort = 'On';
-        
-    case 0
-        ParPort = 'Off';
-end
-
-handles.ParPort    = ParPort;
-DataStruct.ParPort = ParPort;
-
-
-%% Check if Eyelink toolbox is available
-
-switch get(get(handles.uipanel_EyelinkMode,'SelectedObject'),'Tag')
-    
-    case 'radiobutton_EyelinkOff'
-        
-        EyelinkMode = 'Off';
-        
-    case 'radiobutton_EyelinkOn'
-        
-        EyelinkMode = 'On';
-        
-        % 'Eyelink.m' exists ?
-        status = which('Eyelink.m');
-        if isempty(status)
-            error('NBI:EyelinkToolbox','no ''Eyelink.m'' detected in the path')
-        end
-        
-        % Save mode ?
-        if strcmp(DataStruct.SaveMode,'NoSave')
-            error('NBI:SaveModeForEyelink',' \n ---> Save mode should be turned on when using Eyelink <--- \n ')
-        end
-        
-        % Eyelink connected ?
-        Eyelink.IsConnected
-        
-        % File name for the eyelink : 8 char maximum
-        switch Task
-            case 'NBI'
-                task = 'NB';
-            case 'EyelinkCalibration'
-                task = 'EC';
-            case 'MTMST_Left'
-                task = 'ML';
-            case 'MTMST_Right'
-                task = 'MR';
-            case 'Retinotopy'
-                task = 'RT';
-            case 'Illusion'
-                task = ['I' get(handles.edit_IlluBlock,'String')];
-            otherwise
-                error('NBI:Task','Task ?')
-        end
-        EyelinkFile = [ SubjectID task sprintf('%.2d',str2double(RunNumber)) ];
-        
-        DataStruct.EyelinkFile = EyelinkFile;
-        
-    otherwise
-        
-        warning('NBI:EyelinkMode','Error in Eyelink mode')
-        
-end
-
-DataStruct.EyelinkMode = EyelinkMode;
-
-
-%% Security : NEVER overwrite a file
-% If erasing a file is needed, we need to do it manually
-
-if strcmp(SaveMode,'SaveData') && strcmp(OperationMode,'Acquisition')
-    
-    if exist([DataFile '.mat'], 'file')
-        error('MATLAB:FileAlreadyExists',' \n ---> \n The file %s.mat already exists .  <--- \n \n',DataFile);
-    end
-    
-end
-
-
-%% Get stimulation parameters
-
-DataStruct.Parameters = GetParameters( DataStruct );
-
-% Screen mode selection
-AvalableDisplays = get(handles.listbox_Screens,'String');
-SelectedDisplay = get(handles.listbox_Screens,'Value');
-DataStruct.Parameters.Video.ScreenMode = str2double( AvalableDisplays(SelectedDisplay) );
-
-
-%% Windowed screen ?
-
-switch get(handles.checkbox_WindowedScreen,'Value')
-    
-    case 1
-        WindowedMode = 'On';
-    case 0
-        WindowedMode = 'Off';
-    otherwise
-        warning('STIMPNEE:WindowedScreen','Error in WindowedScreen')
-        
-end
-
-DataStruct.WindowedMode = WindowedMode;
-
-
-%% Open PTB window
-
-DataStruct.PTB = StartPTB( DataStruct );
-
-
-%% Task run
-
-switch Task
-    
-    case 'NBI'
-        TaskData = NBI.NBI( DataStruct );
-        
-    case 'EyelinkCalibration'
-        TaskData = Eyelink.Calibration( DataStruct );
-        
-    case 'MTMST_Left'
-        TaskData = MTMST.MTMST( DataStruct );
-        
-    case 'MTMST_Right'
-        TaskData = MTMST.MTMST( DataStruct );
-        
-    case 'Retinotopy'
-        TaskData = Retinotopy.Retinotopy( DataStruct );
-        
-    case 'Illusion'
-        TaskData = Illusion.Illusion( DataStruct );
-        
-    otherwise
-        error('NBI:Task','Task ?')
-end
-
-DataStruct.TaskData = TaskData;
-
-
-%% Save files on the fly : just a security in case of crash of the end the script
-
-save([fileparts(pwd) filesep 'data' filesep 'LastDataStruct'],'DataStruct');
-
-
-%% Close PTB
-
-% Just to be sure that if there is a problem with PTB, we do not loose all
-% the data drue to a crash.
-try
-    
-    Screen('CloseAll'); % Close PTB window
-    
-    Priority( DataStruct.PTB.oldLevel );
-    
-catch err
-    
-end
-
-
-%% SPM data organization
-
-[ names , onsets , durations ] = SPMnod( DataStruct ); %#ok<*NASGU,*ASGLU>
-
-
-%% Saving data strucure
-
-if strcmp(SaveMode,'SaveData') && strcmp(OperationMode,'Acquisition')
-    
-    if ~exist(DataPath, 'dir')
-        mkdir(DataPath);
-    end
-    
-    save(DataFile, 'DataStruct', 'names', 'onsets', 'durations');
-    save([DataFile '_SPM'], 'names', 'onsets', 'durations');
-    
-    % BrainVoyager data organization
-    spm2bv( names , onsets , durations , DataStruct.DataFile )
-    
-end
-
-
-%% Send DataStruct and SPM nod to workspace
-
-assignin('base', 'DataStruct', DataStruct);
-assignin('base', 'names', names);
-assignin('base', 'onsets', onsets);
-assignin('base', 'durations', durations);
-
-
-%% End recording of Eyelink
-
-Eyelink.StopRecording( DataStruct )
-
-
-%% Ready for another run
-
-set(handles.text_LastFileNameAnnouncer,'Visible','on')
-set(handles.text_LastFileName,'Visible','on')
-set(handles.text_LastFileName,'String',DataFile(length(DataPath)+1:end))
-
-WaitSecs(0.100);
-fprintf('\n')
-fprintf('--------------------- \n')
-fprintf('Ready for another run \n')
-fprintf('--------------------- \n')
-
-
-% -------------------------------------------------------------------------
-%                                   END
-% -------------------------------------------------------------------------
-
-
-% --- Executes on button press in pushbutton_EyelinkCalibration.
-function pushbutton_EyelinkCalibration_Callback(hObject, eventdata, handles) %#ok<*DEFNU>
-% hObject    handle to pushbutton_EyelinkCalibration (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-NBI_main_routine(hObject, eventdata, handles)
-
-
-% --- Executes on button press in pushbutton_NBI.
-function pushbutton_NBI_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_NBI (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-NBI_main_routine(hObject, eventdata, handles)
-
-
-% --- Executes on button press in pushbutton_MTMST_Left.
-function pushbutton_MTMST_Left_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_MTMST_Left (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-NBI_main_routine(hObject, eventdata, handles)
-
-
-% --- Executes on button press in pushbutton_MTMST_Right.
-function pushbutton_MTMST_Right_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_MTMST_Right (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-NBI_main_routine(hObject, eventdata, handles)
-
-
-% --- Executes on button press in pushbutton_Retinotopy.
-function pushbutton_Retinotopy_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_Retinotopy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-NBI_main_routine(hObject, eventdata, handles)
-
-
-% --- Executes on button press in pushbutton_Illusion.
-function pushbutton_Illusion_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_Illusion (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-NBI_main_routine(hObject, eventdata, handles)
-
-
-% --- Executes on button press in pushbutton_GenerateNoise.
-function pushbutton_GenerateNoise_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_GenerateNoise (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-clc
-sca
-
-% Initialize the main structure
-DataStruct           = struct;
-DataStruct.TimeStamp = datestr(now, 'yyyy-mm-dd HH:MM');
-
-% Set task name for general coherence
-DataStruct.Task = 'GenerateNoise';
-
-% Get stimulation parameters
-DataStruct.Parameters = GetParameters( DataStruct );
-
-% Screen mode selection
-AvalableDisplays = get(handles.listbox_Screens,'String');
-SelectedDisplay = get(handles.listbox_Screens,'Value');
-DataStruct.Parameters.Video.ScreenMode = str2double( AvalableDisplays(SelectedDisplay) );
-
-% Windowed screen ?
-switch get(handles.checkbox_WindowedScreen,'Value')
-    case 1
-        WindowedMode = 'On';
-    case 0
-        WindowedMode = 'Off';
-    otherwise
-        warning('STIMPNEE:WindowedScreen','Error in WindowedScreen')
-end
-DataStruct.WindowedMode = WindowedMode;
-
-% Open PTB window
-DataStruct.PTB = StartPTB( DataStruct );
-
-% Parameters, references, convertions
-Illusion.preProcess;
-
-% Close PTB
-% Just to be sure that if there is a problem with PTB, we do not loose all
-% the data drue to a crash.
-try
-    Screen('CloseAll'); % Close PTB window
-    Priority( DataStruct.PTB.oldLevel );
-catch err
-end
-
-pause(0.2); % cooldown the system
-
-% Main process
-Illusion.GenerateNoise
-
-load('m_2D')
-load('m_3D')
-
-fprintf('\n GenerateNoise DONE \n')
-
-
-% --- Executes when selected object is changed in uipanel_OperationMode.
-function uipanel_OperationMode_SelectionChangeFcn(hObject, eventdata, handles)
-% hObject    handle to the selected object in uipanel_OperationMode
-% eventdata  structure with the following fields (see UIBUTTONGROUP)
-%	EventName: string 'SelectionChanged' (read only)
-%	OldValue: handle of the previously selected object or empty if none was selected
-%	NewValue: handle of the currently selected object
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes during object creation, after setting all properties.
-function edit_SubjectID_CreateFcn(hObject, eventdata, handles) %#ok<*INUSD>
-% hObject    handle to edit_SubjectID (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes during object creation, after setting all properties.
-function edit_RunNumber_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_RunNumber (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-function edit_SubjectID_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_SubjectID (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit_SubjectID as text
-%        str2double(get(hObject,'String')) returns contents of edit_SubjectID as a double
-
-
-function edit_RunNumber_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_RunNumber (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit_RunNumber as text
-%        str2double(get(hObject,'String')) returns contents of edit_RunNumber as a double
-
-
-% --- Executes on button press in radiobutton_EyelinkOn.
-function radiobutton_EyelinkOn_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton_EyelinkOn (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of radiobutton_EyelinkOn
-
-
-% --- Executes on button press in radiobutton_EyelinkOff.
-function radiobutton_EyelinkOff_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton_EyelinkOff (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of radiobutton_EyelinkOff
-
-
-% --- Executes when selected object is changed in uipanel_EyelinkMode.
-function uipanel_EyelinkMode_SelectionChangeFcn(hObject, eventdata, handles)
-% hObject    handle to the selected object in uipanel_EyelinkMode
-% eventdata  structure with the following fields (see UIBUTTONGROUP)
-%	EventName: string 'SelectionChanged' (read only)
-%	OldValue: handle of the previously selected object or empty if none was selected
-%	NewValue: handle of the currently selected object
-% handles    structure with handles and user data (see GUIDATA)
-
-switch get(eventdata.NewValue,'Tag') % Get Tag of selected object.
-    case 'radiobutton_EyelinkOff'
-        set(handles.pushbutton_EyelinkCalibration,'Visible','off')
-        set(handles.pushbutton_IsConnected,'Visible','off')
-        set(handles.pushbutton_ForceShutDown,'Visible','off')
-        set(handles.pushbutton_Initialize,'Visible','off')
-    case 'radiobutton_EyelinkOn'
-        set(handles.pushbutton_EyelinkCalibration,'Visible','on')
-        set(handles.pushbutton_IsConnected,'Visible','on')
-        set(handles.pushbutton_ForceShutDown,'Visible','on')
-        set(handles.pushbutton_Initialize,'Visible','on')
-end
-
-
-% --- Executes on selection change in listbox_Screens.
-function listbox_Screens_Callback(hObject, eventdata, handles)
-% hObject    handle to listbox_Screens (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns listbox_Screens contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from listbox_Screens
-
-
-
-% --- Executes during object creation, after setting all properties.
-function listbox_Screens_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to listbox_Screens (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-GUI.Listbox_Screens_CreateFcn( hObject );
-
-
-
-% --- Executes during object creation, after setting all properties.
-function text_ScreenMode_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to text_ScreenMode (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-set(hObject,'TooltipString',sprintf('Output of Screen(''Screens'') \n Use ''Screen Screens?'' in Command window for help'))
-
-
-
-% --- Executes on button press in pushbutton_RunNumber_p1.
-function pushbutton_RunNumber_p1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_RunNumber_p1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-GUI.Pushbutton_RunNumber_p1_Callback;
-
-
-
-% --- Executes on button press in pushbutton_RunNumber_m1.
-function pushbutton_RunNumber_m1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_RunNumber_m1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-GUI.Pushbutton_RunNumber_m1_Callback;
-
-
-% --- Executes on button press in pushbutton_Check_SubjectID_data.
-function pushbutton_Check_SubjectID_data_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_Check_SubjectID_data (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-GUI.Pushbutton_Check_SubjectID_data_Callback( handles.edit_SubjectID );
-
-
-% --- Executes on button press in checkbox_ParPort.
-function handles = checkbox_ParPort_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_ParPort (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_ParPort
-
-GUI.Checkbox_ParPort_Callback(hObject);
-
-
-% --- Executes on button press in checkbox_WindowedScreen.
-function checkbox_WindowedScreen_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_WindowedScreen (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_WindowedScreen
-
-
-function edit_IlluBlock_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_IlluBlock (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit_IlluBlock as text
-%        str2double(get(hObject,'String')) returns contents of edit_IlluBlock as a double
-
-block = str2double(get(hObject,'String'));
-
-if block ~= round(block) || block < 0 || block > 8
-    set(hObject,'String','1');
-    error('block number must be from 0 to 8')
-end
-
-
-% --- Executes during object creation, after setting all properties.
-function edit_IlluBlock_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_IlluBlock (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-set(hObject,'TooltipString','Block number of Illusion : from 0 to 8')
-
-
-
-% --- Executes on button press in pushbutton_IsConnected.
-function pushbutton_IsConnected_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_IsConnected (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-Eyelink.IsConnected;
-
-
-
-% --- Executes on button press in pushbutton_Initialize.
-function pushbutton_Initialize_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_Initialize (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-Eyelink.Initialize;
-
-
-% --- Executes on button press in pushbutton_ForceShutDown.
-function pushbutton_ForceShutDown_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_ForceShutDown (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-Eyelink.ForceShutDown;
-
-
-
-
-function edit_RecordName_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_RecordName (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit_RecordName as text
-%        str2double(get(hObject,'String')) returns contents of edit_RecordName as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit_RecordName_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_RecordName (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes when selected object is changed in uipanel_RecordVideo.
-function uipanel_RecordVideo_SelectionChangeFcn(hObject, eventdata, handles)
-% hObject    handle to the selected object in uipanel_RecordVideo 
-% eventdata  structure with the following fields (see UIBUTTONGROUP)
-%	EventName: string 'SelectionChanged' (read only)
-%	OldValue: handle of the previously selected object or empty if none was selected
-%	NewValue: handle of the currently selected object
-% handles    structure with handles and user data (see GUIDATA)
+function uipanel_RecordVideo_SelectionChangeFcn(hObject, eventdata)
+handles = guidata(hObject);
 
 switch get(eventdata.NewValue,'Tag') % Get Tag of selected object.
     case 'radiobutton_RecordOn'
@@ -921,3 +850,37 @@ switch get(eventdata.NewValue,'Tag') % Get Tag of selected object.
         set(handles.edit_RecordName,'Visible','off')
 end
 
+end % function
+
+
+% -------------------------------------------------------------------------
+function edit_IlluBlock_Callback(hObject, ~)
+
+block = str2double(get(hObject,'String'));
+
+if block ~= round(block) || block < 0 || block > 8
+    set(hObject,'String','1');
+    error('block number must be from 0 to 8')
+end
+
+end % function
+
+
+% -------------------------------------------------------------------------
+function uipanel_EyelinkMode_SelectionChangeFcn(hObject, eventdata)
+handles = guidata(hObject);
+
+switch get(eventdata.NewValue,'Tag') % Get Tag of selected object.
+    case 'radiobutton_EyelinkOff'
+        set(handles.pushbutton_EyelinkCalibration,'Visible','off')
+        set(handles.pushbutton_IsConnected       ,'Visible','off')
+        set(handles.pushbutton_ForceShutDown     ,'Visible','off')
+        set(handles.pushbutton_Initialize        ,'Visible','off')
+    case 'radiobutton_EyelinkOn'
+        set(handles.pushbutton_EyelinkCalibration,'Visible','on')
+        set(handles.pushbutton_IsConnected       ,'Visible','on')
+        set(handles.pushbutton_ForceShutDown     ,'Visible','on')
+        set(handles.pushbutton_Initialize        ,'Visible','on')
+end
+
+end % function
