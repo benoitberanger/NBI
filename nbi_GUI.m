@@ -758,7 +758,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-GUI.Listbox_Screens_CreateFcn;
+GUI.Listbox_Screens_CreateFcn( hObject );
 
 
 
@@ -797,7 +797,7 @@ function pushbutton_Check_SubjectID_data_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-GUI.Pushbutton_Check_SubjectID_data_Callback;
+GUI.Pushbutton_Check_SubjectID_data_Callback( handles.edit_SubjectID );
 
 
 % --- Executes on button press in checkbox_ParPort.
@@ -808,7 +808,7 @@ function handles = checkbox_ParPort_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox_ParPort
 
-GUI.Checkbox_ParPort_Callback;
+GUI.Checkbox_ParPort_Callback(hObject);
 
 
 % --- Executes on button press in checkbox_WindowedScreen.
