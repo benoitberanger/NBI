@@ -134,7 +134,7 @@ try
     
     %% Start recording eye motions
     
-    Eyelink.StartRecording( DataStruct );
+    Common.StartRecordingEyelink;
     
     
     %% Go

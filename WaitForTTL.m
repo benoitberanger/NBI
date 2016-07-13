@@ -37,8 +37,10 @@ if strcmp(DataStruct.OperationMode,'Acquisition')
                         
                     elseif keyCode(DataStruct.Parameters.Keybinds.Stop_Escape_ASCII)
                         
-                        % Stop routine for Escape key
-                        Eyelink.STOP(DataStruct)
+                        % Eyelink mode 'On' ?
+                        if strcmp(DataStruct.EyelinkMode,'On')
+                            Eyelink.STOP % Stop wrapper
+                        end
                         
                         sca
                         stack = dbstack;

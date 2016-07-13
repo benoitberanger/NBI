@@ -147,7 +147,6 @@ end
 
 RunNumber = num2str(LastRunNumber + 1);
 
-
 switch Task
     case 'Illusion'
         DataFile = sprintf('%s%s_%s_B%d_%s_%s', DataPath, SubjectID, Task, BlockNumber, Environement, RunNumber );
@@ -302,8 +301,10 @@ switch Task
         TaskData = NBI.NBI( DataStruct );
         
     case 'EyelinkCalibration'
-        TaskData = Eyelink.Calibration( DataStruct );
-        
+        Eyelink.Calibration( DataStruct.PTB.Window );
+        TaskData.ER.Data = {};
+        TaskData.IsEyelinkRreadyToRecord = 1;
+
     case 'MTMST_Left'
         TaskData = MTMST.MTMST( DataStruct );
         
@@ -375,7 +376,16 @@ assignin('base', 'durations', durations);
 
 %% End recording of Eyelink
 
-Eyelink.StopRecording( DataStruct )
+% Eyelink mode 'On' ?
+if strcmp(DataStruct.EyelinkMode,'On')
+    
+    % Stop recording and retrieve the file
+    Eyelink.StopRecording( DataStruct.EyelinkFile , DataStruct.DataPath )
+    
+    % Rename the file
+    movefile([DataStruct.DataPath filesep EyelinkFile '.edf'], [DataStruct.DataFile '.edf'])
+    
+end
 
 
 %% Ready for another run
