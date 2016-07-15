@@ -382,8 +382,12 @@ if strcmp(DataStruct.EyelinkMode,'On')
     % Stop recording and retrieve the file
     Eyelink.StopRecording( DataStruct.EyelinkFile , DataStruct.DataPath )
     
-    % Rename the file
-    movefile([DataStruct.DataPath filesep EyelinkFile '.edf'], [DataStruct.DataFile '.edf'])
+    if ~strcmp(DataStruct.Task,'EyelinkCalibration')
+        
+        % Rename the file
+        movefile([DataStruct.DataPath filesep EyelinkFile '.edf'], [DataStruct.DataFile '.edf'])
+        
+    end
     
 end
 
