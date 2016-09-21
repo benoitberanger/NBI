@@ -38,6 +38,7 @@ try
             names = {
                 'cw'  ;
                 'ccw' ;
+                'rest'
                 };
             
         case 'Illusion'
@@ -163,6 +164,8 @@ try
                 onsets{1} = [onsets{1} ; EventData{event,2}];
             case 'ccw'
                 onsets{2} = [onsets{2} ; EventData{event,2}];
+            case 'rest'
+                onsets{3} = [onsets{3} ; EventData{event,2}];
                 
                 % Illusion
             case 'Illusion_InOut'
@@ -228,6 +231,8 @@ try
                 durations{1} = [ durations{1} ; EventData{event+1,2}-EventData{event,2}] ;
             case 'ccw'
                 durations{2} = [ durations{2} ; EventData{event+1,2}-EventData{event,2}] ;
+            case 'rest'
+                durations{3} = [ durations{3} ; EventData{event+1,2}-EventData{event,2}] ;
                 
                 % Illusion
             case 'Illusion_InOut'

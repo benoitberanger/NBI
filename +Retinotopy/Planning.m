@@ -1,6 +1,7 @@
 %% Tuning
 
 CompleteTurnDuration = 48;
+TR = 1.0; % s
 
 %% Prepare event
 
@@ -26,6 +27,7 @@ end
 for i = 1 : 4
     EP.AddPlanning({ 'ccw' NextOnset(EP) CompleteTurnDuration 'ccw' 360/CompleteTurnDuration });
 end
+EP.AddPlanning({ 'rest' NextOnset(EP) 9*TR [] [] });
 
 % --- Stop ----------------------------------------------------------------
 
@@ -35,32 +37,32 @@ EP.AddPlanning({ 'StopTime' NextOnset(EP) 0 [] [] });
 %% Acceleration
 
 if nargout > 0
-
-switch DataStruct.OperationMode
     
-    case 'Acquisition'
+    switch DataStruct.OperationMode
         
-        Speed = 1;
-        
-    case 'FastDebug'
-        
-        Speed = 20;
-        
-        new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) );
-        EP.Data(:,2) = new_onsets;
-        
-        new_durations = cellfun( @(x) {x/Speed} , EP.Data(:,3) );
-        EP.Data(:,3) = new_durations;
-        
-    case 'RealisticDebug'
-        
-        Speed = 1;
-        
-    otherwise
-        error( 'DataStruct.OperationMode = %s' , DataStruct.OperationMode )
-        
-end
-
+        case 'Acquisition'
+            
+            Speed = 1;
+            
+        case 'FastDebug'
+            
+            Speed = 20;
+            
+            new_onsets = cellfun( @(x) {x/Speed} , EP.Data(:,2) );
+            EP.Data(:,2) = new_onsets;
+            
+            new_durations = cellfun( @(x) {x/Speed} , EP.Data(:,3) );
+            EP.Data(:,3) = new_durations;
+            
+        case 'RealisticDebug'
+            
+            Speed = 1;
+            
+        otherwise
+            error( 'DataStruct.OperationMode = %s' , DataStruct.OperationMode )
+            
+    end
+    
 end
 
 
@@ -76,6 +78,6 @@ if nargout < 1
     fprintf( '\n' )
     
     EP.Plot
-   
+    
 end
 

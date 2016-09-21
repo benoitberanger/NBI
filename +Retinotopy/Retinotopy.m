@@ -128,7 +128,7 @@ try
     %% Start recording eye motions
     
     Common.StartRecordingEyelink;
-                    
+    
     
     %% Go
     
@@ -156,6 +156,18 @@ try
                 
                 Common.StopTimeEvent;
                 
+            case 'rest'
+                
+                MTMST.DrawFixation;
+                
+                % Tell PTB that no further drawing commands will follow before Screen('Flip')
+                Screen('DrawingFinished', DataStruct.PTB.Window);
+                
+                % Flip
+                flip_onset = Screen('Flip',DataStruct.PTB.Window);
+                
+                % Save onset
+                ER.AddEvent({ EP.Data{evt,1} flip_onset-StartTime })
                 
             otherwise
                 
