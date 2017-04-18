@@ -275,7 +275,11 @@ try
         
         % CLICK
         
-        clic_spot = regexp(DataStruct.TaskData.KL.KbEvents(:,1),KbName(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII));
+        KbName('UnifyKeyNames'); % Don't know if its usefull
+        ListKeysWindows = KbName('KeyNamesWindows');
+        ClickKeyName = ListKeysWindows( DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII );
+        % clic_spot = regexp(DataStruct.TaskData.KL.KbEvents(:,1),KbName(DataStruct.Parameters.Keybinds.Right_Blue_1_ASCII));
+        clic_spot = regexp(DataStruct.TaskData.KL.KbEvents(:,1),ClickKeyName);
         clic_spot = ~cellfun(@isempty,clic_spot);
         clic_spot = find(clic_spot);
         
